@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <cc.listviewdemo.view.TotalScrollView
+        android:id="@+id/main"
+        android:layout_width="match_parent"
+        android:layout_height="800dp"
+        android:background="#efefef">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="800dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <com.bigkoo.convenientbanner.ConvenientBanner
+                    android:id="@+id/guanggao_cb"
+                    android:layout_width="match_parent"
+                    android:layout_height="180dp"
+                    app:canLoop="true" />
+                <GridView
+                    android:id="@+id/shoptype_gv"
+                    android:layout_width="match_parent"
+                    android:layout_height="140dp"
+                    android:numColumns="4"
+                    android:background="@android:color/white"></GridView>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="25dp"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="5dp"
+                        android:text="附近商家"
+                        android:textSize="12sp" />
+                </LinearLayout>
+                <cc.listviewdemo.view.MeasureListView
+                    android:id="@+id/main_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:listSelector="@android:color/transparent"
+                    android:background="@android:color/white"
+                     >
+
+                </cc.listviewdemo.view.MeasureListView>
+            </LinearLayout>
+
+        </RelativeLayout>
+
+    </cc.listviewdemo.view.TotalScrollView>
+
+    <RelativeLayout
+        android:id="@+id/iv"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="#01D8E1">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center">
+
+            <LinearLayout
+                android:id="@+id/xuanze_zuobiao_ll"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp">
+                <ImageView
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:src="@mipmap/icon_dingwei"/>
+                <TextView
+                    android:id="@+id/dizhi_tv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="未知地区>"
+                    android:layout_marginLeft="5dp"
+                    android:textSize="16sp"
+                    android:textColor="@android:color/white"/>
+            </LinearLayout>
+        </LinearLayout>
+        <ImageView
+            android:id="@+id/search_iv"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:src="@mipmap/chaxun"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:paddingLeft="20dp"
+            android:paddingRight="10dp"/>
+
+    </RelativeLayout>
+</RelativeLayout>
