@@ -3,6 +3,7 @@ package cc.listviewdemo.control.a;
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Message;
+import android.util.Log;
 import android.util.Xml;
 import android.view.View;
 import android.widget.Button;
@@ -18,6 +19,7 @@ import com.tencent.mm.sdk.modelbase.BaseResp;
 import com.tencent.mm.sdk.modelpay.PayReq;
 import com.tencent.mm.sdk.openapi.IWXAPI;
 import com.tencent.mm.sdk.openapi.WXAPIFactory;
+//import com.tsy.pay.weixin.WXPay;
 
 import net.tsz.afinal.annotation.view.CodeNote;
 
@@ -30,13 +32,22 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.xmlpull.v1.XmlPullParser;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import cc.listviewdemo.R;
 import cc.listviewdemo.base.BaseActivity;
@@ -44,6 +55,7 @@ import cc.listviewdemo.base.BaseApplication;
 import cc.listviewdemo.config.Config;
 import cc.listviewdemo.money.Util;
 import cc.listviewdemo.wxapi.MD5;
+import cc.listviewdemo.wxapi.WX;
 
 /**
  * Created by Administrator on 2016/7/5.
@@ -52,6 +64,7 @@ public class TestActivity extends BaseActivity {
     @CodeNote(id = R.id.btn, click = "onClick")
     Button btn;
     private IWXAPI api;
+
     @Override
     public void initViews() {
         setContentView(R.layout.activity_test);
@@ -60,19 +73,94 @@ public class TestActivity extends BaseActivity {
 
     @Override
     public void initEvents() {
+
     }
+
+    SortedMap<Object,Object> map = new TreeMap<Object,Object>();
 
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn:
-                new GetAccessTokenTask().execute();
+                new MyThread().start();
                 break;
         }
+    }
+    class MyThread extends Thread{
+        public void run(){
+            map.put("appid", "wxb25da091f7dc485c");//应用ID
+            map.put("mch_id", "1359957202");//商户号
+            map.put("nonce_str", "5K8264ILTKCH16CQ2502SI8ZNMTM67VS");//随机数
+            map.put("body", "asd");//商品描述
+            map.put("detail", "asdasd");//商品详细信息
+            map.put("out_trade_no", "A012123123123");//商户订单号
+            map.put("total_fee", "25");//总金额
+            map.put("spbill_create_ip", "127.0.0.1");//终端ip
+            map.put("notify_url", "http://s-264268.gotocdn.com/weixinpay/payNotifyUrl.aspx");//通知地址
+            map.put("trade_type", "APP");
+            map.put("sign",WX.createSign("UTF-8",map));//创建微信签名
+            String result=sendPost("https://api.mch.weixin.qq.com/pay/unifiedorder",WX.loadXml(map));//创建预订单
+        }
+    }
+    /**
+     * 向指定 URL 发送POST方法的请求
+     *
+     * @param url   发送请求的 URL
+     * @param param 请求参数，请求参数应该是 name1=value1&name2=value2 的形式。
+     * @return 所代表远程资源的响应结果
+     */
+    public static String sendPost(String url, String param) {
+        PrintWriter out = null;
+        BufferedReader in = null;
+        String result = "";
+        try {
+            URL realUrl = new URL(url);
+            // 打开和URL之间的连接
+            URLConnection conn = realUrl.openConnection();
+            // 设置通用的请求属性
+            conn.setRequestProperty("accept", "*/*");
+            conn.setRequestProperty("connection", "Keep-Alive");
+            conn.setRequestProperty("user-agent",
+                    "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1;SV1)");
+            // 发送POST请求必须设置如下两行
+            conn.setDoOutput(true);
+            conn.setDoInput(true);
+            // 获取URLConnection对象对应的输出流
+            out = new PrintWriter(conn.getOutputStream());
+            // 发送请求参数
+            out.print(param);
+            // flush输出流的缓冲
+            out.flush();
+            // 定义BufferedReader输入流来读取URL的响应
+            in = new BufferedReader(
+                    new InputStreamReader(conn.getInputStream()));
+            String line;
+            while ((line = in.readLine()) != null) {
+                result += line;
+            }
+            Log.i("TAG",result);
+        } catch (Exception e) {
+            System.out.println("发送 POST 请求出现异常！" + e);
+            e.printStackTrace();
+        }
+        //使用finally块来关闭输出流、输入流
+        finally {
+            try {
+                if (out != null) {
+                    out.close();
+                }
+                if (in != null) {
+                    in.close();
+                }
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+        return result;
     }
 
     /**
      * 微信公众平台商户模块和商户约定的密钥
-     *
+     * <p/>
      * 注意：不能hardcode在客户端，建议genPackage这个过程由服务器端完成
      */
     private static final String PARTNER_KEY = "uFG7BlYM9EzNhfbaW8x2eQbL1hHF4aNe";
@@ -97,60 +185,10 @@ public class TestActivity extends BaseActivity {
 
     /**
      * 微信开放平台和商户约定的密钥
-     *
+     * <p/>
      * 注意：不能hardcode在客户端，建议genSign这个过程由服务器端完成
      */
     private static final String APP_SECRET = "703c7ff19fdbac5c5127a93de7a0b37a"; // wxd930ea5d5a258f4f 对应的密钥
-
-    /**
-     * 微信开放平台和商户约定的支付密钥
-     *
-     * 注意：不能hardcode在客户端，建议genSign这个过程由服务器端完成
-     */
-//    private static final String  APP_KEY= "L8LrMqqeGRxST5reouB0K66CaYAWpqhAVsq7ggKkxHCOastWksvuX1uvmvQclxaHoYd3ElNBrNO2DHnnzgfVG9Qs473M3DTOZug5er46FhuGofumV8H2FVR9qkjSlC5K"; // wxd930ea5d5a258f4f 对应的支付密钥
-
-    private class GetAccessTokenTask extends AsyncTask<Void, Void, GetAccessTokenResult> {
-
-        private ProgressDialog dialog;
-
-        @Override
-        protected void onPreExecute() {
-            dialog = ProgressDialog.show(TestActivity.this, "app_tip", "getting_access_token");
-        }
-
-        @Override
-        protected void onPostExecute(GetAccessTokenResult result) {
-            if (dialog != null) {
-                dialog.dismiss();
-            }
-
-            if (result.localRetCode == LocalRetCode.ERR_OK) {
-                Toast.makeText(TestActivity.this, "get_access_token_succ", Toast.LENGTH_LONG).show();
-                GetPrepayIdTask getPrepayId = new GetPrepayIdTask(result.accessToken);
-                getPrepayId.execute();
-            } else {
-                Toast.makeText(TestActivity.this, "shibai", Toast.LENGTH_LONG).show();
-            }
-        }
-
-        @Override
-        protected GetAccessTokenResult doInBackground(Void... params) {
-            GetAccessTokenResult result = new GetAccessTokenResult();
-
-            String url = String.format("https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=%s&secret=%s",
-                    Config.APP_ID, APP_SECRET);
-
-            byte[] buf = Util.httpGet(url);
-            if (buf == null || buf.length == 0) {
-                result.localRetCode = LocalRetCode.ERR_HTTP;
-                return result;
-            }
-
-            String content = new String(buf);
-            result.parseFrom(content);
-            return result;
-        }
-    }
 
     private class GetPrepayIdTask extends AsyncTask<Void, Void, GetPrepayIdResult> {
 
@@ -163,7 +201,7 @@ public class TestActivity extends BaseActivity {
 
         @Override
         protected void onPreExecute() {
-            dialog = ProgressDialog.show(TestActivity.this, "app_tip","getting_prepayid");
+            dialog = ProgressDialog.show(TestActivity.this, "app_tip", "getting_prepayid");
         }
 
         @Override
@@ -173,10 +211,10 @@ public class TestActivity extends BaseActivity {
             }
 
             if (result.localRetCode == LocalRetCode.ERR_OK) {
-                Toast.makeText(TestActivity.this,"成功", Toast.LENGTH_LONG).show();
+                Toast.makeText(TestActivity.this, "成功", Toast.LENGTH_LONG).show();
                 sendPayReq(result);
             } else {
-                Toast.makeText(TestActivity.this, "失败"+result.errMsg, Toast.LENGTH_LONG).show();
+                Toast.makeText(TestActivity.this, "失败" + result.errMsg, Toast.LENGTH_LONG).show();
             }
         }
 
@@ -362,9 +400,9 @@ public class TestActivity extends BaseActivity {
         } catch (Exception e) {
             return null;
         }
-        String result="";
+        String result = "";
         try {
-            result=new String(json.toString().getBytes(), "ISO8859-1");
+            result = new String(json.toString().getBytes(), "ISO8859-1");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
