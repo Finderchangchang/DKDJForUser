@@ -20,6 +20,8 @@ import java.util.Map;
 
 import cc.listviewdemo.R;
 import cc.listviewdemo.base.BaseActivity;
+import cc.listviewdemo.control.a.main.MainActivitys;
+import cc.listviewdemo.control.a.zhuce.RegUserActivity;
 import cc.listviewdemo.model.FoodType;
 import cc.listviewdemo.view.HttpUtils;
 import cc.listviewdemo.view.Utils;
@@ -30,6 +32,7 @@ import cc.listviewdemo.view.Utils;
  * 邮箱：1031066280@qq.com
  */
 public class LoginActivity extends BaseActivity {
+    public static LoginActivity mInstance;
     @CodeNote(id = R.id.login_account_et)
     EditText login_account_et;//账号
     @CodeNote(id = R.id.login_password_et)
@@ -45,6 +48,7 @@ public class LoginActivity extends BaseActivity {
     public void initViews() {
         setContentView(R.layout.activity_login);
         map = new HashMap<>();
+        mInstance=this;
     }
 
     @Override
@@ -55,7 +59,7 @@ public class LoginActivity extends BaseActivity {
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.tv_findpassword:
-                Utils.IntentPost(null);//跳转到注册页面
+                Utils.IntentPost(RegUserActivity.class);//跳转到注册页面
                 break;
             case R.id.login_btn:
                 if (login_account_et.getText().toString().equals("") || login_password_et.getText().toString().equals("")) {
@@ -70,12 +74,20 @@ public class LoginActivity extends BaseActivity {
                                 if (obj != null) {
                                     if (obj.getString("state").equals("1")) {
                                         ToastShort("登录成功");
+                                        if(MainActivitys.mInstance!=null){
+                                            MainActivitys.mInstance.finish();
+                                        }
+                                        if(RegUserActivity.mInstance!=null){
+                                            RegUserActivity.mInstance.finish();
+                                        }
+                                        Utils.IntentPost(MainActivitys.class);
+                                        mInstance.finish();//关闭当前页面
                                     } else {
                                         ToastShort("登录失败");
                                     }
                                 }
                             } catch (JSONException e) {
-
+                                ToastShort("登录失败");
                             }
 
                         }

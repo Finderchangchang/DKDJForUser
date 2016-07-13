@@ -46,12 +46,12 @@
                     android:layout_height="wrap_content"
                     android:numStars="5"
                     android:rating="5" />
-
                 <TextView
                     android:id="@+id/sell_num_tv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="0服" />
+
             </LinearLayout>
 
             <LinearLayout
@@ -62,7 +62,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="阿斯达："
+                    android:text="起送价："
                     android:textColor="@color/peisong_lab" />
 
                 <TextView
@@ -75,7 +75,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="  | 阿斯达："
+                    android:text="  | 配送费："
                     android:textColor="@color/peisong_lab" />
 
                 <TextView

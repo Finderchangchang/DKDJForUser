@@ -44,9 +44,8 @@
         <activity android:name=".control.a.shanghu.SHDetailsActivity" />
         <activity android:name=".control.a.order.ConfirmOrderActivity" />
         <activity android:name=".control.a.address_manage.AddressListActivity" />
-        <activity android:name=".control.a.TestActivity">
-
-        </activity>
+        <activity android:name=".control.a.TestActivity"/>
+        <activity android:name=".control.a.zhuce.RegUserActivity"/>
         <receiver
             android:name=".AppRegister">
             <intent-filter>
