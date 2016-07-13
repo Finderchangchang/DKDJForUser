@@ -40,6 +40,7 @@
                 <data android:scheme="wxb25da091f7dc485c"/>
             </intent-filter>
         </activity>
+        <activity android:name=".control.a.login.LoginActivity"></activity>
         <activity android:name=".control.a.shanghu.SHDetailsActivity" />
         <activity android:name=".control.a.order.ConfirmOrderActivity" />
         <activity android:name=".control.a.address_manage.AddressListActivity" />

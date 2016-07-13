@@ -83,8 +83,8 @@ public class Util {
 				Log.e(TAG, "httpGet fail, status code = " + resp.getStatusLine().getStatusCode());
 				return null;
 			}
-
-			return EntityUtils.toByteArray(resp.getEntity());
+			byte[] bytes=EntityUtils.toByteArray(resp.getEntity());
+			return bytes;
 
 		} catch (Exception e) {
 			Log.e(TAG, "httpGet exception, e = " + e.getMessage());

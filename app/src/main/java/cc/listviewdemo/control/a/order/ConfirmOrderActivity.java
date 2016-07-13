@@ -20,6 +20,11 @@ import android.widget.Toast;
 
 import com.alipay.sdk.app.PayTask;
 import com.google.gson.Gson;
+import com.squareup.okhttp.Call;
+import com.squareup.okhttp.Callback;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.Response;
 
 import net.tsz.afinal.annotation.view.CodeNote;
 
@@ -27,6 +32,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
@@ -47,6 +53,7 @@ import cc.listviewdemo.model.OrderModel;
 import cc.listviewdemo.model.PayResult;
 import cc.listviewdemo.model.PayState;
 import cc.listviewdemo.model.Shop;
+import cc.listviewdemo.money.Util;
 import cc.listviewdemo.view.CommonAdapter;
 import cc.listviewdemo.view.CommonViewHolder;
 import cc.listviewdemo.view.HttpUtils;
@@ -165,50 +172,46 @@ public class ConfirmOrderActivity extends BaseActivity {
                 orderModels.add(model);
                 String json = new Gson().toJson(orderModels);
                 map.put("ordermodel", json);
+
                 HttpUtils.loadJson("SubmitOrder", map, new HttpUtils.LoadJsonListener() {
                     @Override
                     public void load(JSONObject obj) {
-                        try {
-                            if (obj != null) {
-                                if (obj.getString("state").equals("1")) {
-                                    state = new Gson().fromJson(obj.toString(), PayState.class);
-                                    String orderInfo = getOrderInfo("大可到家Android支付", "body", total_price + "");
-                                    String sign = sign(orderInfo);
-                                    try {
-                                        sign = URLEncoder.encode(sign, "UTF-8");
-                                    } catch (UnsupportedEncodingException e) {
-                                        e.printStackTrace();
-                                    }
-                                    /**
-                                     * 完整的符合支付宝参数规范的订单信息
-                                     */
-                                    final String payInfo = orderInfo + "&sign=\"" + sign + "\"&" + getSignType();
-                                    Runnable payRunnable = new Runnable() {
-
-                                        @Override
-                                        public void run() {
-                                            // 构造PayTask 对象
-                                            PayTask alipay = new PayTask(ConfirmOrderActivity.this);
-                                            // 调用支付接口，获取支付结果
-                                            String result = alipay.pay(payInfo, true);
-                                            Message msg = new Message();
-                                            msg.what = SDK_PAY_FLAG;
-                                            msg.obj = result;
-                                            mHandler.sendMessage(msg);
-                                        }
-                                    };
-
-                                    // 必须异步调用
-                                    Thread payThread = new Thread(payRunnable);
-                                    payThread.start();
-                                } else {
-                                    ToastShort("预订单生成失败...");
+                        if (obj != null) {
+                            state = new Gson().fromJson(obj.toString(), PayState.class);
+                            if (state.getOrderstate().equals("1")) {
+                                String orderInfo = getOrderInfo("大可到家Android支付", "body", total_price + "");
+                                String sign = sign(orderInfo);
+                                try {
+                                    sign = URLEncoder.encode(sign, "UTF-8");
+                                } catch (UnsupportedEncodingException e) {
+                                    e.printStackTrace();
                                 }
+                                /**
+                                 * 完整的符合支付宝参数规范的订单信息
+                                 */
+                                final String payInfo = orderInfo + "&sign=\"" + sign + "\"&" + getSignType();
+                                Runnable payRunnable = new Runnable() {
+
+                                    @Override
+                                    public void run() {
+                                        // 构造PayTask 对象
+                                        PayTask alipay = new PayTask(ConfirmOrderActivity.this);
+                                        // 调用支付接口，获取支付结果
+                                        String result = alipay.pay(payInfo, true);
+                                        Message msg = new Message();
+                                        msg.what = SDK_PAY_FLAG;
+                                        msg.obj = result;
+                                        mHandler.sendMessage(msg);
+                                    }
+                                };
+
+                                // 必须异步调用
+                                Thread payThread = new Thread(payRunnable);
+                                payThread.start();
+                            } else {
+                                ToastShort("预订单生成失败...");
                             }
-                        } catch (JSONException e) {
-
                         }
-
                     }
                 });
                 break;
@@ -223,36 +226,22 @@ public class ConfirmOrderActivity extends BaseActivity {
             switch (msg.what) {
                 case SDK_PAY_FLAG: {
                     PayResult payResult = new PayResult((String) msg.obj);
-                    /**
-                     * 同步返回的结果必须放置到服务端进行验证（验证的规则请看https://doc.open.alipay.com/doc2/
-                     * detail.htm?spm=0.0.0.0.xdvAU6&treeId=59&articleId=103665&
-                     * docType=1) 建议商户依赖异步通知
-                     */
                     String resultInfo = payResult.getResult();// 同步返回需要验证的信息
-
                     String resultStatus = payResult.getResultStatus();
                     // 判断resultStatus 为“9000”则代表支付成功，具体状态码代表含义可参考接口文档
                     if (TextUtils.equals(resultStatus, "9000")) {
                         Toast.makeText(ConfirmOrderActivity.this, "支付成功", Toast.LENGTH_SHORT).show();
                         mInstance.finish();//关闭当前页面
                         SHDetailsActivity.mInstance.finish();//关闭商户页面
-
                         /*后期需要实现跳转到订单相信页面，是支付失败还是再来一单*/
-
                     } else {
-                        // 判断resultStatus 为非"9000"则代表可能支付失败
-                        // "8000"代表支付结果因为支付渠道原因或者系统原因还在等待支付结果确认，最终交易是否成功以服务端异步通知为准（小概率状态）
                         if (TextUtils.equals(resultStatus, "8000")) {
                             Toast.makeText(ConfirmOrderActivity.this, "支付结果确认中", Toast.LENGTH_SHORT).show();
                         } else {
                             // 其他值就可以判断为支付失败，包括用户主动取消支付，或者系统返回的错误
                             Toast.makeText(ConfirmOrderActivity.this, "支付失败", Toast.LENGTH_SHORT).show();
-//                            Utils.IntentPost(OrderDetailActivity.class, new Utils.putListener() {
-//                                @Override
-//                                public void put(Intent intent) {
-//                                    intent.putExtra("orderState", state);
-//                                }
-//                            });
+                            mInstance.finish();//关闭当前页面
+                            SHDetailsActivity.mInstance.finish();//关闭商户页面
                         }
                     }
                     break;
@@ -261,8 +250,6 @@ public class ConfirmOrderActivity extends BaseActivity {
                     break;
             }
         }
-
-        ;
     };
 
     /**
