@@ -9,11 +9,12 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="200dp"
-        android:orientation="vertical"
-        android:background="@mipmap/user_bg">
+        android:background="@mipmap/user_bg"
+        android:orientation="vertical">
+
         <LinearLayout
             android:id="@+id/logined_container"
-            android:layout_width="wrap_content"
+            android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="27.0dp"
@@ -27,15 +28,15 @@
                 android:background="@mipmap/user_icon"></RelativeLayout>
 
             <TextView
-                android:id="@+id/username"
+                android:id="@+id/username_tv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="7.0dp"
                 android:gravity="center"
-                android:text="1155"
+                android:text="登录/注册"
                 android:textColor="@android:color/white"
-                android:textSize="16.0dp" />
+                android:textSize="20.0dp" />
         </LinearLayout>
 
         <LinearLayout
@@ -60,7 +61,8 @@
                     android:drawableTop="@mipmap/qianbao2"
                     android:gravity="center_horizontal"
                     android:text="余额"
-                    android:textSize="10.5dp" />
+                    android:textColor="#fff"
+                    android:textSize="12.5dp" />
 
                 <TextView
                     android:id="@+id/tv_money"
@@ -68,6 +70,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="0dp"
                     android:text="0"
+                    android:textColor="#fff"
                     android:textSize="24.5dp" />
 
                 <TextView
@@ -77,6 +80,7 @@
                     android:layout_marginLeft="2.5dp"
                     android:layout_marginTop="0dp"
                     android:text="元"
+                    android:textColor="#fff"
                     android:textSize="15.0dp" />
 
                 <TextView
@@ -106,14 +110,16 @@
                     android:drawableTop="@mipmap/icon_daijinquanda"
                     android:gravity="center_horizontal"
                     android:text="代金券"
-                    android:textSize="10.5dp" />
+                    android:textColor="#fff"
+                    android:textSize="12.5dp" />
 
                 <TextView
                     android:id="@+id/tv_number1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10.0dp"
-                    android:text="6"
+                    android:text="0"
+                    android:textColor="#fff"
                     android:textSize="24.5dp" />
 
                 <TextView
@@ -123,6 +129,7 @@
                     android:layout_marginLeft="2.5dp"
                     android:layout_marginTop="10.0dp"
                     android:text="个"
+                    android:textColor="#fff"
                     android:textSize="15.0dp" />
 
                 <TextView
@@ -153,14 +160,16 @@
                     android:drawableTop="@mipmap/shoucang2"
                     android:gravity="center_horizontal"
                     android:text="收藏店铺"
-                    android:textSize="10.5dp" />
+                    android:textColor="#fff"
+                    android:textSize="12.5dp" />
 
                 <TextView
                     android:id="@+id/tv_number2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5.0dp"
-                    android:text="10"
+                    android:text="0"
+                    android:textColor="#fff"
                     android:textSize="24.5dp" />
 
                 <TextView
@@ -168,8 +177,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="2.5dp"
+                    android:layout_marginRight="5dp"
                     android:layout_marginTop="5.0dp"
                     android:text="个"
+                    android:textColor="#fff"
                     android:textSize="15.0dp" />
             </LinearLayout>
         </LinearLayout>
@@ -199,8 +210,8 @@
             android:layout_weight="1"
             android:drawableTop="@mipmap/tixingda"
             android:gravity="center"
-            android:paddingTop="10.0dp"
             android:paddingBottom="5.0dp"
+            android:paddingTop="10.0dp"
             android:text="消息提醒"
             android:textColor="#333333" />
 
@@ -215,10 +226,10 @@
             android:layout_width="0dp"
             android:layout_height="106.5dp"
             android:layout_weight="1"
-            android:paddingTop="10.0dp"
-            android:paddingBottom="5.0dp"
             android:drawableTop="@mipmap/dingwei"
             android:gravity="center"
+            android:paddingBottom="5.0dp"
+            android:paddingTop="10.0dp"
             android:text="我的地址"
             android:textColor="#333333" />
 
@@ -233,10 +244,10 @@
             android:layout_width="0dp"
             android:layout_height="fill_parent"
             android:layout_weight="1"
-            android:paddingTop="10.0dp"
-            android:paddingBottom="5.0dp"
             android:drawableTop="@mipmap/xiaoxida"
             android:gravity="center"
+            android:paddingBottom="5.0dp"
+            android:paddingTop="10.0dp"
             android:text="我的评价"
             android:textColor="#333333" />
     </LinearLayout>

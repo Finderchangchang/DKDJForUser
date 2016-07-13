@@ -20,7 +20,10 @@ import cc.listviewdemo.model.FoodDetail;
 import cc.listviewdemo.model.FoodType;
 import cc.listviewdemo.model.GWCar;
 import cc.listviewdemo.model.Good;
+import cc.listviewdemo.model.Goods;
+import cc.listviewdemo.model.OrderModel;
 import cc.listviewdemo.model.Shop;
+import cc.listviewdemo.model.ShopListModel;
 import cc.listviewdemo.view.GoodsClassifyAdapter;
 import cc.listviewdemo.view.GoodsDetailsAdapter;
 import cc.listviewdemo.view.Utils;
@@ -55,6 +58,8 @@ public class GoodListFragment extends BaseFragment implements IFGoodListView {
         mLeft = new ArrayList<>();
         mRight1 = new ArrayList<>();
         mListener = new GoodListListener(MainActivitys.mInstance, this);
+        shops=new ArrayList<>();
+        goods=new ArrayList<>();
     }
 
     @Override
@@ -70,19 +75,22 @@ public class GoodListFragment extends BaseFragment implements IFGoodListView {
         });
         detailsAdapter = new GoodsDetailsAdapter(this, mRight1, mLefts);
         right_lv.setAdapter(detailsAdapter);
-        mCar=new GWCar();
-        mCar.setShopName(shop.getTogoName());
     }
 
+    List<ShopListModel> shops;
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.billing:
                 if(count>0){
-                    mCar.setPsMoney(Double.parseDouble(shop.getSendmoney()));
+                    shop.setGoodses(goods);
+                    shops.add(new ShopListModel("115.508560", "38.893189",shop.getDataID(),shop.getSendmoney(),shop.getTogoName(),goods));//添加商品到商户，再将商户信息添加到shop集合中。
                     Utils.IntentPost(ConfirmOrderActivity.class, new Utils.putListener() {
                         @Override
                         public void put(Intent intent) {
-                            intent.putExtra("goods",mCar);
+                            OrderModel model=new OrderModel(
+                                    "17093215800", "17093215800", "26", "先生", "先生", "鞋和女装",
+                                    "", "2016-07-12 12:10:26", "115.508560", "38.893189", "", "913", "多来一双筷子", "1", "3",shops);
+                            intent.putExtra("order",model);
                         }
                     });
                 }else{
@@ -91,30 +99,76 @@ public class GoodListFragment extends BaseFragment implements IFGoodListView {
                 break;
         }
     }
-
+    List<Goods> goods;
     double price = 0;
     int count = 0;
-    GWCar mCar;
     /**
      * 计算总价与选中的个数,并显示在界面上
      *
      * @param num 购物车商品数量
      * @param p   总钱数
      */
-    public void calculateTotalPrice(int num, double p,Good good) {
+    public void calculateTotalPrice(int num, double p,Goods good) {
         count = count + num;
         price = price + p;
         price_main.setText("￥" + Math.round(price * 100) / 100.0);
         if(num==1){
-            mCar.addGood(good);
+            addGood(good);
         }else{
-            mCar.removeGood(good);
+            removeGood(good);
         }
         if (count > 0) {
             total_num_tv.setText(count + "");
             total_num_tv.setVisibility(View.VISIBLE);
         } else {
             total_num_tv.setVisibility(View.GONE);
+        }
+    }
+
+    /**
+     * 在集合中添加Goods
+     * @param good
+     */
+    public void addGood(Goods good){
+        if(goods==null){
+            goods=new ArrayList<>();
+        }
+        if(check(good)){
+            good.setPNum((Integer.parseInt(goods.get(position).getPNum()) + 1)+"");
+            goods.remove(position);
+            goods.add(position,good);
+        }else{
+            good.setPNum("1");
+            goods.add(good);
+        }
+    }
+    int position=-1;
+    /**
+     * 存在该id
+     * @param good
+     * @return true
+     */
+    private boolean check(Goods good){
+        for(int i=0;i<goods.size();i++){
+            if(goods.get(i).getSid()==good.getSid()){
+                position=i;
+                return true;
+            }
+        }
+        return false;
+    }
+    public void removeGood(Goods good){
+        if(check(good)){
+            int nu=Integer.parseInt(goods.get(position).getPNum())-1;
+            if(nu==0){
+                goods.remove(position);
+            }else{
+                good.setPNum(nu + "");
+                if(Integer.parseInt(goods.get(position).getPNum())>=0){
+                    goods.remove(position);
+                    goods.add(position,good);
+                }
+            }
         }
     }
 

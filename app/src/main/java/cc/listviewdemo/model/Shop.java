@@ -34,6 +34,38 @@ public class Shop implements Serializable {
     private String status;
     private int seekType;
     private String keyWord;
+    private List<Goods> ItemList;
+
+    public Shop(List<Goods> goods, String lat, String lng) {
+        this.ItemList = goods;
+        this.lat = lat;
+        this.lng = lng;
+    }
+
+    public List<Goods> getGoodses() {
+        return ItemList;
+    }
+
+    public void setGoodses(List<Goods> goodses) {
+        this.ItemList = goodses;
+    }
+
+    /**
+     * PName : 尝试1
+     * ReveInt1 : 0
+     * ReveInt2 : 0
+     * Material : 0
+     * sid : 6757 商品ID
+     * sname :
+     * addprice : 0.00
+     * PId : 6757 商品ID
+     * PNum : 1 数量
+     * TogoId : 914 店铺ID
+     * owername : 0.00 不用管
+     * PPrice : 0.10 价格
+     * Currentprice : 0.10 价格
+     */
+
     /**
      * togoname : null
      * IID : 0

@@ -12,10 +12,37 @@ public class GWCar implements Serializable {
     private List<Good> foods;//商品集合
     private String shopName;//店铺名称
     private double psMoney;//配送费
+    private String Lng;
+    private String Lat;
+    private String TogoId;
     int position;
 
     public GWCar() {
         position=-1;
+    }
+
+    public String getLng() {
+        return Lng;
+    }
+
+    public void setLng(String lng) {
+        Lng = lng;
+    }
+
+    public String getLat() {
+        return Lat;
+    }
+
+    public void setLat(String lat) {
+        Lat = lat;
+    }
+
+    public String getTogoId() {
+        return TogoId;
+    }
+
+    public void setTogoId(String togoId) {
+        TogoId = togoId;
     }
 
     public List<Good> getFoods() {

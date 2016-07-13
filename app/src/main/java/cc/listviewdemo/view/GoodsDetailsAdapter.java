@@ -16,6 +16,7 @@ import cc.listviewdemo.control.a.main.MainActivitys;
 import cc.listviewdemo.control.f.goodlist.GoodListFragment;
 import cc.listviewdemo.model.FoodDetail;
 import cc.listviewdemo.model.Good;
+import cc.listviewdemo.model.Goods;
 
 /**
  * Description:商品详细信息的适配器
@@ -101,7 +102,7 @@ public class GoodsDetailsAdapter extends BaseAdapter {
                 count = FoodDetailList.get(position).getCount();
                 count--;
                 FoodDetailList.get(position).setCount(count);
-                context.calculateTotalPrice(-1, -price, new Good(FoodDetail.getFoodID(), FoodDetail.getName(), price, Double.parseDouble(FoodDetail.getPackageFree())));
+                context.calculateTotalPrice(-1, -price, new Goods(FoodDetail.getName(), "0", "0","0", FoodDetail.getFoodID(),"","0.00", FoodDetail.getFoodID(),FoodDetail.getTogoid(),"0.00",price+"",price+""));
                 GoodsDetailsAdapter.this.notifyDataSetChanged();
 //                BaseApplication.mCar.removeGood(new Good(FoodDetail.getFoodID(),FoodDetail.getName(),price,Double.parseDouble(FoodDetail.getPackageFree())));//从购物车删除商品
 //                classifyAdapter.notifyDataSetChanged();
@@ -114,7 +115,7 @@ public class GoodsDetailsAdapter extends BaseAdapter {
                 count = FoodDetailList.get(position).getCount();
                 count++;
                 FoodDetailList.get(position).setCount(count);
-                context.calculateTotalPrice(1, price, new Good(FoodDetail.getFoodID(), FoodDetail.getName(), price,Double.parseDouble(FoodDetail.getPackageFree())));
+                context.calculateTotalPrice(1, price, new Goods(FoodDetail.getName(), "0", "0","0", FoodDetail.getFoodID(),"","0.00", FoodDetail.getFoodID(),FoodDetail.getTogoid(),"0.00",price+"",price+""));
                 GoodsDetailsAdapter.this.notifyDataSetChanged();
             }
         });

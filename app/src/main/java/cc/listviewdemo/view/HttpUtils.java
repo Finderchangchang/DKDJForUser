@@ -1,5 +1,7 @@
 package cc.listviewdemo.view;
 
+import android.util.Log;
+
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
@@ -25,6 +27,7 @@ public class HttpUtils {
         while (i.hasNext()) {
             url = url + "&" + i.next().toString();
         }
+        Log.i("TAG","url:"+url);
         JsonObjectRequest json = new JsonObjectRequest(
                 url, null,
                 new Response.Listener<JSONObject>() {
