@@ -28,7 +28,7 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar">
-        <activity android:name=".control.a.main.MainActivitys">
+        <activity android:name=".activity.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -40,12 +40,12 @@
                 <data android:scheme="wxb25da091f7dc485c"/>
             </intent-filter>
         </activity>
-        <activity android:name=".control.a.login.LoginActivity"></activity>
-        <activity android:name=".control.a.shanghu.SHDetailsActivity" />
-        <activity android:name=".control.a.order.ConfirmOrderActivity" />
-        <activity android:name=".control.a.address_manage.AddressListActivity" />
-        <activity android:name=".control.a.TestActivity"/>
-        <activity android:name=".control.a.zhuce.RegUserActivity"/>
+        <activity android:name=".activity.LoginActivity"></activity>
+        <activity android:name=".activity.SHDetailsActivity" />
+        <activity android:name=".activity.ConfirmOrderActivity" />
+        <activity android:name=".activity.AddressListActivity" />
+        <activity android:name=".activity.TestActivity"/>
+        <activity android:name=".activity.RegUserActivity"/>
         <receiver
             android:name=".AppRegister">
             <intent-filter>

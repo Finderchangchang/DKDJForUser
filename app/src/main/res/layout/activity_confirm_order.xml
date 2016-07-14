@@ -336,6 +336,7 @@
                 android:textSize="12sp" />
 
             <EditText
+                android:id="@+id/order_remark_et"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:layout_margin="10dp"

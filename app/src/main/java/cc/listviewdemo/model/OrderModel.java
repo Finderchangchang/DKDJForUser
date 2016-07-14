@@ -27,7 +27,7 @@ public class OrderModel implements Serializable {
      * TogoId : 914 店铺ID
      * Remark :
      * PayMode : 1支付宝，3余额 5微信
-     * Ordersource : 3
+     * Ordersource : 3 订单来源 0：web ;1:wap;2:android;3:ios;
      * ShopList : [{"Lng":"115.509015","Lat":"38.894451","TogoId":"914","ItemList":[{"PName":"尝试1","ReveInt1":"0","ReveInt2":"0","Material":"0","sid":"6757","sname":"","addprice":"0.00","PId":"6757","PNum":"1","TogoId":"914","owername":"0.00","PPrice":"0.10","Currentprice":"0.10"},{"PName":"薯格","ReveInt1":"0","ReveInt2":"0","Material":"0","sid":"6747","sname":"","addprice":"0.00","PId":"6747","PNum":"1","TogoId":"914","owername":"1.00","PPrice":"15.00","Currentprice":"15.00"}]}]
      */
     @Expose
@@ -40,7 +40,7 @@ public class OrderModel implements Serializable {
     private String Address;
     private String PayPassword;
     private String GainTime;
-    private String ulng;
+    private String ulng;//收件人经纬度
     private String ulat;
     private String bid;
     private String TogoId;
@@ -52,7 +52,7 @@ public class OrderModel implements Serializable {
 
     }
 
-    public OrderModel(String phone, String mobilephone, String userID, String receiver, String customerName, String address, String payPassword, String gainTime, String ulng, String ulat, String bid, String togoId, String remark, String payMode, String ordersource, List<ShopListModel> shop) {
+    public OrderModel(String phone, String mobilephone, String userID, String receiver, String customerName, String address, String payPassword, String gainTime, String ulng, String ulat, String bid, String togoId, String ordersource, List<ShopListModel> shop) {
         Phone = phone;
         Mobilephone = mobilephone;
         UserID = userID;
@@ -65,8 +65,6 @@ public class OrderModel implements Serializable {
         this.ulat = ulat;
         this.bid = bid;
         TogoId = togoId;
-        Remark = remark;
-        PayMode = payMode;
         Ordersource = ordersource;
         ShopList = shop;
     }

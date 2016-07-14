@@ -12,10 +12,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cc.listviewdemo.R;
-import cc.listviewdemo.control.a.main.MainActivitys;
-import cc.listviewdemo.control.f.goodlist.GoodListFragment;
+import cc.listviewdemo.activity.MainActivity;
+import cc.listviewdemo.fragment.GoodListFragment;
 import cc.listviewdemo.model.FoodDetail;
-import cc.listviewdemo.model.Good;
 import cc.listviewdemo.model.Goods;
 
 /**
@@ -65,7 +64,7 @@ public class GoodsDetailsAdapter extends BaseAdapter {
         final FoodDetail FoodDetail = FoodDetailList.get(position);
         final ViewHolder holder;
         if (convertView == null) {
-            convertView = View.inflate(MainActivitys.mInstance, R.layout.item_food_detail, null);
+            convertView = View.inflate(MainActivity.mInstance, R.layout.item_food_detail, null);
             holder = new ViewHolder();
             holder.mGoodsName = (TextView) convertView.findViewById(R.id.name_tv);
             holder.mGoodsPrice = (TextView) convertView.findViewById(R.id.price_tv);
@@ -74,7 +73,7 @@ public class GoodsDetailsAdapter extends BaseAdapter {
             holder.mGoodsAdd = (ImageView) convertView.findViewById(R.id.add_iv);
             holder.mGoodsReduce = (ImageView) convertView.findViewById(R.id.reduce);
             convertView.setTag(holder);
-            Glide.with(MainActivitys.mInstance)
+            Glide.with(MainActivity.mInstance)
                     .load(FoodDetail.getIcon()).error(R.mipmap.no_img)
                     .into(holder.mMainIv);
         } else {

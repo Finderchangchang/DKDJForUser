@@ -6,10 +6,9 @@ import android.widget.ImageView;
 
 import com.bigkoo.convenientbanner.holder.Holder;
 import com.bumptech.glide.Glide;
-import com.nostra13.universalimageloader.core.ImageLoader;
 
 import cc.listviewdemo.R;
-import cc.listviewdemo.control.a.main.MainActivitys;
+import cc.listviewdemo.activity.MainActivity;
 
 /**
  * Created by Sai on 15/8/4.
@@ -29,7 +28,7 @@ public class NetworkImageHolderView implements Holder<String> {
     @Override
     public void UpdateUI(Context context, int position, String data) {
         imageView.setImageResource(R.mipmap.ic_launcher);
-        Glide.with(MainActivitys.mInstance)
+        Glide.with(MainActivity.mInstance)
                 .load(data)
                 .into(imageView);
     }

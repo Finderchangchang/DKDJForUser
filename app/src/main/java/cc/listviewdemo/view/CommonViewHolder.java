@@ -111,7 +111,7 @@ public class CommonViewHolder {
     public CommonViewHolder setGlideImage(int viewId, String url) {
         ImageView view = getView(viewId);
         Glide.with(mContext)
-                .load(url)
+                .load(url).error(R.mipmap.no_img)
                 .into(view);
         return this;
     }
