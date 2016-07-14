@@ -46,6 +46,7 @@
         <activity android:name=".activity.AddressListActivity" />
         <activity android:name=".activity.TestActivity"/>
         <activity android:name=".activity.RegUserActivity"/>
+        <activity android:name=".activity.AddAddressActivity"/>
         <receiver
             android:name=".AppRegister">
             <intent-filter>

@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import cc.listviewdemo.R;
+import cc.listviewdemo.activity.AddressListActivity;
 import cc.listviewdemo.base.BaseFragment;
 import cc.listviewdemo.activity.MainActivity;
 import cc.listviewdemo.activity.RegUserActivity;
@@ -35,8 +36,10 @@ public class UserFragment extends BaseFragment {
     LinearLayout logined_container;
     @CodeNote(id = R.id.username_tv)
     TextView username_tv;
-    @CodeNote(id=R.id.iv_my_icon)
+    @CodeNote(id = R.id.iv_my_icon)
     ImageView iv_my_icon;
+    @CodeNote(id = R.id.tv_myaddress, click = "onClick")
+    TextView tv_myaddress;
     String userId;//当前登录的用户ID
     Map<String, String> map;
     private UserModel model;
@@ -79,11 +82,18 @@ public class UserFragment extends BaseFragment {
                     Utils.IntentPost(RegUserActivity.class, new Utils.putListener() {
                         @Override
                         public void put(Intent intent) {
-                            intent.putExtra("position",2);
+                            intent.putExtra("position", 2);
                         }
                     });
                 } else {
                     MainActivity.mInstance.ToastShort("敬请期待");
+                }
+                break;
+            case R.id.tv_myaddress:
+                if (!userId.equals("")) {
+                    Utils.IntentPost(AddressListActivity.class);
+                } else {
+                    MainActivity.mInstance.ToastShort("请先登录");
                 }
                 break;
         }
