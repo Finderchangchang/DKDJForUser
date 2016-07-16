@@ -17,10 +17,14 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import cc.dkdj.model.Shop;
 import cc.dkdj.model.ShopType;
+import cc.dkdj.view.HttpUtils;
+import cc.dkdj.view.Utils;
 
 /**
  * 首页Fragment逻辑处理页面
@@ -35,103 +39,70 @@ public class FMainListener {
     }
 
     /**
-     * 加载主页数据
-     */
-    public void loading() {
-        initGG();
-        initShopType();
-        initShops();
-    }
-
-    /**
      * 加载顶部广告
      */
-    private void initGG() {
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest("http://122.114.94.150/App/Android/specialad.aspx", null,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-                            List<String> list = new ArrayList<>();
-                            JSONArray array = response.getJSONArray("foodtypelist");
-                            for (int i = 0; i < array.length(); i++) {
-                                Gson gson = new Gson();
-                                ShopType type = gson.fromJson(array.getString(i), ShopType.class);
-                                list.add(type.getSortName());
-                            }
-                            mView.loadGG(list);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }, new Response.ErrorListener() {
+    public void initGG() {
+        HttpUtils.loadJson("specialad", null, new HttpUtils.LoadJsonListener() {
             @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.e("TAG", error.getMessage(), error);
-            }
-        });
-        jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(500000,//默认超时时间，应设置一个稍微大点儿的，例如本处的500000
-                3,//默认最大尝试次数
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        mQueue.add(jsonObjectRequest);
-    }
-
-    private void initShopType() {
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
-                "http://122.114.94.150/App/Android/GetShopTypeList.aspx?pid=0&indexpage=1&pagesize=100&languageType=2", null,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-                            List<ShopType> list = new ArrayList<>();
-                            JSONArray array = response.getJSONArray("datalist");
-                            for (int i = 0; i < array.length(); i++) {
-                                list.add(new Gson().fromJson(array.getString(i), ShopType.class));
-                            }
-                            mView.load8Item(list);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.e("TAG", error.getMessage(), error);
-            }
-        });
-        jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(500000,//默认超时时间，应设置一个稍微大点儿的，例如本处的500000
-                3,//默认最大尝试次数
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        mQueue.add(jsonObjectRequest);
-    }
-
-    private void initShops() {
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
-                "http://122.114.94.150/App/Android/GetShopListByLocation.aspx?languageType=2&pageindex=1&sortname=SortNum&pagesize=20&shoptype=15&lat=38.893189&sortflag=1&lng=115.508560",
-                null, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
+            public void load(JSONObject obj) {
                 try {
-                    List<Shop> list = new ArrayList<>();
-                    JSONArray array = response.getJSONArray("list");
+                    List<String> list = new ArrayList<>();
+                    JSONArray array = obj.getJSONArray("foodtypelist");
                     for (int i = 0; i < array.length(); i++) {
-                        list.add(new Gson().fromJson(array.getString(i), Shop.class));
+                        Gson gson = new Gson();
+                        ShopType type = gson.fromJson(array.getString(i), ShopType.class);
+                        list.add(type.getSortName());
                     }
-                    mView.loadNearSH(response.getInt("record"), response.getInt("page"), response.getInt("total"), list);
+                    mView.loadGG(list);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.e("TAG", error.getMessage(), error);
-            }
         });
-        jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(500000,//默认超时时间，应设置一个稍微大点儿的，例如本处的500000
-                3,//默认最大尝试次数
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        mQueue.add(jsonObjectRequest);
     }
 
+    /**
+     * 加载shop分类
+     */
+    public void initShopType() {
+        Map<String,String> map=new HashMap<>();
+        map.put("pid","0");
+        map.put("indexpage","1");
+        map.put("pagesize","100");
+        map.put("languageType","2");
+        HttpUtils.loadJson("GetShopTypeList", map, new HttpUtils.LoadJsonListener() {
+            @Override
+            public void load(JSONObject obj) {
+                try {
+                    List<ShopType> list = new ArrayList<>();
+                    JSONArray array = obj.getJSONArray("datalist");
+                    for (int i = 0; i < array.length(); i++) {
+                        list.add(new Gson().fromJson(array.getString(i), ShopType.class));
+                    }
+                    mView.load8Item(list);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    public void initShops(Map map) {
+        map.put("languageType","2");
+        HttpUtils.loadJson("GetShopListByLocation", map, new HttpUtils.LoadJsonListener() {
+            @Override
+            public void load(JSONObject obj) {
+                try {
+                    List<Shop> list = new ArrayList<>();
+                    JSONArray array = obj.getJSONArray("list");
+                    for (int i = 0; i < array.length(); i++) {
+                        list.add(new Gson().fromJson(array.getString(i), Shop.class));
+                    }
+                    mView.loadNearSH(obj.getInt("record"), obj.getInt("page"), obj.getInt("total"), list);
+                } catch (JSONException e) {
+
+                }
+            }
+        });
+    }
 }

@@ -47,6 +47,22 @@ public class Utils {
         return BaseApplication.getContext().getString(key);
     }
 
+    /*
+    * 获取当前程序的版本号
+    */
+    public static String getVersion() {
+        //获取packagemanager的实例
+        PackageManager packageManager = BaseApplication.getContext().getPackageManager();
+        //getPackageName()是你当前类的包名，0代表是获取版本信息
+        PackageInfo packInfo = null;
+        try {
+            packInfo = packageManager.getPackageInfo(BaseApplication.getContext().getPackageName(), 0);
+        } catch (PackageManager.NameNotFoundException e) {
+
+        }
+        return packInfo.versionName;
+    }
+
     /**
      * 加载当前时间。
      * 1.同一年的显示格式 05-11  07:45
@@ -428,7 +444,7 @@ public class Utils {
     public static String encodeBitmap(Bitmap bitmap) {
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.JPEG,80, baos);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 80, baos);
             return Base64.encodeToString(baos.toByteArray(), Base64.DEFAULT)
                     .trim();
         } catch (Exception e) {

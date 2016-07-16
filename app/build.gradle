@@ -9,7 +9,7 @@ android {
         minSdkVersion 19
         targetSdkVersion 22
         versionCode 1
-        versionName "1.0"
+        versionName "0.1"
     }
     buildTypes {
         release {
@@ -17,12 +17,16 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['libs']
+        }
+    }
 }
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile project(':afinal')
-    //    compile project(':pay_android_sdk_1.0')
     compile 'com.shizhefei:ViewPagerIndicator:1.0.7'
     compile 'com.bigkoo:convenientbanner:2.0.5'
     compile 'com.nostra13.universalimageloader:universal-image-loader:1.9.+'

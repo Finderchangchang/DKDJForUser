@@ -5,7 +5,10 @@ package cc.dkdj.config;
  * Created by Administrator on 2016/7/9.
  */
 public class Config {
-    public static final String URL = "http://122.114.94.150/App/Android/";
+    public static final String URL = "http://122.114.94.150";
+    public static final String PATH=URL+"/App/Android/";
+    public static final String DOWN_PATH=URL+"/download/";
+
     // 商户PID
     public static final String PARTNER = "2088421279495661";
     // 商户收款账号

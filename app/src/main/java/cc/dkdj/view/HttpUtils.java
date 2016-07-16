@@ -26,14 +26,21 @@ import cc.dkdj.config.Config;
  * 邮箱：1031066280@qq.com
  */
 public class HttpUtils {
+
     public static void loadJson(String method, Map<String, String> map, final LoadJsonListener listener) {
-        String url = Config.URL + method + ".aspx?1=1";
-        Iterator i = map.entrySet().iterator();
-        while (i.hasNext()) {
-            url = url + "&" + i.next().toString();
+        String url;
+        if (method.equals("version")) {
+            url = Config.DOWN_PATH + method + ".aspx?1=1";
+        } else {
+            url = Config.PATH + method + ".aspx?1=1";
         }
-        url=url.replace(" ","%20");
-        Log.i("TAG","url:"+url);
+        if (map != null) {
+            Iterator i = map.entrySet().iterator();
+            while (i.hasNext()) {
+                url = url + "&" + i.next().toString();
+            }
+            url = url.replace(" ", "%20");
+        }
         JsonObjectRequest json = new JsonObjectRequest(
                 url, null,
                 new Response.Listener<JSONObject>() {
@@ -62,35 +69,5 @@ public class HttpUtils {
 
     public interface LoadJsonListener {
         void load(JSONObject obj);
-    }
-    public interface LoadStringListener{
-        void load(String obj);
-    }
-    public static void loadString(String method, Map<String,String> map){
-        String url = Config.URL + method + ".aspx?1=1";
-        Iterator i = map.entrySet().iterator();
-        while (i.hasNext()) {
-            url = url + "&" + i.next().toString();
-        }
-        Log.i("TAG","url:"+url);
-        //创建okHttpClient对象
-        OkHttpClient mOkHttpClient = new OkHttpClient();
-        //创建一个Request
-        final Request request = new Request.Builder()
-                .url(url).build();
-        //new call
-        Call call = mOkHttpClient.newCall(request);
-        //请求加入调度
-        call.enqueue(new Callback() {
-            @Override
-            public void onFailure(Request request, IOException e) {
-                String s="";
-            }
-
-            @Override
-            public void onResponse(final com.squareup.okhttp.Response response) throws IOException {
-                String htmlStr =  response.body().string();
-            }
-        });
     }
 }

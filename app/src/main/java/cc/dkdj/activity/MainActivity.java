@@ -1,19 +1,38 @@
 package cc.dkdj.activity;
 
+import android.annotation.SuppressLint;
 import android.app.FragmentTransaction;
+import android.app.ProgressDialog;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.baidu.location.BDLocation;
+import com.baidu.location.BDLocationListener;
+import com.baidu.location.Poi;
 import com.google.gson.Gson;
 
 import net.tsz.afinal.annotation.view.CodeNote;
 import net.tsz.afinal.model.ChangeItem;
 import net.tsz.afinal.model.ItemModel;
+import net.tsz.afinal.view.NormalDialog;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,11 +40,15 @@ import java.util.Map;
 
 import cc.dkdj.R;
 import cc.dkdj.base.BaseActivity;
+import cc.dkdj.base.BaseApplication;
 import cc.dkdj.config.SaveKey;
 import cc.dkdj.fragment.DingDanFragment;
 import cc.dkdj.fragment.MainFragment;
 import cc.dkdj.fragment.UserFragment;
 import cc.dkdj.model.UserModel;
+import cc.dkdj.model.Version;
+import cc.dkdj.service.LocationService;
+import cc.dkdj.view.FileDownloadThread;
 import cc.dkdj.view.HttpUtils;
 import cc.dkdj.view.Utils;
 
@@ -62,15 +85,20 @@ public class MainActivity extends BaseActivity {
     DingDanFragment search_frag;
     UserFragment user_frag;
     String userId;
-    Map<String,String> map;
-
+    Map<String, String> map;
+    NormalDialog dialog;
     @Override
     public void initViews() {
         setContentView(R.layout.activity_main);
         mItems = new ArrayList<>();
         listbtn = new ArrayList<>();
         mInstance = this;
-        map=new HashMap<>();
+        map = new HashMap<>();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
     }
 
     @Override
@@ -83,7 +111,7 @@ public class MainActivity extends BaseActivity {
         listbtn.add(new ChangeItem(search_tv, search_iv));
         listbtn.add(new ChangeItem(setting_tv, setting_iv));
         setItem(mClick);//显示首页
-        userId=Utils.ReadString(SaveKey.KEY_UserId);
+        userId = Utils.ReadString(SaveKey.KEY_UserId);
         if (!userId.equals("")) {
             if (finalDb.findAll(UserModel.class).size() == 0) {
                 map.put("userid", userId);
@@ -101,8 +129,8 @@ public class MainActivity extends BaseActivity {
                 }
             }
         }
+        checkForUpdate();//验证是否需要更新
     }
-
     /**
      * 点击事件处理
      *
@@ -174,5 +202,135 @@ public class MainActivity extends BaseActivity {
                 break;
         }
         transaction.commit();
+    }
+    Version model;
+    /**
+     * 检查更新
+     */
+    private void checkForUpdate() {
+        map = new HashMap<>();
+        map.put("c", "1");
+        HttpUtils.loadJson("version", map, new HttpUtils.LoadJsonListener() {
+            @Override
+            public void load(JSONObject obj) {
+                    model = new Gson().fromJson(obj.toString(),Version.class);
+                if (Double.parseDouble(model.getVersion()) > Double.parseDouble(Utils.getVersion())) {//最新版本大于当前版本
+                    dialog=new NormalDialog(MainActivity.mInstance);
+                    dialog.setOnPositiveListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            doDownload();
+                            dialog.dismiss();
+                        }
+                    });
+                    dialog.setMiddleMessage("有新版本需要更新");
+                    dialog.show();
+                }
+            }
+        });
+    }
+
+    /**
+     * 下载准备工作，获取SD卡路径、开启线程
+     */
+    private void doDownload() {
+        // 获取SD卡路径
+        String path = Environment.getExternalStorageDirectory()
+                + "/dkdj/";
+        File file = new File(path);
+        // 如果SD卡目录不存在创建
+        if (!file.exists()) {
+            file.mkdir();
+        }
+
+        String fileName = "dkdj.apk";
+        int threadNum = 5;
+        String filepath = path + fileName;
+        downloadTask task = new downloadTask(model.getDownload(), threadNum, filepath);
+        task.start();
+    }
+    /**
+     * 多线程文件下载
+     *
+     * @author yangxiaolong
+     * @2014-8-7
+     */
+    class downloadTask extends Thread {
+        private String downloadUrl;// 下载链接地址
+        private int threadNum;// 开启的线程数
+        private String filePath;// 保存文件路径地址
+        private int blockSize;// 每一个线程的下载量
+
+        public downloadTask(String downloadUrl, int threadNum, String fileptah) {
+            this.downloadUrl = downloadUrl;
+            this.threadNum = threadNum;
+            this.filePath = fileptah;
+        }
+
+        @Override
+        public void run() {
+
+            FileDownloadThread[] threads = new FileDownloadThread[threadNum];
+            try {
+                URL url = new URL(downloadUrl);
+                URLConnection conn = url.openConnection();
+                // 读取下载文件总大小
+                int fileSize = conn.getContentLength();
+                if (fileSize <= 0) {
+                    System.out.println("读取文件失败");
+                    return;
+                }
+                // 计算每条线程下载的数据长度
+                blockSize = (fileSize % threadNum) == 0 ? fileSize / threadNum
+                        : fileSize / threadNum + 1;
+
+                File file = new File(filePath);
+                for (int i = 0; i < threads.length; i++) {
+                    // 启动线程，分别下载每个线程需要下载的部分
+                    threads[i] = new FileDownloadThread(url, file, blockSize,
+                            (i + 1));
+                    threads[i].setName("Thread:" + i);
+                    threads[i].start();
+                }
+
+                boolean isfinished = false;
+                int downloadedAllSize = 0;
+                while (!isfinished) {
+                    isfinished = true;
+                    // 当前所有线程下载总量
+                    downloadedAllSize = 0;
+                    for (int i = 0; i < threads.length; i++) {
+                        downloadedAllSize += threads[i].getDownloadLength();
+                        if (!threads[i].isCompleted()) {
+                            isfinished = false;
+                        }
+                    }
+                    // 通知handler去更新视图组件
+                    Message msg = new Message();
+                    msg.getData().putInt("size", downloadedAllSize);
+                    Thread.sleep(1000);// 休息1秒后再读取下载进度
+                }
+                if(isfinished){
+                    installApk(file);
+                }
+
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+        }
+    }
+    //安装apk
+    protected void installApk(File file) {
+        Intent intent = new Intent();
+        //执行动作
+        intent.setAction(Intent.ACTION_VIEW);
+        //执行的数据类型
+        intent.setDataAndType(Uri.fromFile(file), "application/vnd.android.package-archive");
+        startActivity(intent);
     }
 }
