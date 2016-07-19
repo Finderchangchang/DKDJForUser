@@ -68,7 +68,7 @@ public class RegUserActivity extends BaseActivity {
         if (login_id_et.getText().toString().trim() == "") {
             ToastShort("手机号码不能为空");
             return false;
-        } else if (!sms_code_et.getText().toString().trim().equals(SMS_Code)) {
+        } else if (!sms_code_et.getText().toString().trim().equals(SMS_Code)||sms_code_et.getText().toString().trim().equals("")) {
             ToastShort("短信验证码不正确");
             return false;
         } else if (pwd_et.getText().toString().trim() == "") {
@@ -101,7 +101,7 @@ public class RegUserActivity extends BaseActivity {
             });
         }
     };
-
+    Map<String,String> map;
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.right_tv:
@@ -116,48 +116,38 @@ public class RegUserActivity extends BaseActivity {
                 if (LoginActivity.mInstance != null) {
                     LoginActivity.mInstance.finish();
                 }
+                mInstance.finish();
                 break;
-            case R.id.reg_btn://登陆按钮
+            case R.id.reg_btn://注册按钮
                 if (checkEt()) {//验证输入是否正确
-                    map = new HashMap<>();
-                    map.put("password", pwd_et.getText().toString().trim());
-                    map.put("tel", login_id_et.getText().toString().trim());
+                    map=new HashMap<>();
+                    map.put("tel",login_id_et.getText().toString().trim());
+                    map.put("password",pwd_et.getText().toString().trim());
                     HttpUtils.loadJson("NewRegedit", map, new HttpUtils.LoadJsonListener() {
                         @Override
                         public void load(JSONObject obj) {
                             try {
-                                if (obj != null) {
-                                    if (obj.getString("state").equals("1")) {
-                                        //将UserID写入内存中。
-                                        String userId = obj.getString("userid");
-                                        mInstance.finish();//关闭当前页面
-                                        if (MainActivity.mInstance != null) {
-                                            MainActivity.mInstance.finish();
-                                        }
-                                        if (LoginActivity.mInstance != null) {
-                                            LoginActivity.mInstance.finish();
-                                        }
-                                        Utils.IntentPost(MainActivity.class);//跳转到主页
-                                    }
+                                String state=obj.getString("state");
+                                if(state.equals("1")){//注册成功
+
+                                }
+                                if(state.equals("-2")){
                                     ToastShort(obj.getString("msg"));
-                                } else {
-                                    ToastShort("注册失败！");
                                 }
                             } catch (JSONException e) {
-
+                                e.printStackTrace();
                             }
-
+                        }
+                    });
+                    Utils.IntentPost(LoginActivity.class, new Utils.putListener() {
+                        @Override
+                        public void put(Intent intent) {
+                            if (position >= 0) {
+                                intent.putExtra("position", position);
+                            }
                         }
                     });
                 }
-                Utils.IntentPost(LoginActivity.class, new Utils.putListener() {
-                    @Override
-                    public void put(Intent intent) {
-                        if (position >= 0) {
-                            intent.putExtra("position", position);
-                        }
-                    }
-                });
                 break;
             case R.id.back_iv:
                 mInstance.finish();

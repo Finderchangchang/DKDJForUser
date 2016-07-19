@@ -85,7 +85,7 @@ public class MainFragment extends BaseFragment implements IFMainView {
         @Override
         public void onReceiveLocation(BDLocation location) {
             map.put("pageindex", "1");//pageindex=1&pagesize=20&lat=38.893189&lng=115.508560
-            map.put("pagesize", "20");
+            map.put("pagesize", "100");
             String lat = "0";
             String lon = "0";
             if (null != location && location.getLocType() != BDLocation.TypeServerError) {
@@ -144,6 +144,12 @@ public class MainFragment extends BaseFragment implements IFMainView {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
+            }
+        });
+        shoptype_gv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                MainActivity.mInstance.ToastShort("敬请期待...");
             }
         });
     }
