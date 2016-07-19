@@ -52,9 +52,7 @@ public class OrderModel implements Serializable {
 
     }
 
-    public OrderModel(String phone, String mobilephone, String userID, String gainTime, String bid, String togoId, String ordersource, List<ShopListModel> shop) {
-        Phone = phone;
-        Mobilephone = mobilephone;
+    public OrderModel(String userID, String gainTime, String bid, String togoId, String ordersource, List<ShopListModel> shop) {
         UserID = userID;
         PayPassword = "";
         GainTime = gainTime;

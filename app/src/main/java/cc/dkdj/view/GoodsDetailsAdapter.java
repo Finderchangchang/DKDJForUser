@@ -1,12 +1,18 @@
 package cc.dkdj.view;
 
+import android.content.Context;
+import android.graphics.Bitmap;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.ImageLoader;
+import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.util.LruCache;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +40,65 @@ public class GoodsDetailsAdapter extends BaseAdapter {
         this.FoodDetailList = FoodDetailList;
         this.classifyAdapter = classifyAdapter;
     }
+    public class VolleyLoadPicture {
 
+        private ImageLoader mImageLoader = null;
+        private BitmapCache mBitmapCache;
+
+        private ImageLoader.ImageListener one_listener;
+
+        public VolleyLoadPicture(Context context,ImageView imageView){
+            one_listener = ImageLoader.getImageListener(imageView, 0, 0);
+
+            RequestQueue mRequestQueue = Volley.newRequestQueue(context);
+            mBitmapCache = new BitmapCache();
+            mImageLoader = new ImageLoader(mRequestQueue, mBitmapCache);
+        }
+
+        public ImageLoader getmImageLoader() {
+            return mImageLoader;
+        }
+
+        public void setmImageLoader(ImageLoader mImageLoader) {
+            this.mImageLoader = mImageLoader;
+        }
+
+        public ImageLoader.ImageListener getOne_listener() {
+            return one_listener;
+        }
+
+        public void setOne_listener(ImageLoader.ImageListener one_listener) {
+            this.one_listener = one_listener;
+        }
+
+        class BitmapCache implements ImageLoader.ImageCache {
+            private LruCache<String, Bitmap> mCache;
+            private int sizeValue;
+
+            public BitmapCache() {
+                int maxSize = 10 * 1024 * 1024;
+                mCache = new LruCache<String, Bitmap>(maxSize) {
+                    protected int sizeOf(String key, Bitmap value) {
+                        sizeValue = value.getRowBytes() * value.getHeight();
+                        return sizeValue;
+                    }
+
+                };
+            }
+
+            @Override
+            public Bitmap getBitmap(String url) {
+                return mCache.get(url);
+            }
+
+            @Override
+            public void putBitmap(String url, Bitmap bitmap) {
+                mCache.put(url, bitmap);
+            }
+        }
+
+
+    }
     @Override
     public int getCount() {
         return FoodDetailList.size();
@@ -72,13 +136,19 @@ public class GoodsDetailsAdapter extends BaseAdapter {
             holder.mMainIv= (ImageView) convertView.findViewById(R.id.main_iv);
             holder.mGoodsAdd = (ImageView) convertView.findViewById(R.id.add_iv);
             holder.mGoodsReduce = (ImageView) convertView.findViewById(R.id.reduce);
+            holder.mSmallIv= (ImageView) convertView.findViewById(R.id.notice_iv);
             convertView.setTag(holder);
-            Glide.with(MainActivity.mInstance)
-                    .load(FoodDetail.getIcon()).error(R.mipmap.no_img)
-                    .into(holder.mMainIv);
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
+        VolleyLoadPicture vlp = new VolleyLoadPicture(MainActivity.mInstance, holder.mMainIv);
+        vlp.getmImageLoader().get(FoodDetail.getIcon(), vlp.getOne_listener());
+//        Glide.with(MainActivity.mInstance)
+//                .load(FoodDetail.getIcon())
+//                .into(holder.mSmallIv);
+//        Glide.with(MainActivity.mInstance)
+//                .load(FoodDetail.getIcon()).error(R.mipmap.no_img)
+//                .into(holder.mMainIv);
         holder.mGoodsName.setText(FoodDetail.getName());
         int num = FoodDetail.getCount();
         //当所点上商品数量为0时，隐藏“减”的图标

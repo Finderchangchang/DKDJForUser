@@ -1,6 +1,7 @@
 package cc.dkdj.activity;
 
 import android.content.Intent;
+import android.os.Handler;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -14,6 +15,8 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import cc.dkdj.R;
 import cc.dkdj.base.BaseActivity;
@@ -78,6 +81,27 @@ public class RegUserActivity extends BaseActivity {
         return true;
     }
 
+    private int recLen = 60;
+    Timer timer = new Timer();
+    TimerTask task = new TimerTask() {
+        @Override
+        public void run() {
+
+            runOnUiThread(new Runnable() {      // UI thread
+                @Override
+                public void run() {
+                    recLen--;
+                    get_code_btn.setText(recLen + "s");
+                    if (recLen == 0) {
+                        timer.cancel();
+                        get_code_btn.setClickable(true);
+                        get_code_btn.setText("获取验证码");
+                    }
+                }
+            });
+        }
+    };
+
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.right_tv:
@@ -140,26 +164,39 @@ public class RegUserActivity extends BaseActivity {
                 break;
             case R.id.get_code_btn://获得验证码
                 if (!login_id_et.getText().toString().trim().equals("")) {
-                    map.put("type", "0");//用户名
-                    map.put("tel", login_id_et.getText().toString().trim());//密码
-                    HttpUtils.loadJson("sendcode", map, new HttpUtils.LoadJsonListener() {
-                        @Override
-                        public void load(JSONObject obj) {
-                            try {
-                                if (obj != null) {
-                                    if (obj.getString("state").equals("1")) {
-                                        SMS_Code = obj.getString("pwd");//获得验证码
+                    get_code_btn.setClickable(false);
+                    timer.schedule(task, 1000, 1000);
+                    if (get_code_btn.getText().equals("获取验证码")) {
+                        map.put("type", "0");//用户名
+                        map.put("tel", login_id_et.getText().toString().trim());//密码
+                        HttpUtils.loadJson("sendcode", map, new HttpUtils.LoadJsonListener() {
+                            @Override
+                            public void load(JSONObject obj) {
+                                try {
+                                    if (obj != null) {
+                                        if (obj.getString("state").equals("1")) {
+                                            SMS_Code = obj.getString("pwd");//获得验证码
+                                        } else if(obj.getString("state").equals("-1")){
+                                            ToastShort("该手机号已存在，可直接登陆");
+                                        }else {
+                                            ToastShort("发送失败");
+                                            timer.cancel();
+                                            get_code_btn.setClickable(true);
+                                            get_code_btn.setText("获取验证码");
+                                        }
                                     } else {
-                                        ToastShort("登录失败");
+                                        ToastShort("发送失败！");
+                                        timer.cancel();
+                                        get_code_btn.setClickable(true);
+                                        get_code_btn.setText("获取验证码");
                                     }
-                                } else {
-                                    ToastShort("发送失败！");
-                                }
-                            } catch (JSONException e) {
+                                } catch (JSONException e) {
 
+                                }
                             }
-                        }
-                    });
+                        });
+                    }
+
                 } else {
                     ToastShort("手机号不能为空或者格式不正确！");
                 }

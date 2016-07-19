@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/darker_gray"
+    android:background="#babcbc"
     tools:context="com.example.henry.test.MainActivity">
 
     <RelativeLayout
@@ -122,14 +122,13 @@
                     android:layout_height="wrap_content"
                     android:text="配送费￥0.00"/>
             </LinearLayout>
-            <TextView
+            <Button
                 android:id="@+id/billing"
                 android:layout_width="150dp"
                 android:layout_height="match_parent"
                 android:layout_alignParentRight="true"
-                android:background="@android:color/holo_green_light"
+                android:background="@android:color/darker_gray"
                 android:gravity="center"
-                android:text="去结算"
                 android:clickable="true"
                 android:textColor="@android:color/white"
                 android:textSize="18dp" />

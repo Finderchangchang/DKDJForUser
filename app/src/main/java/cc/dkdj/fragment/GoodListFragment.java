@@ -45,25 +45,26 @@ public class GoodListFragment extends BaseFragment implements IFGoodListView {
     TextView billing;
     List<FoodType> mLeft;
     List<FoodDetail> mRight1;
-    GoodsClassifyAdapter mLefts;
+    GoodsClassifyAdapter mLefts;//商品分类
     @CodeNote(id = R.id.price_main)
     TextView price_main;
     @CodeNote(id = R.id.total_num_tv)
     TextView total_num_tv;
-    GoodsDetailsAdapter detailsAdapter;
+    GoodsDetailsAdapter detailsAdapter;//商品列表
     GoodListListener mListener;//调用访问后台数据接口
-    Shop shop=SHDetailsActivity.mInstance.shop;
+    Shop shop = SHDetailsActivity.mInstance.shop;
     String shopId;//店铺ID
     String userId;
+
     @Override
     public void initViews() {
         setContentView(R.layout.frag_goodlist);
-        shopId=shop.getDataID();
+        shopId = shop.getDataID();
         mLeft = new ArrayList<>();
         mRight1 = new ArrayList<>();
         mListener = new GoodListListener(MainActivity.mInstance, this);
-        shops=new ArrayList<>();
-        goods=new ArrayList<>();
+        shops = new ArrayList<>();
+        goods = new ArrayList<>();
     }
 
     @Override
@@ -79,109 +80,128 @@ public class GoodListFragment extends BaseFragment implements IFGoodListView {
         });
         detailsAdapter = new GoodsDetailsAdapter(this, mRight1, mLefts);
         right_lv.setAdapter(detailsAdapter);
-        userId=Utils.ReadString(SaveKey.KEY_UserId);
+        billing.setBackgroundColor(getResources().getColor(R.color.smallLab));
+        billing.setText("￥" + shop.getMinmoney() + "起送");
     }
 
     List<ShopListModel> shops;
+
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.billing:
-                if(!userId.equals("")){
-                    if(count>0){
-                        final UserModel user=MainActivity.mInstance.finalDb.findAll(UserModel.class).get(0);
+                userId = Utils.ReadString(SaveKey.KEY_UserId);
+
+                if (!userId.equals("")) {
+                    if (count > 0) {
                         shop.setGoodses(goods);
-                        shops.add(new ShopListModel(shop.getLng(),shop.getLat(),shop.getDataID(),shop.getSendmoney(),shop.getTogoName(),goods));//添加商品到商户，再将商户信息添加到shop集合中。
+                        shops.add(new ShopListModel(shop.getLng(), shop.getLat(), shop.getDataID(), shop.getSendmoney(), shop.getTogoName(), goods));//添加商品到商户，再将商户信息添加到shop集合中。
                         Utils.IntentPost(ConfirmOrderActivity.class, new Utils.putListener() {
                             @Override
                             public void put(Intent intent) {
-                                OrderModel model=new OrderModel(
-                                        user.getPhone(),user.getPhone(), user.getUserid(),
-                                         Utils.getNormalTime(), "", shop.getDataID(), "2",shops);
-                                intent.putExtra("order",model);
+                                OrderModel model = new OrderModel(userId,
+                                        Utils.getNormalTime(), "", shop.getDataID(), "2", shops);
+                                intent.putExtra("order", model);
                             }
                         });
-                    }else{
+                    } else {
                         SHDetailsActivity.mInstance.ToastShort("购物车不能为空");
                     }
-                }else{
+                } else {
                     Utils.IntentPost(LoginActivity.class, new Utils.putListener() {
                         @Override
                         public void put(Intent intent) {
-                            intent.putExtra("isGWC",true);
+                            intent.putExtra("isGWC", true);
                         }
                     });
                 }
                 break;
         }
     }
+
     List<Goods> goods;
     double price = 0;
     int count = 0;
+
     /**
      * 计算总价与选中的个数,并显示在界面上
      *
      * @param num 购物车商品数量
      * @param p   总钱数
      */
-    public void calculateTotalPrice(int num, double p,Goods good) {
+    public void calculateTotalPrice(int num, double p, Goods good) {
         count = count + num;
         price = price + p;
         price_main.setText("￥" + Math.round(price * 100) / 100.0);
-        if(num==1){
+        if (num == 1) {
             addGood(good);
-        }else{
+        } else {
             removeGood(good);
+        }
+        if (price >= Double.parseDouble(shop.getMinmoney())) {
+            billing.setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
+            billing.setText("去结算");
+            billing.setClickable(true);
+        } else {
+            billing.setBackgroundColor(getResources().getColor(R.color.smallLab));
+            billing.setText("￥" + shop.getMinmoney() + "起送");
+            billing.setClickable(false);
         }
         if (count > 0) {
             total_num_tv.setText(count + "");
             total_num_tv.setVisibility(View.VISIBLE);
         } else {
+
             total_num_tv.setVisibility(View.GONE);
         }
     }
 
     /**
      * 在集合中添加Goods
+     *
      * @param good
      */
-    public void addGood(Goods good){
-        if(goods==null){
-            goods=new ArrayList<>();
+    public void addGood(Goods good) {
+        if (goods == null) {
+            goods = new ArrayList<>();
         }
-        if(check(good)){
-            good.setPNum((Integer.parseInt(goods.get(position).getPNum()) + 1)+"");
+        if (check(good)) {
+            good.setPNum((Integer.parseInt(goods.get(position).getPNum()) + 1) + "");
             goods.remove(position);
-            goods.add(position,good);
-        }else{
+            goods.add(position, good);
+        } else {
             good.setPNum("1");
             goods.add(good);
         }
     }
-    int position=-1;
+
+    int position = -1;
+
     /**
      * 存在该id
+     *
      * @param good
      * @return true
      */
-    private boolean check(Goods good){
-        for(int i=0;i<goods.size();i++){
-            if(goods.get(i).getSid()==good.getSid()){
-                position=i;
+    private boolean check(Goods good) {
+        for (int i = 0; i < goods.size(); i++) {
+            if (goods.get(i).getSid() == good.getSid()) {
+                position = i;
                 return true;
             }
         }
         return false;
     }
-    public void removeGood(Goods good){
-        if(check(good)){
-            int nu=Integer.parseInt(goods.get(position).getPNum())-1;
-            if(nu==0){
+
+    public void removeGood(Goods good) {
+        if (check(good)) {
+            int nu = Integer.parseInt(goods.get(position).getPNum()) - 1;
+            if (nu == 0) {
                 goods.remove(position);
-            }else{
+            } else {
                 good.setPNum(nu + "");
-                if(Integer.parseInt(goods.get(position).getPNum())>=0){
+                if (Integer.parseInt(goods.get(position).getPNum()) >= 0) {
                     goods.remove(position);
-                    goods.add(position,good);
+                    goods.add(position, good);
                 }
             }
         }

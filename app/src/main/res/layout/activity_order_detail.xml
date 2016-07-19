@@ -62,6 +62,11 @@
             android:layout_height="0.5dp"
             android:background="#efefef" />
 
+        <ListView
+            android:id="@+id/order_detail_lv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"></ListView>
+
         <LinearLayout
             android:id="@+id/tv_expInfo"
             android:layout_width="fill_parent"
@@ -135,7 +140,8 @@
                 android:layout_height="wrap_content"
                 android:text="优惠"
                 android:textColor="#999999"
-                android:textSize="13sp" />
+                android:textSize="13sp"
+                android:visibility="gone"/>
 
             <TextView
                 android:id="@+id/mEtSum"
@@ -151,7 +157,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginRight="2dp"
                 android:layout_toLeftOf="@+id/mEtSum"
-                android:text="优惠"
+                android:text="总计"
                 android:textColor="#999999"
                 android:textSize="13sp" />
         </RelativeLayout>
@@ -182,7 +188,7 @@
                 android:layout_height="fill_parent"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:text="催单"
+                android:text="去支付"
                 android:textColor="#00dbe3"
                 android:textSize="13sp" />
         </LinearLayout>
@@ -258,8 +264,9 @@
                 android:textColor="#c3c3c3"
                 android:textSize="13sp" />
 
+
             <TextView
-                android:id="@+id/etGender"
+                android:id="@+id/etphone"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignBaseline="@+id/etUserName"
@@ -267,19 +274,6 @@
                 android:layout_marginLeft="10dp"
                 android:layout_marginTop="10dp"
                 android:layout_toRightOf="@+id/etUserName"
-                android:text="先生 "
-                android:textColor="#c3c3c3"
-                android:textSize="13sp" />
-
-            <TextView
-                android:id="@+id/etphone"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignBaseline="@+id/etGender"
-                android:layout_alignParentTop="true"
-                android:layout_marginLeft="10dp"
-                android:layout_marginTop="10dp"
-                android:layout_toRightOf="@+id/etGender"
                 android:text="17088889999 "
                 android:textColor="#c3c3c3"
                 android:textSize="13sp" />

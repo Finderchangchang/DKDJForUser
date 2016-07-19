@@ -70,7 +70,6 @@ public class LoginActivity extends BaseActivity {
                         public void load(JSONObject obj) {
                             try {
                                 if (obj != null) {
-                                    UserModel model=new Gson().fromJson(obj.toString(),UserModel.class);
                                     if (obj.getString("state").equals("1")) {
                                         ToastShort("登录成功");
                                         if(!isGWC){
@@ -85,7 +84,6 @@ public class LoginActivity extends BaseActivity {
                                                     }
                                                 });
                                             }
-
                                         }
                                         if(RegUserActivity.mInstance!=null){
                                             RegUserActivity.mInstance.finish();

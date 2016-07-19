@@ -26,6 +26,7 @@ import cc.dkdj.base.BaseApplication;
 import cc.dkdj.base.BaseFragment;
 import cc.dkdj.activity.MainActivity;
 import cc.dkdj.activity.SHDetailsActivity;
+import cc.dkdj.config.SaveKey;
 import cc.dkdj.control.FMainListener;
 import cc.dkdj.control.IFMainView;
 import cc.dkdj.model.Shop;
@@ -48,7 +49,7 @@ public class MainFragment extends BaseFragment implements IFMainView {
     TotalScrollView main;
     @CodeNote(id = R.id.iv)
     RelativeLayout iv;
-    @CodeNote(id=R.id.dizhi_tv)
+    @CodeNote(id = R.id.dizhi_tv)
     TextView dizhi_tv;
     @CodeNote(id = R.id.shop_img_iv)
     ImageView shop_img_iv;
@@ -74,7 +75,7 @@ public class MainFragment extends BaseFragment implements IFMainView {
         mListener = new FMainListener(this, MainActivity.mInstance);
         BaseApplication.locationService.registerListener(dbListener);
         BaseApplication.locationService.start();// 定位SDK
-        map=new HashMap<>();
+        map = new HashMap<>();
     }
 
     /***
@@ -83,26 +84,31 @@ public class MainFragment extends BaseFragment implements IFMainView {
     private BDLocationListener dbListener = new BDLocationListener() {
         @Override
         public void onReceiveLocation(BDLocation location) {
-            map.put("pageindex","1");//pageindex=1&pagesize=20&lat=38.893189&lng=115.508560
-            map.put("pagesize","20");
-            String lat="0";
-            String lon="0";
+            map.put("pageindex", "1");//pageindex=1&pagesize=20&lat=38.893189&lng=115.508560
+            map.put("pagesize", "20");
+            String lat = "0";
+            String lon = "0";
             if (null != location && location.getLocType() != BDLocation.TypeServerError) {
                 lat=location.getLatitude()+"";
                 lon=location.getLongitude()+"";
-            }else{
+//                lat = "38.894431";
+//                lon = "115.504949";
+            } else {
                 dizhi_tv.setText("无法定位>");
             }
-            map.put("lat",lat);
-            map.put("lng",lon);
+            Utils.WriteString(SaveKey.KEY_LAT, lat);
+            Utils.WriteString(SaveKey.KEY_LON, lon);
+            map.put("lat", lat);
+            map.put("lng", lon);
             mListener.initShops(map);
             if (location.getPoiList() != null && !location.getPoiList().isEmpty()) {
-                dizhi_tv.setText(location.getPoiList().get(0).getName()+">");
+                dizhi_tv.setText(location.getPoiList().get(0).getName() + ">");
             }
         }
 
     };
-    Map<String,String> map;
+    Map<String, String> map;
+
     @Override
     public void initEvents() {
         mListener.initGG();//加载广告
@@ -114,11 +120,14 @@ public class MainFragment extends BaseFragment implements IFMainView {
             public void convert(CommonViewHolder holder, Shop detail, int position) {
                 holder.setText(R.id.title_tv, detail.getTogoName());
                 holder.setGlideImage(R.id.iv, detail.getIcon());
-                holder.setStar(R.id.star_rb, detail.getGrade());
-                holder.setText(R.id.sell_num_tv, "月售" + detail.getSales() + "单");
                 holder.setText(R.id.qisong_num_tv, "￥" + detail.getMinmoney());//起送价
                 holder.setText(R.id.peisong_num_tv, "￥" + detail.getSendmoney());//配送费
                 holder.setTags(R.id.tag_gv, detail.getTaglist());
+                if (!detail.getStatus().equals("1")) {
+                    holder.setVisible(R.id.shop_no_open_tv, true);
+                }else{
+                    holder.setVisible(R.id.shop_no_open_tv, false);
+                }
             }
         };
         main_list.setAdapter(mAdapter);
@@ -168,12 +177,16 @@ public class MainFragment extends BaseFragment implements IFMainView {
         main_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
-                Utils.IntentPost(SHDetailsActivity.class, new Utils.putListener() {
-                    @Override
-                    public void put(Intent intent) {
-                        intent.putExtra("Shop", list.get(position));
-                    }
-                });
+                if (list.get(position).getStatus().equals("1")) {
+                    Utils.IntentPost(SHDetailsActivity.class, new Utils.putListener() {
+                        @Override
+                        public void put(Intent intent) {
+                            intent.putExtra("Shop", list.get(position));
+                        }
+                    });
+                } else {
+                    MainActivity.mInstance.ToastShort("商家休息中...");
+                }
             }
         });
     }

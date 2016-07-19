@@ -5,9 +5,11 @@ package cc.dkdj.config;
  * Created by Administrator on 2016/7/9.
  */
 public class Config {
-    public static final String URL = "http://122.114.94.150";
-    public static final String PATH=URL+"/App/Android/";
-    public static final String DOWN_PATH=URL+"/download/";
+    //    public static final String URL = "http://122.114.94.150";
+    public static final String URL = "http://www.dakedaojia.com";
+
+    public static final String PATH = URL + "/App/Android/";
+    public static final String DOWN_PATH = URL + "/download/";
 
     // 商户PID
     public static final String PARTNER = "2088421279495661";
@@ -21,6 +23,6 @@ public class Config {
     // APP_ID 替换为你的应用从官方网站申请到的合法appId
     public static final String APP_ID = "wxb25da091f7dc485c";
     public static final String MCH_ID = "1337228001";
-    public static final String HD_URL="http://s-264268.gotocdn.com/weixinpay/payNotifyUrl.aspx";
-    public static final String PARTNER_ID="uFG7BlYM9EzNhfbaW8x2eQbL1hHF4aNe";
+    public static final String HD_URL = "http://s-264268.gotocdn.com/weixinpay/payNotifyUrl.aspx";
+    public static final String PARTNER_ID = "uFG7BlYM9EzNhfbaW8x2eQbL1hHF4aNe";
 }

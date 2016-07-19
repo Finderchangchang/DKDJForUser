@@ -1,6 +1,7 @@
 package cc.dkdj.view;
 
 import android.util.Log;
+import android.widget.Toast;
 
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Response;
@@ -51,6 +52,7 @@ public class HttpUtils {
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
+                Toast.makeText(BaseApplication.getContext(),error.toString(),Toast.LENGTH_SHORT).show();
                 listener.load(null);
             }
         });

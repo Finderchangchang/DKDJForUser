@@ -67,7 +67,19 @@ public class AddressListActivity extends BaseActivity {
             @Override
             public void convert(CommonViewHolder holder, AddressModel addressModel, int position) {
                 String address = addressModel.getAddress();
-                holder.setText(R.id.address_tv, address.split("\\|")[1] + " " + address.split("\\|")[2]);
+                if(address.contains("|")){
+                    if(address.split("\\|").length==3){
+//                        holder.setText(R.id.address_tv, address.split("\\|")[1] + " " + address.split("\\|")[2]);
+                        address=address.split("\\|")[1]+" "+address.split("\\|")[2];
+                    }else{
+                        address=address.replace("\\|"," ");
+//                        holder.setText(R.id.address_tv, address.replace("\\|"," "));
+                    }
+                }
+                if(address.length()>13){
+                    address=address.substring(0,13)+"...";
+                }
+                holder.setText(R.id.address_tv, address);
                 holder.setText(R.id.first_name_tv, addressModel.getReceiver());
                 holder.setText(R.id.tel_tv, addressModel.getMobilephone());
             }
@@ -76,7 +88,7 @@ public class AddressListActivity extends BaseActivity {
         main_lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
-                Intent intent=new Intent(mInstance, AddAddressActivity.class);
+                Intent intent = new Intent(mInstance, AddAddressActivity.class);
                 intent.putExtra("address", address.get(position));
                 startActivityForResult(intent, 0);
             }
@@ -97,7 +109,6 @@ public class AddressListActivity extends BaseActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        String s="";
         switch (resultCode) {
             case 1:
                 load();

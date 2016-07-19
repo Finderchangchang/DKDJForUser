@@ -56,7 +56,6 @@ public class AddAddressActivity extends BaseActivity {
     Map<String, String> map;
     String address;
     boolean isAdd = false;//false.编辑.true,新增
-
     //新增1，删除-1，编辑0
     @Override
     public void initViews() {
@@ -122,6 +121,7 @@ public class AddAddressActivity extends BaseActivity {
                         try {
                             String s = obj.getString("state");
                             if (s.equals("1")) {
+                                mInstance.setResult(1, new Intent());
                                 mInstance.finish();
                                 ToastShort("删除成功");
                             } else {
@@ -143,7 +143,7 @@ public class AddAddressActivity extends BaseActivity {
                 break;
             case R.id.save_address_btn://保存按钮
                 //修改dataid=0&userid=26&op=0&receiver=胡海珍&address=河北保定|秀兰康欣园|2050室&mobilephone=17093215800
-                //添加userid=26&op=1&receiver=胡海珍&address=河北保定|秀兰康欣园|2050室&mobilephone=17093215800
+                    //添加userid=26&op=1&receiver=胡海珍&address=河北保定|秀兰康欣园|2050室&mobilephone=17093215800
                 if (checkET()) {
                     map = new HashMap<>();
                     map.put("userid", Utils.ReadString(SaveKey.KEY_UserId));
@@ -153,7 +153,11 @@ public class AddAddressActivity extends BaseActivity {
                         map.put("op", "0");//编辑
                         map.put("dataid", model.getDataid());//地址编码
                     }
-                    map.put("receiver", name_et.getText().toString().trim());
+                    String sex="女士";
+                    if(xiansheng_cb.isChecked()){
+                        sex="先生";
+                    }
+                    map.put("receiver", name_et.getText().toString().trim()+" "+sex);
                     map.put("address", "|" + address_et.getText().toString().trim() + "|" + louhao_et.getText().toString().trim());
                     map.put("mobilephone", tel_et.getText().toString().trim());
 //                  map.put("lat", "");(目前没用到)
@@ -163,7 +167,7 @@ public class AddAddressActivity extends BaseActivity {
                         public void load(JSONObject obj) {
                             try {
                                 String s = obj.getString("state");
-                                if (s.equals("1")) {
+                                if (Integer.parseInt(s)>0) {
                                     mInstance.setResult(1, new Intent());
                                     mInstance.finish();
                                     if(isAdd){

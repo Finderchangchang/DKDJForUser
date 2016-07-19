@@ -12,6 +12,30 @@ public class Good implements Serializable {
     private int num;//商品数量
     private double packageMoney;//打包费
     private double price;//单价
+    private String dnum;
+    private String dprice;
+
+    public Good(String name, String dnum, String dprice) {
+        this.name = name;
+        this.dnum = dnum;
+        this.dprice = dprice;
+    }
+
+    public String getDnum() {
+        return dnum;
+    }
+
+    public void setDnum(String dnum) {
+        this.dnum = dnum;
+    }
+
+    public String getDprice() {
+        return dprice;
+    }
+
+    public void setDprice(String dprice) {
+        this.dprice = dprice;
+    }
 
     public Good(String goodId, String name, double price,double packageMoney) {
         this.goodId = goodId;

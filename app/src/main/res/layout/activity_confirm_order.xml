@@ -31,7 +31,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentLeft="true"
                     android:layout_marginLeft="10dp"
-                    android:text="鹏翔小区"
+                    android:text=""
                     android:textColor="#333333"
                     android:textSize="15sp" />
 
@@ -43,7 +43,7 @@
                     android:layout_below="@+id/address_tv"
                     android:layout_marginLeft="10dp"
                     android:layout_marginTop="10dp"
-                    android:text="柳"
+                    android:text=""
                     android:textColor="#c3c3c3"
                     android:textSize="13sp" />
 
@@ -55,7 +55,7 @@
                     android:layout_marginLeft="10dp"
                     android:layout_marginTop="10dp"
                     android:layout_toRightOf="@+id/name_tv"
-                    android:text="17093215800"
+                    android:text=""
                     android:textColor="#c3c3c3"
                     android:textSize="13sp" />
 
@@ -161,7 +161,8 @@
                 android:layout_height="35dp"
                 android:background="@android:color/white"
                 android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:visibility="gone">
 
                 <TextView
                     android:layout_width="0dp"

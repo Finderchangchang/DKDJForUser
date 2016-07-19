@@ -3,7 +3,10 @@ package cc.dkdj.activity;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.text.TextUtils;
 import android.view.View;
@@ -133,6 +136,10 @@ public class ConfirmOrderActivity extends BaseActivity {
         send_price_tv.setText("￥" + model.getShopList().get(0).getSendMoney());//配送费
         total_price = total_price + Double.parseDouble(model.getShopList().get(0).getSendMoney());//配送费
         total_price_tv.setText("￥" + total_price);
+        loadAddress();
+    }
+
+    private void loadAddress() {
         map = new HashMap<>();
         map.put("userid", Utils.ReadString(SaveKey.KEY_UserId));
         HttpUtils.loadJson("GetUserAddressList", map, new HttpUtils.LoadJsonListener() {
@@ -145,6 +152,8 @@ public class ConfirmOrderActivity extends BaseActivity {
                             String[] add = address.getAddress().split("\\|");
                             address_tv.setText(add[1] + "  " + add[2]);
                         }
+                        model.setPhone(address.getMobilephone());
+                        model.setMobilephone(address.getMobilephone());
                         name_tv.setText(address.getReceiver());
                         tel_tv.setText(address.getMobilephone());
                         model.setAddress(address.getAddress());
@@ -160,6 +169,16 @@ public class ConfirmOrderActivity extends BaseActivity {
         });
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (resultCode) {
+            case 1:
+                loadAddress();
+                break;
+        }
+    }
+
     String orderid = "";//订单编号
 
     public void onClick(View view) {
@@ -168,7 +187,8 @@ public class ConfirmOrderActivity extends BaseActivity {
                 mInstance.finish();
                 break;
             case R.id.address_rl://点击进入选择地址页面
-                ToastShort("敬请期待...");
+                Intent intent = new Intent(ConfirmOrderActivity.mInstance, AddAddressActivity.class);
+                startActivityForResult(intent, 0);
                 break;
             case R.id.zfb_ll://点击选择支付宝
                 zfb_cb.setChecked(true);
@@ -179,69 +199,133 @@ public class ConfirmOrderActivity extends BaseActivity {
                 wx_cb.setChecked(true);
                 break;
             case R.id.sure_lock_btn://调用支付接口
-                if (TextUtils.isEmpty(Config.PARTNER) || TextUtils.isEmpty(Config.RSA_PRIVATE) || TextUtils.isEmpty(Config.SELLER)) {
-                    new AlertDialog.Builder(this).setTitle("警告").setMessage("需要配置PARTNER | RSA_PRIVATE| SELLER")
-                            .setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialoginterface, int i) {
-                                    finish();
-                                }
-                            }).show();
-                    return;
-                }
-                if (zfb_cb.isChecked()) {
-                    model.setPayMode("1");
-                } else {
-                    model.setPayMode("5");
-                }
-                model.setRemark(order_remark_et.getText().toString().trim());
-                List<OrderModel> orderModels = new ArrayList<>();
-                orderModels.add(model);
-                String json = new Gson().toJson(orderModels);
-                map = new HashMap<>();
-                map.put("ordermodel", json);
-
-                HttpUtils.loadJson("SubmitOrder", map, new HttpUtils.LoadJsonListener() {
-                    @Override
-                    public void load(JSONObject obj) {
-                        if (obj != null) {
-                            state = new Gson().fromJson(obj.toString(), PayState.class);
-                            if (state.getOrderstate().equals("1")) {
-                                String orderInfo = getOrderInfo("大可到家Android支付", "body", total_price + "");
-                                String sign = sign(orderInfo);
-                                try {
-                                    sign = URLEncoder.encode(sign, "UTF-8");
-                                } catch (UnsupportedEncodingException e) {
-                                    e.printStackTrace();
-                                }
-                                /**
-                                 * 完整的符合支付宝参数规范的订单信息
-                                 */
-                                final String payInfo = orderInfo + "&sign=\"" + sign + "\"&" + getSignType();
-                                Runnable payRunnable = new Runnable() {
-
-                                    @Override
-                                    public void run() {
-                                        // 构造PayTask 对象
-                                        PayTask alipay = new PayTask(ConfirmOrderActivity.this);
-                                        // 调用支付接口，获取支付结果
-                                        String result = alipay.pay(payInfo, true);
-                                        Message msg = new Message();
-                                        msg.what = SDK_PAY_FLAG;
-                                        msg.obj = result;
-                                        mHandler.sendMessage(msg);
+                if (!address_tv.getText().equals("")) {
+                    if (TextUtils.isEmpty(Config.PARTNER) || TextUtils.isEmpty(Config.RSA_PRIVATE) || TextUtils.isEmpty(Config.SELLER)) {
+                        new AlertDialog.Builder(this).setTitle("警告").setMessage("需要配置PARTNER | RSA_PRIVATE| SELLER")
+                                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialoginterface, int i) {
+                                        finish();
                                     }
-                                };
-
-                                // 必须异步调用
-                                Thread payThread = new Thread(payRunnable);
-                                payThread.start();
-                            } else {
-                                ToastShort("预订单生成失败...");
-                            }
+                                }).show();
+                        return;
+                    }
+                    if (zfb_cb.isChecked()) {
+                        model.setPayMode("1");
+                    } else {
+                        model.setPayMode("5");
+                    }
+                    if (model.getUlng().equals("")) {
+                        if (Utils.ReadString(SaveKey.KEY_LON).equals("")) {
+                            model.setUlng("115.508560");
+                        } else {
+                            model.setUlng(Utils.ReadString(SaveKey.KEY_LON));
                         }
                     }
-                });
+                    if (model.getUlat().equals("")) {
+                        if (Utils.ReadString(SaveKey.KEY_LAT).equals("")) {
+                            model.setUlat("38.893189");
+                        } else {
+                            model.setUlat(Utils.ReadString(SaveKey.KEY_LAT));
+                        }
+                    }
+
+                    model.setRemark(order_remark_et.getText().toString().trim());
+                    List<OrderModel> orderModels = new ArrayList<>();
+                    orderModels.add(model);
+                    String json = new Gson().toJson(orderModels);
+                    map = new HashMap<>();
+                    map.put("ordermodel", json);
+                    HttpUtils.loadJson("SubmitOrder", map, new HttpUtils.LoadJsonListener() {
+                        @Override
+                        public void load(JSONObject obj) {
+                            if (obj != null) {
+                                state = new Gson().fromJson(obj.toString(), PayState.class);
+                                if (state.getOrderstate().equals("1")) {
+                                    init(total_price + "", state.getOrderid());
+//
+                                } else {//判断是否为关门状态
+                                    ToastShort("预订单生成失败...");
+                                }
+                            }
+                        }
+                    });
+                }else{
+                    ToastShort("请添加收货地址");
+                }
                 break;
+        }
+    }
+
+    HandlerTest1 mHandlerTest1;
+
+    private void init(final String price, final String orderid) {
+        //1 子线程发送消息给本身
+        new Thread() {
+            public void run() {
+                Looper.prepare();
+                mHandlerTest1 = new HandlerTest1(Looper.myLooper());
+                Message message = new Message();
+                message.obj = price + ";" + orderid;
+                mHandlerTest1.sendMessage(message);
+                Looper.loop();
+            }
+
+            ;
+        }.start();
+
+    }
+
+    private class HandlerTest1 extends Handler {
+
+        private HandlerTest1(Looper looper) {
+            super(looper);
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            map = new HashMap<String, String>();
+            map.put("orderid", msg.obj.toString().split(";")[1]);
+            map.put("price", msg.obj.toString().split(";")[0]);
+            HttpUtils.loadJson("buildpaynum", map, new HttpUtils.LoadJsonListener() {
+                @Override
+                public void load(JSONObject obj) {
+                    try {
+                        String orderInfo = getOrderInfo("大可到家Android支付", "body", total_price + "", obj.getString("batch"));
+                        String sign = sign(orderInfo);
+                        try {
+                            sign = URLEncoder.encode(sign, "UTF-8");
+                        } catch (UnsupportedEncodingException e) {
+
+                        }
+                        /**
+                         * 完整的符合支付宝参数规范的订单信息
+                         */
+                        final String payInfo = orderInfo + "&sign=\"" + sign + "\"&" + getSignType();
+                        Runnable payRunnable = new Runnable() {
+
+                            @Override
+                            public void run() {
+                                // 构造PayTask 对象
+                                PayTask alipay = new PayTask(ConfirmOrderActivity.this);
+                                // 调用支付接口，获取支付结果
+                                String result = alipay.pay(payInfo, true);
+                                Message msg = new Message();
+                                msg.what = SDK_PAY_FLAG;
+                                msg.obj = result;
+                                mHandler.sendMessage(msg);
+                            }
+                        };
+
+//             必须异步调用
+                        Thread payThread = new Thread(payRunnable);
+                        payThread.start();
+                    } catch (JSONException e) {
+
+                    }
+                }
+            });
+
         }
     }
 
@@ -282,7 +366,7 @@ public class ConfirmOrderActivity extends BaseActivity {
     /**
      * create the order info. 创建订单信息
      */
-    private String getOrderInfo(String subject, String body, String price) {
+    private String getOrderInfo(String subject, String body, String price, String orderid) {
 
         // 签约合作者身份ID
         String orderInfo = "partner=" + "\"" + Config.PARTNER + "\"";
@@ -291,7 +375,7 @@ public class ConfirmOrderActivity extends BaseActivity {
         orderInfo += "&seller_id=" + "\"" + Config.SELLER + "\"";
 
         // 商户网站唯一订单号
-        orderInfo += "&out_trade_no=" + "\"" + getOutTradeNo() + "\"";
+        orderInfo += "&out_trade_no=" + "\"" + orderid + "\"";
 
         // 商品名称
         orderInfo += "&subject=" + "\"" + subject + "\"";
@@ -303,7 +387,7 @@ public class ConfirmOrderActivity extends BaseActivity {
         orderInfo += "&total_fee=" + "\"" + price + "\"";
 
         // 服务器异步通知页面路径
-        orderInfo += "&notify_url=" + "\"" + "http://notify.msp.hk/notify.htm" + "\"";
+        orderInfo += "&notify_url=" + "\"" + "http://www.dakedaojia.com/Alipay/iosnotify.aspx" + "\"";
 
         // 服务接口名称， 固定值
         orderInfo += "&service=\"mobile.securitypay.pay\"";

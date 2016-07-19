@@ -2,10 +2,11 @@ package cc.dkdj.model;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
- * 作者：lwj on 2016/7/3 16:31
+ * 作者：lwj on 2016/7/3 16:31 123
  * 邮箱：1031066280@qq.com
  */
 public class OrderList {
@@ -63,7 +64,7 @@ public class OrderList {
         this.orderlist = orderlist;
     }
 
-    public static class OrderlistBean {
+    public static class OrderlistBean implements Serializable{
         private String OrderID;
         private String TogoPic;
         private String TogoName;
@@ -221,7 +222,7 @@ public class OrderList {
             this.foodlist = foodlist;
         }
 
-        public static class FoodlistBean {
+        public static class FoodlistBean implements Serializable{
             private String Num;
             private String FoodID;
             private String FoodPrice;

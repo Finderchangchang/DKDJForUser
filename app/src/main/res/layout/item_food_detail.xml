@@ -10,7 +10,7 @@
         android:id="@+id/main_iv"
         android:layout_width="60dp"
         android:layout_height="60dp"
-        android:layout_margin="10dp" />
+        android:layout_margin="10dp"/>
 
     <LinearLayout
         android:layout_width="0dp"
@@ -48,7 +48,6 @@
                 android:id="@+id/notice_iv"
                 android:layout_width="10dp"
                 android:layout_height="10dp"
-                android:src="#ff0099"
                 android:layout_marginLeft="5dp"/>
         </LinearLayout>
 

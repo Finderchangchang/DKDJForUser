@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import cc.dkdj.activity.SHDetailsActivity;
 import cc.dkdj.model.Shop;
 import cc.dkdj.model.ShopType;
 import cc.dkdj.view.HttpUtils;
@@ -87,9 +88,9 @@ public class FMainListener {
         });
     }
 
-    public void initShops(Map map) {
-        map.put("languageType","2");
-        HttpUtils.loadJson("GetShopListByLocation", map, new HttpUtils.LoadJsonListener() {
+    public void initShops(Map maps) {
+        maps.put("languageType","2");
+        HttpUtils.loadJson("GetShopListByLocation", maps, new HttpUtils.LoadJsonListener() {
             @Override
             public void load(JSONObject obj) {
                 try {

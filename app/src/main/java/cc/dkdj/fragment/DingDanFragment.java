@@ -2,9 +2,11 @@ package cc.dkdj.fragment;
 
 import android.content.Intent;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 
@@ -20,6 +22,7 @@ import java.util.Map;
 import cc.dkdj.R;
 import cc.dkdj.activity.LoginActivity;
 import cc.dkdj.activity.MainActivity;
+import cc.dkdj.activity.OrderDetailActivity;
 import cc.dkdj.base.BaseFragment;
 import cc.dkdj.config.SaveKey;
 import cc.dkdj.model.OrderList;
@@ -47,6 +50,7 @@ public class DingDanFragment extends BaseFragment {
     List<OrderList.OrderlistBean> have_beans;
     @CodeNote(id = R.id.no_order_tv)
     TextView no_order_tv;
+    boolean isComplement = false;
 
     @Override
     public void initViews() {
@@ -66,10 +70,58 @@ public class DingDanFragment extends BaseFragment {
                 holder.setGlideImage(R.id.shop_img_iv, orderList.getTogoPic());
                 holder.setText(R.id.shop_name_tv, orderList.getTogoName());
                 holder.setText(R.id.price_tv, "￥" + orderList.getTotalPrice());
-                holder.setText(R.id.state_tv, "审核通过");
+                String state = "未支付";
+                if (orderList.getPaystate().equals("0")) {
+                    state = "未支付";
+                } else {
+                    switch (orderList.getSendstate()) {
+                        case "0":
+                            if (orderList.getState().equals("2")) {
+                                if (orderList.getIsShopSet().equals("0")) {
+                                    state = "订单已提交";
+                                } else {
+                                    state = "商家已接单";
+                                }
+                            } else if (orderList.getState().equals("4")) {
+                                state = "商家拒接此单";
+                            } else if (orderList.getState().equals("7")) {
+                                state = "正在匹配骑手";
+                            } else {
+                                state = "订单已取消";
+                            }
+                            break;
+                        case "1":
+                            state = "骑手去商家取货";
+                            break;
+                        case "2":
+                            state = "已取货，配送中";
+                            break;
+                        case "3":
+                            state = "已送达";
+                            break;
+                    }
+                }
+                holder.setText(R.id.state_tv, state);
             }
         };
+
         main_lv.setAdapter(mAdapter);
+        main_lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
+                Utils.IntentPost(OrderDetailActivity.class, new Utils.putListener() {
+                    @Override
+                    public void put(Intent intent) {
+                        if (isComplement) {
+                            intent.putExtra("orderId", have_beans.get(position).getOrderID());
+                        } else {
+                            intent.putExtra("orderId", no_beans.get(position).getOrderID());
+                        }
+
+                    }
+                });
+            }
+        });
         userId = Utils.ReadString(SaveKey.KEY_UserId);//获得当前用户ID
         if (userId.equals("")) {
             Utils.IntentPost(LoginActivity.class, new Utils.putListener() {
@@ -80,13 +132,15 @@ public class DingDanFragment extends BaseFragment {
             });
         } else {
             map.put("userid", userId);
+            map.put("pageindex", "1");
+            map.put("pagesize", "100");
             HttpUtils.loadJson("GetOrderListByUserId", map, new HttpUtils.LoadJsonListener() {
                 @Override
                 public void load(JSONObject obj) {
                     orderList = new Gson().fromJson(obj.toString(), OrderList.class);
                     for (int i = 0; i < orderList.getOrderlist().size(); i++) {
                         OrderList.OrderlistBean bean = orderList.getOrderlist().get(i);
-                        if (bean.getSendstate().equals("3")) {
+                        if (bean.getState().equals("3")) {
                             have_beans.add(bean);
                         } else {
                             no_beans.add(bean);
@@ -98,13 +152,19 @@ public class DingDanFragment extends BaseFragment {
         }
     }
 
+    private void load() {
+
+    }
+
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.no_success_btn:
                 setClick(1);
+                isComplement = false;
                 break;
             case R.id.have_success_btn:
                 setClick(2);
+                isComplement = true;
                 break;
         }
     }
@@ -151,3 +211,4 @@ public class DingDanFragment extends BaseFragment {
         }
     }
 }
+

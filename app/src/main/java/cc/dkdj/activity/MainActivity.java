@@ -1,23 +1,17 @@
 package cc.dkdj.activity;
 
-import android.annotation.SuppressLint;
 import android.app.FragmentTransaction;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.baidu.location.BDLocation;
-import com.baidu.location.BDLocationListener;
-import com.baidu.location.Poi;
 import com.google.gson.Gson;
 
 import net.tsz.afinal.annotation.view.CodeNote;
@@ -25,7 +19,6 @@ import net.tsz.afinal.model.ChangeItem;
 import net.tsz.afinal.model.ItemModel;
 import net.tsz.afinal.view.NormalDialog;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -47,7 +40,6 @@ import cc.dkdj.fragment.MainFragment;
 import cc.dkdj.fragment.UserFragment;
 import cc.dkdj.model.UserModel;
 import cc.dkdj.model.Version;
-import cc.dkdj.service.LocationService;
 import cc.dkdj.view.FileDownloadThread;
 import cc.dkdj.view.HttpUtils;
 import cc.dkdj.view.Utils;
@@ -94,11 +86,6 @@ public class MainActivity extends BaseActivity {
         listbtn = new ArrayList<>();
         mInstance = this;
         map = new HashMap<>();
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
     }
 
     @Override
@@ -186,8 +173,10 @@ public class MainActivity extends BaseActivity {
                     search_frag = new DingDanFragment();
                     transaction.add(R.id.main_frag, search_frag);
                 } else {
+                    transaction.remove(search_frag);
                     // 如果MessageFragment不为空，则直接将它显示出来
-                    transaction.show(search_frag);
+                    search_frag = new DingDanFragment();
+                    transaction.add(R.id.main_frag, search_frag);
                 }
                 break;
             case 2:
@@ -332,5 +321,43 @@ public class MainActivity extends BaseActivity {
         //执行的数据类型
         intent.setDataAndType(Uri.fromFile(file), "application/vnd.android.package-archive");
         startActivity(intent);
+    }
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            exit();
+            return false;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+    // 定义一个变量，来标识是否退出
+    private static boolean isExit = false;
+
+    Handler mHandler = new Handler() {
+
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            isExit = false;
+        }
+    };
+    private void exit() {
+        if (!isExit) {
+            isExit = true;
+            ToastShort("再按一次退出程序");
+            // 利用handler延迟发送更改状态信息
+            mHandler.sendEmptyMessageDelayed(0, 2000);
+        } else {
+            finish();
+            System.exit(0);
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        BaseApplication.locationService.stop();
+        Utils.WriteString(SaveKey.KEY_LAT, "");
+        Utils.WriteString(SaveKey.KEY_LON, "");
     }
 }
