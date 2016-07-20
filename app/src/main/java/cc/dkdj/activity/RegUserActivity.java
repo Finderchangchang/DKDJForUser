@@ -62,8 +62,6 @@ public class RegUserActivity extends BaseActivity {
         position = getIntent().getIntExtra("position", -1);
     }
 
-    Map<String, String> map;
-
     private boolean checkEt() {
         if (login_id_et.getText().toString().trim() == "") {
             ToastShort("手机号码不能为空");
@@ -74,13 +72,12 @@ public class RegUserActivity extends BaseActivity {
         } else if (pwd_et.getText().toString().trim() == "") {
             ToastShort("密码不能为空");
             return false;
-        } else if (pwd_et.getText().toString().trim().equals(re_pwd_et.getText().toString().trim())) {
+        } else if (!pwd_et.getText().toString().trim().equals(re_pwd_et.getText().toString().trim())) {
             ToastShort("前后密码不一致，请重新输入");
             return false;
         }
         return true;
     }
-
     private int recLen = 60;
     Timer timer = new Timer();
     TimerTask task = new TimerTask() {
@@ -129,6 +126,17 @@ public class RegUserActivity extends BaseActivity {
                             try {
                                 String state=obj.getString("state");
                                 if(state.equals("1")){//注册成功
+                                    if(LoginActivity.mInstance==null){
+                                        Utils.IntentPost(LoginActivity.class, new Utils.putListener() {
+                                            @Override
+                                            public void put(Intent intent) {
+                                                if (position >= 0) {
+                                                    intent.putExtra("position", position);
+                                                }
+                                            }
+                                        });
+                                    }
+                                    mInstance.finish();
 
                                 }
                                 if(state.equals("-2")){
@@ -139,14 +147,7 @@ public class RegUserActivity extends BaseActivity {
                             }
                         }
                     });
-                    Utils.IntentPost(LoginActivity.class, new Utils.putListener() {
-                        @Override
-                        public void put(Intent intent) {
-                            if (position >= 0) {
-                                intent.putExtra("position", position);
-                            }
-                        }
-                    });
+
                 }
                 break;
             case R.id.back_iv:
@@ -155,7 +156,9 @@ public class RegUserActivity extends BaseActivity {
             case R.id.get_code_btn://获得验证码
                 if (!login_id_et.getText().toString().trim().equals("")) {
                     get_code_btn.setClickable(false);
+                    timer= new Timer();
                     timer.schedule(task, 1000, 1000);
+                    recLen=60;
                     if (get_code_btn.getText().equals("获取验证码")) {
                         map.put("type", "0");//用户名
                         map.put("tel", login_id_et.getText().toString().trim());//密码

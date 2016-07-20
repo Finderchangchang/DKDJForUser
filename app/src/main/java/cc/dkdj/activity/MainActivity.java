@@ -3,6 +3,7 @@ package cc.dkdj.activity;
 import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
@@ -173,10 +174,8 @@ public class MainActivity extends BaseActivity {
                     search_frag = new DingDanFragment();
                     transaction.add(R.id.main_frag, search_frag);
                 } else {
-                    transaction.remove(search_frag);
                     // 如果MessageFragment不为空，则直接将它显示出来
-                    search_frag = new DingDanFragment();
-                    transaction.add(R.id.main_frag, search_frag);
+                    transaction.show(search_frag);
                 }
                 break;
             case 2:
@@ -359,5 +358,10 @@ public class MainActivity extends BaseActivity {
         BaseApplication.locationService.stop();
         Utils.WriteString(SaveKey.KEY_LAT, "");
         Utils.WriteString(SaveKey.KEY_LON, "");
+    }
+    public void onSaveInstanceState(Bundle outState) {
+        // TODO Auto-generated method stub
+        //Log.v("LH", "onSaveInstanceState"+outState);
+        //super.onSaveInstanceState(outState);   //将这一行注释掉，阻止activity保存fragment的状态
     }
 }

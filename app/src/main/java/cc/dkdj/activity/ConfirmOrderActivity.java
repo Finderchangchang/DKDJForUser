@@ -122,7 +122,7 @@ public class ConfirmOrderActivity extends BaseActivity {
             @Override
             public void convert(CommonViewHolder holder, Goods good, int position) {
                 holder.setText(R.id.name_num_tv, good.getPName() + "*" + good.getPNum());
-                holder.setText(R.id.total_price_tv, good.getCurrentprice() + "");
+                holder.setText(R.id.total_price_tv, (Double.parseDouble(good.getCurrentprice())*Integer.parseInt(good.getPNum())) + "");
             }
         };
         good_list_lv.setAdapter(mAdapter);

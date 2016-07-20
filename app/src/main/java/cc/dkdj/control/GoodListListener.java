@@ -23,22 +23,21 @@ import cc.dkdj.view.HttpUtils;
  * 邮箱：1031066280@qq.com
  */
 public class GoodListListener {
-    private Context mContext;
     IFGoodListView mView;
+    Map<String, String> foodtype;
+    String shopid;
 
-    public GoodListListener(Context mContext, IFGoodListView mView) {
-        this.mContext = mContext;
+    public GoodListListener(IFGoodListView mView, String shopId) {
         this.mView = mView;
+        this.shopid = shopId;
     }
 
     /**
      * 根据shopId获得数据
-     *
-     * @param shopId
      */
-    public void load(String shopId) {
-        Map<String, String> foodtype = new HashMap<>();
-        foodtype.put("shopid", shopId);
+    public void loadType() {
+        foodtype = new HashMap<>();
+        foodtype.put("shopid", shopid);
         HttpUtils.loadJson("GetFoodTypeListByShopId", foodtype, new HttpUtils.LoadJsonListener() {
             @Override
             public void load(JSONObject obj) {
@@ -59,11 +58,21 @@ public class GoodListListener {
 
             }
         });
+
+    }
+
+    public void loadFoods(String shopsortid) {
+        foodtype = new HashMap<>();
+        foodtype.put("shopid", shopid);
+        if (!shopsortid.equals("")) {
+            foodtype.put("shopsortid", shopsortid);
+        }
+        foodtype.put("pagesize","100");
         HttpUtils.loadJson("GetFoodListByShopId", foodtype, new HttpUtils.LoadJsonListener() {
             @Override
             public void load(JSONObject obj) {
                 try {
-                    if(obj!=null) {
+                    if (obj != null) {
                         List<FoodDetail> list = new ArrayList<>();
                         String page = obj.getString("page");
                         String total = obj.getString("total");
@@ -72,7 +81,7 @@ public class GoodListListener {
                             list.add(new Gson().fromJson(array.getString(i), FoodDetail.class));
                         }
                         mView.loadGoodDetails(list);
-                    }else{
+                    } else {
                         mView.loadGoodDetails(null);
                     }
                 } catch (JSONException e) {
@@ -80,6 +89,5 @@ public class GoodListListener {
                 }
             }
         });
-
     }
 }

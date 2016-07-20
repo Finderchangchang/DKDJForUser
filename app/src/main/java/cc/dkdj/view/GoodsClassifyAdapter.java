@@ -77,7 +77,6 @@ public class GoodsClassifyAdapter extends BaseAdapter {
             convertView.setBackgroundColor(Color.LTGRAY);
             holder.mName.setTextColor(Color.GRAY);
         }
-
         return convertView;
     }
 

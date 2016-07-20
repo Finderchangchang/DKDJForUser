@@ -143,12 +143,6 @@ public class GoodsDetailsAdapter extends BaseAdapter {
         }
         VolleyLoadPicture vlp = new VolleyLoadPicture(MainActivity.mInstance, holder.mMainIv);
         vlp.getmImageLoader().get(FoodDetail.getIcon(), vlp.getOne_listener());
-//        Glide.with(MainActivity.mInstance)
-//                .load(FoodDetail.getIcon())
-//                .into(holder.mSmallIv);
-//        Glide.with(MainActivity.mInstance)
-//                .load(FoodDetail.getIcon()).error(R.mipmap.no_img)
-//                .into(holder.mMainIv);
         holder.mGoodsName.setText(FoodDetail.getName());
         int num = FoodDetail.getCount();
         //当所点上商品数量为0时，隐藏“减”的图标

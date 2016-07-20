@@ -88,6 +88,8 @@ public class MainFragment extends BaseFragment implements IFMainView {
             map.put("pagesize", "100");
             String lat = "0";
             String lon = "0";
+//            lat = "38.894431";
+//            lon = "115.504949";
             if (null != location && location.getLocType() != BDLocation.TypeServerError) {
                 lat=location.getLatitude()+"";
                 lon=location.getLongitude()+"";

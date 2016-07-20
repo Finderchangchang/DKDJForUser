@@ -60,6 +60,14 @@ public class DingDanFragment extends BaseFragment {
         have_beans = new ArrayList<>();
     }
 
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+        if(!hidden){//显示
+            initDingDan();
+        }
+    }
+
     OrderList orderList;
 
     @Override
@@ -117,11 +125,13 @@ public class DingDanFragment extends BaseFragment {
                         } else {
                             intent.putExtra("orderId", no_beans.get(position).getOrderID());
                         }
-
                     }
                 });
             }
         });
+        initDingDan();
+    }
+    private void initDingDan(){
         userId = Utils.ReadString(SaveKey.KEY_UserId);//获得当前用户ID
         if (userId.equals("")) {
             Utils.IntentPost(LoginActivity.class, new Utils.putListener() {
@@ -150,10 +160,6 @@ public class DingDanFragment extends BaseFragment {
                 }
             });
         }
-    }
-
-    private void load() {
-
     }
 
     public void onClick(View view) {

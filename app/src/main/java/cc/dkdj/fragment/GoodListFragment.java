@@ -50,11 +50,15 @@ public class GoodListFragment extends BaseFragment implements IFGoodListView {
     TextView price_main;
     @CodeNote(id = R.id.total_num_tv)
     TextView total_num_tv;
+    @CodeNote(id = R.id.pei_song_tv)
+    TextView pei_song_tv;
     GoodsDetailsAdapter detailsAdapter;//商品列表
     GoodListListener mListener;//调用访问后台数据接口
     Shop shop = SHDetailsActivity.mInstance.shop;
     String shopId;//店铺ID
     String userId;
+    @CodeNote(id = R.id.gouwuche_lv)
+    ListView gouwuche_lv;
 
     @Override
     public void initViews() {
@@ -62,14 +66,14 @@ public class GoodListFragment extends BaseFragment implements IFGoodListView {
         shopId = shop.getDataID();
         mLeft = new ArrayList<>();
         mRight1 = new ArrayList<>();
-        mListener = new GoodListListener(MainActivity.mInstance, this);
         shops = new ArrayList<>();
         goods = new ArrayList<>();
     }
 
     @Override
     public void initEvents() {
-        mListener.load(SHDetailsActivity.mInstance.shop.getDataID());
+        mListener = new GoodListListener(this, SHDetailsActivity.mInstance.shop.getDataID());
+        mListener.loadType();//加载分类
         mLefts = new GoodsClassifyAdapter(SHDetailsActivity.mInstance, mLeft);
         left_lv.setAdapter(mLefts);
         left_lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -82,15 +86,22 @@ public class GoodListFragment extends BaseFragment implements IFGoodListView {
         right_lv.setAdapter(detailsAdapter);
         billing.setBackgroundColor(getResources().getColor(R.color.smallLab));
         billing.setText("￥" + shop.getMinmoney() + "起送");
+        left_lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                mLefts.clearSelection(i);
+//                mListener.loadFoods(mLeft.get(i).getSortID());
+            }
+        });
+        pei_song_tv.setText("配送费￥" + shop.getSendmoney());
     }
 
     List<ShopListModel> shops;
 
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.billing:
+            case R.id.billing://结算按钮
                 userId = Utils.ReadString(SaveKey.KEY_UserId);
-
                 if (!userId.equals("")) {
                     if (count > 0) {
                         shop.setGoodses(goods);
@@ -209,7 +220,14 @@ public class GoodListFragment extends BaseFragment implements IFGoodListView {
 
     @Override
     public void loadGoodType(List<FoodType> mList) {
+        mLeft = new ArrayList<>();
+        mLeft = mList;
         mLefts.refresh(mList);
+        if (mList.size() > 0) {
+//            mListener.loadFoods(mList.get(0).getSortID());
+            mListener.loadFoods("");
+
+        }
     }
 
     @Override

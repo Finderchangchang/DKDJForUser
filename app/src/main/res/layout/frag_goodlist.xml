@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#babcbc"
-    tools:context="com.example.henry.test.MainActivity">
+    android:background="#babcbc">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -95,53 +93,68 @@
 
         </LinearLayout>
 
-
-        <RelativeLayout
+        <LinearLayout
             android:id="@+id/buttom"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:background="@android:color/white">
+            android:background="@android:color/white"
+            android:orientation="vertical">
+            <ListView
+                android:id="@+id/gouwuche_lv"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:visibility="gone"></ListView>
 
             <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_marginLeft="80dp"
-                android:orientation="vertical">
-                <TextView
-                    android:id="@+id/price_main"
-                    android:layout_width="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
                     android:layout_height="wrap_content"
-                    android:text="￥0.00"
-                    android:textSize="16sp"
-                    android:textColor="@android:color/holo_red_light" />
-                <TextView
-                    android:id="@+id/pei_song_tv"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="配送费￥0.00"/>
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="80dp"
+                    android:orientation="vertical"
+                    android:id="@+id/linearLayout">
+                    <TextView
+                        android:id="@+id/price_main"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="￥0.00"
+                        android:textSize="16sp"
+                        android:textColor="@android:color/holo_red_light" />
+                    <TextView
+                        android:id="@+id/pei_song_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="配送费￥0.00"/>
+                </LinearLayout>
+                <Button
+                    android:id="@+id/billing"
+                    android:layout_width="150dp"
+                    android:layout_height="50dp"
+                    android:layout_alignParentRight="true"
+                    android:background="@android:color/darker_gray"
+                    android:gravity="center"
+                    android:clickable="true"
+                    android:textColor="@android:color/white"
+                    android:textSize="18dp" />
+
+
             </LinearLayout>
-            <Button
-                android:id="@+id/billing"
-                android:layout_width="150dp"
-                android:layout_height="match_parent"
-                android:layout_alignParentRight="true"
-                android:background="@android:color/darker_gray"
-                android:gravity="center"
-                android:clickable="true"
-                android:textColor="@android:color/white"
-                android:textSize="18dp" />
-        </RelativeLayout>
+        </LinearLayout>
     </RelativeLayout>
 
     <RelativeLayout
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:layout_alignParentBottom="true"
         android:layout_centerVertical="true"
-        android:layout_marginBottom="20dp"
         android:layout_marginLeft="20dp"
+        android:layout_marginBottom="5dp"
         android:background="@mipmap/icon_cart">
 
         <TextView
