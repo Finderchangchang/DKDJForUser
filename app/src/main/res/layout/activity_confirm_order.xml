@@ -161,8 +161,7 @@
                 android:layout_height="35dp"
                 android:background="@android:color/white"
                 android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:visibility="gone">
+                android:orientation="horizontal">
 
                 <TextView
                     android:layout_width="0dp"

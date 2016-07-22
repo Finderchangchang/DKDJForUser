@@ -11,4 +11,5 @@
     <color name="bottom_normal_lab">#737373</color>
     <color name="bottom_pressed_lab">#00d8e2</color>
     <color name="textColor">#fff</color>
+    <color name="red">#FF0000</color>
 </resources>

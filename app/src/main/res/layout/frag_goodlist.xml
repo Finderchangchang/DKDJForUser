@@ -139,7 +139,6 @@
                     android:layout_alignParentRight="true"
                     android:background="@android:color/darker_gray"
                     android:gravity="center"
-                    android:clickable="true"
                     android:textColor="@android:color/white"
                     android:textSize="18dp" />
 
