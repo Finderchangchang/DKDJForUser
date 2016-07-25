@@ -24,6 +24,7 @@ public class FoodDetail implements Serializable {
     private String Remains;
     private String FoodType;
     private String TotalMoney;
+    private String PackageFree;//打包费
 
     public String getTotalMoney() {
         return TotalMoney;
@@ -31,6 +32,14 @@ public class FoodDetail implements Serializable {
 
     public void setTotalMoney(String totalMoney) {
         TotalMoney = totalMoney;
+    }
+
+    public String getPackageFree() {
+        return PackageFree;
+    }
+
+    public void setPackageFree(String packageFree) {
+        PackageFree = packageFree;
     }
 
     /**

@@ -117,7 +117,7 @@ public class GoodListFragment extends BaseFragment implements IFGoodListView {
                 pop_win.dismiss();//关闭当前页面
             }
         });
-        pop_billing= (Button) view.findViewById(R.id.billing);
+        pop_billing = (Button) view.findViewById(R.id.billing);
         pop_billing.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -125,13 +125,13 @@ public class GoodListFragment extends BaseFragment implements IFGoodListView {
                 pop_win.dismiss();
             }
         });
-        pop_win = new PopupWindow(view, LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.MATCH_PARENT );
+        pop_win = new PopupWindow(view, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
         gouwuche_lv.setAdapter(mAdapter);
         clear_gwc_rl.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 pop_win.dismiss();//关闭popwindow
-                calculateTotalPrice(0, 0, null);
+                calculateTotalPrice(0, 0, 0, null);
                 detailsAdapter.refresh(goods);//清空列表显示
             }
         });
@@ -175,13 +175,13 @@ public class GoodListFragment extends BaseFragment implements IFGoodListView {
                 holder.setOnClickListener(R.id.jian_iv, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        calculateTotalPrice(-1, -Double.parseDouble(goods.getCurrentprice()), goods);
+                        calculateTotalPrice(-1, -Double.parseDouble(goods.getCurrentprice()), -Double.parseDouble(goods.getPackageFree()), goods);
                     }
                 });
                 holder.setOnClickListener(R.id.add_iv, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        calculateTotalPrice(1, Double.parseDouble(goods.getCurrentprice()), goods);
+                        calculateTotalPrice(1, Double.parseDouble(goods.getCurrentprice()), Double.parseDouble(goods.getPackageFree()), goods);
                     }
                 });
                 holder.setText(R.id.num_tv, goods.getPNum());
@@ -203,7 +203,8 @@ public class GoodListFragment extends BaseFragment implements IFGoodListView {
                 break;
         }
     }
-    private void GoToOrder(){
+
+    private void GoToOrder() {
         userId = Utils.ReadString(SaveKey.KEY_UserId);
         if (!userId.equals("")) {
             if (count > 0) {
@@ -229,6 +230,7 @@ public class GoodListFragment extends BaseFragment implements IFGoodListView {
             });
         }
     }
+
     List<Goods> goods;
     double price = 0;
     int count = 0;
@@ -236,10 +238,12 @@ public class GoodListFragment extends BaseFragment implements IFGoodListView {
     /**
      * 计算总价与选中的个数,并显示在界面上
      *
-     * @param num 购物车商品数量
-     * @param p   总钱数
+     * @param num     购物车商品数量
+     * @param p       总钱数
+     * @param peisong 配送费
+     * @param good    商品信息
      */
-    public void calculateTotalPrice(int num, double p, Goods good) {
+    public void calculateTotalPrice(int num, double p, double peisong, Goods good) {
         count = count + num;
         price = price + p;
         if (num == 1) {

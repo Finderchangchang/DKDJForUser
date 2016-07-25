@@ -253,4 +253,18 @@
             android:text="我的评价"
             android:textColor="#333333" />
     </LinearLayout>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <TextView
+            android:id="@+id/kefu_tel_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="客服电话：4001-663779"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="21dp"
+            android:padding="10dp"/>
+    </RelativeLayout>
 </LinearLayout>

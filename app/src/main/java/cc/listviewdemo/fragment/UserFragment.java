@@ -1,6 +1,7 @@
 package cc.listviewdemo.fragment;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -42,6 +43,8 @@ public class UserFragment extends BaseFragment {
     TextView tv_myaddress;
     String userId;//当前登录的用户ID
     Map<String, String> map;
+    @CodeNote(id=R.id.kefu_tel_tv,click = "onClick")
+    TextView kefu_tel_tv;
     private UserModel model;
 
     @Override
@@ -95,6 +98,11 @@ public class UserFragment extends BaseFragment {
                 } else {
                     MainActivity.mInstance.ToastShort("请先登录");
                 }
+                break;
+            case R.id.kefu_tel_tv:
+                Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + "4001663779"));
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
                 break;
         }
     }

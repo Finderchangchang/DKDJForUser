@@ -116,7 +116,7 @@ public class GoodsDetailsAdapter extends BaseAdapter {
                 count = showList.get(position).getCount();
                 count--;
                 showList.get(position).setCount(count);
-                context.calculateTotalPrice(-1, -price, new Goods(FoodDetail.getName(), "0", "0", "0", FoodDetail.getFoodID(), "", "0.00", FoodDetail.getFoodID(), FoodDetail.getFoodID(), "0.00", price + "", price + ""));
+                context.calculateTotalPrice(-1, -price,-Double.parseDouble(FoodDetail.getPackageFree()), new Goods(FoodDetail.getName(), "0", "0", "0", FoodDetail.getFoodID(), "", "0.00", FoodDetail.getFoodID(), FoodDetail.getFoodID(), "0.00", price + "", price + "",FoodDetail.getPackageFree()));
                 GoodsDetailsAdapter.this.notifyDataSetChanged();
 
             }
@@ -127,7 +127,7 @@ public class GoodsDetailsAdapter extends BaseAdapter {
                 count = showList.get(position).getCount();
                 count++;
                 showList.get(position).setCount(count);
-                context.calculateTotalPrice(1, price, new Goods(FoodDetail.getName(), "0", "0", "0", FoodDetail.getFoodID(), "", "0.00", FoodDetail.getFoodID(), FoodDetail.getFoodID(), "0.00", price + "", price + ""));
+                context.calculateTotalPrice(1, price,Double.parseDouble(FoodDetail.getPackageFree()), new Goods(FoodDetail.getName(), "0", "0", "0", FoodDetail.getFoodID(), "", "0.00", FoodDetail.getFoodID(), FoodDetail.getFoodID(), "0.00", price + "", price + "",FoodDetail.getPackageFree()));
                 GoodsDetailsAdapter.this.notifyDataSetChanged();
             }
         });

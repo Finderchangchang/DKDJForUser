@@ -127,8 +127,9 @@ public class ConfirmOrderActivity extends BaseActivity {
         good_list_lv.setAdapter(mAdapter);
         shop_name_tv.setText(model.getShopList().get(0).getShopName());
         for (Goods good : goods) {
-            double packs = Double.parseDouble(good.getPNum()) * Double.parseDouble(good.getOwername());
+            double packs = Double.parseDouble(good.getPNum()) * Double.parseDouble(good.getPackageFree());
             total_price += (Double.parseDouble(good.getCurrentprice()) * Integer.parseInt(good.getPNum())) + packs;//商品价格+打包费
+            String packages=good.getPackageFree();
             pack_price += packs;
         }
         pack_price_tv.setText("￥" + (pack_price) + "");//打包费

@@ -21,6 +21,7 @@ public class Goods implements Serializable{
     private String owername;//配送费
     private String PPrice;
     private String Currentprice;
+    private String PackageFree;//打包费
 
     /**
      * PName : 尝试1
@@ -38,7 +39,7 @@ public class Goods implements Serializable{
      * PPrice : 0.10 平常价格
      * Currentprice : 0.10 现在价格
      */
-    public Goods(String PName, String reveInt1, String reveInt2, String material, String sid, String sname, String addprice, String PId, String togoId, String owername, String PPrice, String currentprice) {
+    public Goods(String PName, String reveInt1, String reveInt2, String material, String sid, String sname, String addprice, String PId, String togoId, String owername, String PPrice, String currentprice,String PackageFree) {
         this.PName = PName;
         ReveInt1 = reveInt1;
         ReveInt2 = reveInt2;
@@ -51,8 +52,16 @@ public class Goods implements Serializable{
         this.owername = owername;
         this.PPrice = PPrice;
         Currentprice = currentprice;
+        this.PackageFree=PackageFree;
     }
 
+    public String getPackageFree() {
+        return PackageFree;
+    }
+
+    public void setPackageFree(String packageFree) {
+        PackageFree = packageFree;
+    }
 
     public String getPName() {
         return PName;

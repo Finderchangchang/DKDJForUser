@@ -10,7 +10,6 @@ import java.util.List;
  * 邮箱：1031066280@qq.com
  */
 public class OrderModel implements Serializable {
-
     /**
      * Phone : 18920219901
      * Mobilephone : 18920219901
