@@ -198,70 +198,79 @@ public class ConfirmOrderActivity extends BaseActivity {
                 wx_cb.setChecked(true);
                 break;
             case R.id.sure_lock_btn://调用支付接口
-                if (!address_tv.getText().equals("")) {
-                    if (zfb_cb.isChecked()) {//支付宝
-                        if (TextUtils.isEmpty(Config.PARTNER) || TextUtils.isEmpty(Config.RSA_PRIVATE) || TextUtils.isEmpty(Config.SELLER)) {
-                            new AlertDialog.Builder(this).setTitle("警告").setMessage("需要配置PARTNER | RSA_PRIVATE| SELLER")
-                                    .setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                                        public void onClick(DialogInterface dialoginterface, int i) {
-                                            finish();
-                                        }
-                                    }).show();
-                            return;
-                        }
-                        if (zfb_cb.isChecked()) {
-                            model.setPayMode("1");
-                        } else {
-                            model.setPayMode("5");
-                        }
-                        if (model.getUlng().equals("")) {
-                            if (Utils.ReadString(SaveKey.KEY_LON).equals("")) {
-                                model.setUlng("115.508560");
-                            } else {
-                                model.setUlng(Utils.ReadString(SaveKey.KEY_LON));
-                            }
-                        }
-                        if (model.getUlat().equals("")) {
-                            if (Utils.ReadString(SaveKey.KEY_LAT).equals("")) {
-                                model.setUlat("38.893189");
-                            } else {
-                                model.setUlat(Utils.ReadString(SaveKey.KEY_LAT));
-                            }
-                        }
 
-                        model.setRemark(order_remark_et.getText().toString().trim());
-                        List<OrderModel> orderModels = new ArrayList<>();
-                        orderModels.add(model);
-                        String json = new Gson().toJson(orderModels);
-                        map = new HashMap<>();
-                        map.put("ordermodel", json);
-                        HttpUtils.loadJson("SubmitOrder", map, new HttpUtils.LoadJsonListener() {
-                            @Override
-                            public void load(JSONObject obj) {
-                                if (obj != null) {
-                                    state = new Gson().fromJson(obj.toString(), PayState.class);
-                                    if (state.getOrderstate().equals("1")) {
-                                        init(total_price + "", state.getOrderid());
-                                    } else {//判断是否为关门状态
-                                        ToastShort("预订单生成失败...");
+                if (!address_tv.getText().equals("")) {//支付宝
+                    if (TextUtils.isEmpty(Config.PARTNER) || TextUtils.isEmpty(Config.RSA_PRIVATE) || TextUtils.isEmpty(Config.SELLER)) {
+                        new AlertDialog.Builder(this).setTitle("警告").setMessage("需要配置PARTNER | RSA_PRIVATE| SELLER")
+                                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialoginterface, int i) {
+                                        finish();
                                     }
+                                }).show();
+                        return;
+                    }
+                    if (zfb_cb.isChecked()) {
+                        model.setPayMode("1");
+                    } else {
+                        model.setPayMode("5");
+                    }
+                    if (model.getUlng().equals("")) {
+                        if (Utils.ReadString(SaveKey.KEY_LON).equals("")) {
+                            model.setUlng("115.508560");
+                        } else {
+                            model.setUlng(Utils.ReadString(SaveKey.KEY_LON));
+                        }
+                    }
+                    if (model.getUlat().equals("")) {
+                        if (Utils.ReadString(SaveKey.KEY_LAT).equals("")) {
+                            model.setUlat("38.893189");
+                        } else {
+                            model.setUlat(Utils.ReadString(SaveKey.KEY_LAT));
+                        }
+                    }
+
+                    model.setRemark(order_remark_et.getText().toString().trim());
+                    List<OrderModel> orderModels = new ArrayList<>();
+                    orderModels.add(model);
+                    String json = new Gson().toJson(orderModels);
+                    map = new HashMap<>();
+                    map.put("ordermodel", json);
+                    HttpUtils.loadJson("SubmitOrder", map, new HttpUtils.LoadJsonListener() {
+                        @Override
+                        public void load(JSONObject obj) {
+                            if (obj != null) {
+                                state = new Gson().fromJson(obj.toString(), PayState.class);
+                                if (state.getOrderstate().equals("1")) {
+                                    init(total_price + "", state.getOrderid());
+                                } else {//判断是否为关门状态
+                                    ToastShort("预订单生成失败...");
                                 }
                             }
-                        });
-                    } else {//微信
-                        new MyThread().start();
-                    }
+                        }
+                    });
                 } else {
                     ToastShort("请添加收货地址");
                 }
                 break;
         }
     }
+
+
     class MyThread extends Thread {
+        String Order_Id = "";
+        int Order_Price;
+
+        public MyThread(String orderId, double price) {
+            Order_Id = orderId;
+            Order_Price = (int) (price * 100);
+        }
+
         public void run() {
-            WxUtil.load(ConfirmOrderActivity.mInstance, "测试订单", "大可到家Android测试", "632412123123", "2010");
+            int price=(int)(total_price*100);
+            WxUtil.load(ConfirmOrderActivity.mInstance, "大可到家", "大可到家Android支付", Order_Id, price);
         }
     }
+
     HandlerTest1 mHandlerTest1;
 
     private void init(final String price, final String orderid) {
@@ -278,7 +287,6 @@ public class ConfirmOrderActivity extends BaseActivity {
 
             ;
         }.start();
-
     }
 
     private class HandlerTest1 extends Handler {
@@ -293,45 +301,47 @@ public class ConfirmOrderActivity extends BaseActivity {
             map = new HashMap<String, String>();
             map.put("orderid", msg.obj.toString().split(";")[1]);
             map.put("price", msg.obj.toString().split(";")[0]);
-            HttpUtils.loadJson("buildpaynum", map, new HttpUtils.LoadJsonListener() {
+            HttpUtils.loadSave("buildpaynum", map, new HttpUtils.LoadJsonListener() {
                 @Override
                 public void load(JSONObject obj) {
                     try {
-                        String orderInfo = getOrderInfo("大可到家Android支付", "body", total_price + "", obj.getString("batch"));
-                        String sign = sign(orderInfo);
-                        try {
-                            sign = URLEncoder.encode(sign, "UTF-8");
-                        } catch (UnsupportedEncodingException e) {
+                        String path = obj.getString("batch");//获得OrderID
+                        if (zfb_cb.isChecked()) {
+                            String orderInfo = getOrderInfo("大可到家Android支付", "body", total_price + "", obj.getString("batch"));
+                            String sign = sign(orderInfo);
+                            try {
+                                sign = URLEncoder.encode(sign, "UTF-8");
+                            } catch (UnsupportedEncodingException e) {
 
-                        }
-                        /**
-                         * 完整的符合支付宝参数规范的订单信息
-                         */
-                        final String payInfo = orderInfo + "&sign=\"" + sign + "\"&" + getSignType();
-                        Runnable payRunnable = new Runnable() {
-
-                            @Override
-                            public void run() {
-                                // 构造PayTask 对象
-                                PayTask alipay = new PayTask(ConfirmOrderActivity.this);
-                                // 调用支付接口，获取支付结果
-                                String result = alipay.pay(payInfo, true);
-                                Message msg = new Message();
-                                msg.what = SDK_PAY_FLAG;
-                                msg.obj = result;
-                                mHandler.sendMessage(msg);
                             }
-                        };
+                            /**
+                             * 完整的符合支付宝参数规范的订单信息
+                             */
+                            final String payInfo = orderInfo + "&sign=\"" + sign + "\"&" + getSignType();
+                            Runnable payRunnable = new Runnable() {
 
-//             必须异步调用
-                        Thread payThread = new Thread(payRunnable);
-                        payThread.start();
+                                @Override
+                                public void run() {
+                                    // 构造PayTask 对象
+                                    PayTask alipay = new PayTask(ConfirmOrderActivity.this);
+                                    // 调用支付接口，获取支付结果
+                                    String result = alipay.pay(payInfo, true);
+                                    Message msg = new Message();
+                                    msg.what = SDK_PAY_FLAG;
+                                    msg.obj = result;
+                                    mHandler.sendMessage(msg);
+                                }
+                            };
+                            Thread payThread = new Thread(payRunnable);
+                            payThread.start();
+                        } else {
+                            new MyThread(path,total_price).start();
+                        }
                     } catch (JSONException e) {
 
                     }
                 }
             });
-
         }
     }
 

@@ -7,6 +7,7 @@ import java.io.Serializable;
  * 邮箱：1031066280@qq.com
  */
 public class Goods implements Serializable{
+    private int position;//Good选择的位置
     private String PName;
     private String ReveInt1;
     private String ReveInt2;

@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.text.TextUtils;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -36,6 +37,7 @@ import cc.listviewdemo.view.CommonViewHolder;
 import cc.listviewdemo.view.HttpUtils;
 import cc.listviewdemo.view.SignUtils;
 import cc.listviewdemo.view.Utils;
+import cc.listviewdemo.view.WxUtil;
 
 /**
  * 订单详细信息
@@ -72,6 +74,10 @@ public class OrderDetailActivity extends BaseActivity {
     ListView lv;
     @CodeNote(id = R.id.mBtnDoorder, click = "onClick")
     TextView mBtnDoorder;
+    @CodeNote(id = R.id.cancel_tv, click = "onClick")
+    TextView cancel_tv;
+    @CodeNote(id = R.id.back_iv, click = "onClick")
+    ImageView back_iv;
     Map<String, String> map;
     String key = "";
     OrderDetailModel model;
@@ -87,8 +93,59 @@ public class OrderDetailActivity extends BaseActivity {
         mInstance = this;
     }
 
+    class MyThread extends Thread {
+        String Order_Id = "";
+        int Order_Price;
+
+        public MyThread(String orderId, String price) {
+            Order_Id = orderId;
+            Order_Price = (int) (Double.parseDouble(price) * 100);
+        }
+
+        public void run() {
+            WxUtil.load(mInstance, "大可到家", "大可到家Android支付", Order_Id, Order_Price);
+        }
+    }
+
     public void onClick(View view) {
         switch (view.getId()) {
+            case R.id.back_iv:
+                mInstance.finish();
+                break;
+            case R.id.cancel_tv:
+                if (model.getPaystate().equals("0")) {
+                    OrderDetailActivity.mInstance.ToastShort("未支付订单不能取消");
+                } else {
+                    switch (model.getIsShopSet()) {
+                        case "0":
+                            map = new HashMap<>();
+                            map.put("orderid", model.getOrderID());
+                            map.put("state", "2");
+                            map.put("shopid", model.getTogoId());
+                            HttpUtils.loadJson("/App/shop/saveorderstate", map, new HttpUtils.LoadJsonListener() {
+                                @Override
+                                public void load(JSONObject obj) {
+                                    try {
+                                        if (!obj.getString("state").equals("0")) {
+                                            OrderDetailActivity.mInstance.ToastShort("取消成功");
+                                        } else {
+                                            OrderDetailActivity.mInstance.ToastShort("取消失败");
+                                        }
+                                    } catch (JSONException e) {
+
+                                    }
+                                }
+                            });
+                            break;
+                        case "1":
+                            OrderDetailActivity.mInstance.ToastShort("配送小哥正在路上，请耐心等待");
+                            break;
+                        case "2":
+                            OrderDetailActivity.mInstance.ToastShort("订单已经取消，请耐心等待回款");
+                            break;
+                    }
+                }
+                break;
             case R.id.mBtnDoorder:
                 if (mBtnDoorder.getText().equals("去支付")) {
                     map = new HashMap<String, String>();
@@ -98,38 +155,42 @@ public class OrderDetailActivity extends BaseActivity {
                         @Override
                         public void load(JSONObject obj) {
                             try {
-                                String orderInfo = getOrderInfo("大可到家Android支付", "body", model.getTotalPrice() + "", obj.getString("batch"));
-                                String sign = sign(orderInfo);
-                                try {
-                                    sign = URLEncoder.encode(sign, "UTF-8");
-                                } catch (UnsupportedEncodingException e) {
+                                String path = obj.getString("batch");//获得OrderID
+                                if (model.getPayMode().equals("1")) {
+                                    String orderInfo = getOrderInfo("大可到家Android支付", "body", model.getTotalPrice() + "", path);
+                                    String sign = sign(orderInfo);
+                                    try {
+                                        sign = URLEncoder.encode(sign, "UTF-8");
+                                    } catch (UnsupportedEncodingException e) {
 
-                                }
-                                /**
-                                 * 完整的符合支付宝参数规范的订单信息
-                                 */
-                                final String payInfo = orderInfo + "&sign=\"" + sign + "\"&" + getSignType();
-                                Runnable payRunnable = new Runnable() {
-
-                                    @Override
-                                    public void run() {
-                                        // 构造PayTask 对象
-                                        PayTask alipay = new PayTask(OrderDetailActivity.this);
-                                        // 调用支付接口，获取支付结果
-                                        String result = alipay.pay(payInfo, true);
-                                        Message msg = new Message();
-                                        msg.what = 1;
-                                        msg.obj = result;
-                                        mHandler.sendMessage(msg);
                                     }
-                                };
+                                    /**
+                                     * 完整的符合支付宝参数规范的订单信息
+                                     */
+                                    final String payInfo = orderInfo + "&sign=\"" + sign + "\"&" + getSignType();
+                                    Runnable payRunnable = new Runnable() {
 
-//             必须异步调用
-                                Thread payThread = new Thread(payRunnable);
-                                payThread.start();
+                                        @Override
+                                        public void run() {
+                                            // 构造PayTask 对象
+                                            PayTask alipay = new PayTask(OrderDetailActivity.this);
+                                            // 调用支付接口，获取支付结果
+                                            String result = alipay.pay(payInfo, true);
+                                            Message msg = new Message();
+                                            msg.what = 1;
+                                            msg.obj = result;
+                                            mHandler.sendMessage(msg);
+                                        }
+                                    };
+                                    Thread payThread = new Thread(payRunnable);
+                                    payThread.start();
+                                } else {
+                                    new MyThread(path, model.getTotalPrice()).start();
+                                }
                             } catch (JSONException e) {
 
                             }
+
                         }
                     });
                 } else {
@@ -151,16 +212,10 @@ public class OrderDetailActivity extends BaseActivity {
                     // 判断resultStatus 为“9000”则代表支付成功，具体状态码代表含义可参考接口文档
                     if (TextUtils.equals(resultStatus, "9000")) {
                         Toast.makeText(OrderDetailActivity.this, "支付成功", Toast.LENGTH_SHORT).show();
+                        setResult(1);
                         mInstance.finish();//关闭当前页面
-                        SHDetailsActivity.mInstance.finish();//关闭商户页面
-                        if(MainActivity.mInstance!=null){
-                            MainActivity.mInstance.finish();
-                            Utils.IntentPost(MainActivity.class, new Utils.putListener() {
-                                @Override
-                                public void put(Intent intent) {
-                                    intent.putExtra("position",1);
-                                }
-                            });
+                        if (SHDetailsActivity.mInstance != null) {
+                            SHDetailsActivity.mInstance.finish();//关闭商户页面
                         }
                         /*后期需要实现跳转到订单相信页面，是支付失败还是再来一单*/
                     } else {
@@ -170,7 +225,6 @@ public class OrderDetailActivity extends BaseActivity {
                             // 其他值就可以判断为支付失败，包括用户主动取消支付，或者系统返回的错误
                             Toast.makeText(OrderDetailActivity.this, "支付失败", Toast.LENGTH_SHORT).show();
                             mInstance.finish();//关闭当前页面
-                            SHDetailsActivity.mInstance.finish();//关闭商户页面
                         }
                     }
                     break;
@@ -180,6 +234,14 @@ public class OrderDetailActivity extends BaseActivity {
             }
         }
     };
+
+    /**
+     * 关闭当前页面
+     */
+    public static void closeThis() {
+        mInstance.setResult(1);
+        mInstance.finish();//关闭当前页面
+    }
 
     /**
      * create the order info. 创建订单信息
@@ -274,13 +336,14 @@ public class OrderDetailActivity extends BaseActivity {
                 } else {
                     etOrderType.setText("微信");
                 }
-                String foods = model.getFoodlist().get(0);
-
-                for (int i = 0; i < foods.split("]").length; i++) {
-                    String name = foods.split("]")[i].split(":")[5].split(",")[0].replace("\"", "");
-                    String num = foods.split("]")[i].split(":")[1].split(",")[0];
-                    String price = foods.split("]")[i].split(":")[3].split(",")[0];
-                    list.add(name + "*" + num + ":" + price);
+                if (model.getFoodlist().size() > 0) {
+                    String foods = model.getFoodlist().get(0);
+                    for (int i = 0; i < foods.split("]").length; i++) {
+                        String name = foods.split("]")[i].split(":")[5].split(",")[0].replace("\"", "");
+                        String num = foods.split("]")[i].split(":")[1].split(",")[0];
+                        String price = foods.split("]")[i].split(":")[3].split(",")[0];
+                        list.add(name + "*" + num + ":" + price);
+                    }
                 }
                 etRemark.setText(model.getRemark());
                 mAdapter = new CommonAdapter<String>(OrderDetailActivity.this, list, R.layout.item_good) {

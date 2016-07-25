@@ -90,8 +90,9 @@ public class RegUserActivity extends BaseActivity {
                     get_code_btn.setText(recLen + "s");
                     if (recLen == 0) {
                         timer.cancel();
-                        get_code_btn.setClickable(true);
+                        get_code_btn.setEnabled(true);
                         get_code_btn.setText("获取验证码");
+                        recLen=60;
                     }
                 }
             });
@@ -154,7 +155,7 @@ public class RegUserActivity extends BaseActivity {
                 break;
             case R.id.get_code_btn://获得验证码
                 if (!login_id_et.getText().toString().trim().equals("")) {
-                    get_code_btn.setClickable(false);
+                    get_code_btn.setEnabled(false);
                     timer= new Timer();
                     timer.schedule(task, 1000, 1000);
                     recLen=60;
@@ -168,23 +169,22 @@ public class RegUserActivity extends BaseActivity {
                                     if (obj != null) {
                                         if (obj.getString("state").equals("1")) {
                                             SMS_Code = obj.getString("pwd");//获得验证码
-                                        } else if(obj.getString("state").equals("-1")){
+                                            ToastShort("发送成功");
+                                        } else if (obj.getString("state").equals("-1")) {
                                             ToastShort("该手机号已存在，可直接登陆");
-                                        }else {
+                                        } else {
                                             ToastShort("发送失败");
                                             timer.cancel();
-                                            get_code_btn.setClickable(true);
-                                            get_code_btn.setText("获取验证码");
                                         }
                                     } else {
                                         ToastShort("发送失败！");
                                         timer.cancel();
-                                        get_code_btn.setClickable(true);
-                                        get_code_btn.setText("获取验证码");
                                     }
                                 } catch (JSONException e) {
 
                                 }
+                                get_code_btn.setEnabled(true);
+                                get_code_btn.setText("获取验证码");
                             }
                         });
                     }

@@ -39,7 +39,7 @@ public class WxUtil {
      * @param price
      * @return
      */
-    public static boolean load(Context context,String body, String desc, String orderID, String price) {
+    public static boolean load(Context context,String body, String desc, String orderID, int price) {
         IWXAPI api = WXAPIFactory.createWXAPI(context, Config.APP_ID);
         api.registerApp(Config.APP_ID);//注册App到微信
         SortedMap<Object, Object> map = new TreeMap<Object, Object>();
@@ -50,7 +50,7 @@ public class WxUtil {
         map.put("detail", desc);//商品详细信息
         map.put("out_trade_no", orderID);//商户订单号
         map.put("total_fee", price);//总金额
-        map.put("spbill_create_ip", "127.0.0.1");//终端ip
+//        map.put("spbill_create_ip", "127.0.0.1");//终端ip
         map.put("notify_url", "http://s-264268.gotocdn.com/weixinpay/payNotifyUrl.aspx");//通知地址
         map.put("trade_type", "APP");
         map.put("sign", WX.createSign("UTF-8", map));//创建微信签名

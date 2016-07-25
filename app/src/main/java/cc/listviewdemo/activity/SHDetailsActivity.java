@@ -71,6 +71,7 @@ public class SHDetailsActivity extends BaseActivity {
         final TitleFragmentPagerAdapter adapter = new TitleFragmentPagerAdapter(getFragmentManager(), fragments, new String[]{"购买", "评论", "商家信息"});
         moretab_viewPager.setAdapter(adapter);
         tab.setupWithViewPager(moretab_viewPager);
+        moretab_viewPager.setOffscreenPageLimit(2);
         tab.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {

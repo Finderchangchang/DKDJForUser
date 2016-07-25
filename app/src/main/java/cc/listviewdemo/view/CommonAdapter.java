@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public abstract class CommonAdapter<T> extends BaseAdapter {
@@ -50,7 +51,11 @@ public abstract class CommonAdapter<T> extends BaseAdapter {
     public abstract void convert(CommonViewHolder holder, T t, int position);
 
     public void refresh(List<T> items) {
-        this.mDatas = items;
+        if(items==null){
+            this.mDatas=new ArrayList<>();
+        }else {
+            this.mDatas = items;
+        }
         notifyDataSetChanged();
     }
 }

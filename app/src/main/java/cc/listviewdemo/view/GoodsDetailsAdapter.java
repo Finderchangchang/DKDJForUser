@@ -15,6 +15,7 @@ import cc.listviewdemo.R;
 import cc.listviewdemo.activity.MainActivity;
 import cc.listviewdemo.fragment.GoodListFragment;
 import cc.listviewdemo.model.FoodDetail;
+import cc.listviewdemo.model.Good;
 import cc.listviewdemo.model.Goods;
 
 /**
@@ -24,13 +25,15 @@ import cc.listviewdemo.model.Goods;
  */
 public class GoodsDetailsAdapter extends BaseAdapter {
     private GoodListFragment context;
-    private List<FoodDetail> showList=new ArrayList<>();
+    private List<FoodDetail> showList = new ArrayList<>();
+    private List<Goods> goodsList = new ArrayList<>();
     private int count;
 
     public GoodsDetailsAdapter(GoodListFragment context, List<FoodDetail> FoodDetailList) {
         this.context = context;
         this.showList = FoodDetailList;
     }
+
     @Override
     public int getCount() {
         return showList.size();
@@ -65,10 +68,11 @@ public class GoodsDetailsAdapter extends BaseAdapter {
             holder.mGoodsName = (TextView) convertView.findViewById(R.id.name_tv);
             holder.mGoodsPrice = (TextView) convertView.findViewById(R.id.price_tv);
             holder.mGoodsNum = (TextView) convertView.findViewById(R.id.num);
-            holder.mMainIv= (ImageView) convertView.findViewById(R.id.main_iv);
+            holder.mMainIv = (ImageView) convertView.findViewById(R.id.main_iv);
             holder.mGoodsAdd = (ImageView) convertView.findViewById(R.id.add_iv);
             holder.mGoodsReduce = (ImageView) convertView.findViewById(R.id.reduce);
-            holder.mSmallIv= (ImageView) convertView.findViewById(R.id.notice_iv);
+            holder.mSmallIv = (ImageView) convertView.findViewById(R.id.notice_iv);
+            holder.mSellNum= (TextView) convertView.findViewById(R.id.sell_num_tv);
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
@@ -81,7 +85,6 @@ public class GoodsDetailsAdapter extends BaseAdapter {
                 .crossFade()
                 .into(holder.mMainIv);
         int num = FoodDetail.getCount();
-        //当所点上商品数量为0时，隐藏“减”的图标
         if (num == 0) {
             holder.mGoodsNum.setVisibility(View.GONE);
             holder.mGoodsReduce.setVisibility(View.GONE);
@@ -89,11 +92,23 @@ public class GoodsDetailsAdapter extends BaseAdapter {
             holder.mGoodsNum.setVisibility(View.VISIBLE);
             holder.mGoodsReduce.setVisibility(View.VISIBLE);
         }
+        holder.mSellNum.setText(FoodDetail.getSale());
         holder.mGoodsPrice.setText(FoodDetail.getFoodstylelist().get(0).getPrice() + "");
         double totalPrice = num * Double.parseDouble(showList.get(position).getFoodstylelist().get(0).getPrice());
-        FoodDetail.setTotalMoney("￥"+totalPrice);
+        FoodDetail.setTotalMoney("￥" + totalPrice);
         holder.mGoodsNum.setText(num + "");
-        final double price=Double.parseDouble(FoodDetail.getFoodstylelist().get(0).getPrice());
+        holder.mGoodsReduce.setVisibility(View.GONE);//减显示
+        holder.mGoodsNum.setVisibility(View.GONE);
+        //当所点上商品数量为0时，隐藏“减”的图标
+        for (int i = 0; i < goodsList.size(); i++) {
+            Goods goods = goodsList.get(i);
+            if (FoodDetail.getFoodID().equals(goods.getPId())) {//如果商品信息与列表的商品ID一致，显示当前选择的商品数量
+                holder.mGoodsReduce.setVisibility(View.VISIBLE);//减显示
+                holder.mGoodsNum.setVisibility(View.VISIBLE);
+                holder.mGoodsNum.setText(goods.getPNum());
+            }
+        }
+        final double price = Double.parseDouble(FoodDetail.getFoodstylelist().get(0).getPrice());
         //设置加减监听事件
         holder.mGoodsReduce.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -101,7 +116,7 @@ public class GoodsDetailsAdapter extends BaseAdapter {
                 count = showList.get(position).getCount();
                 count--;
                 showList.get(position).setCount(count);
-                context.calculateTotalPrice(-1, -price, new Goods(FoodDetail.getName(), "0", "0","0", FoodDetail.getFoodID(),"","0.00", FoodDetail.getFoodID(),FoodDetail.getFoodID(),"0.00",price+"",price+""));
+                context.calculateTotalPrice(-1, -price, new Goods(FoodDetail.getName(), "0", "0", "0", FoodDetail.getFoodID(), "", "0.00", FoodDetail.getFoodID(), FoodDetail.getFoodID(), "0.00", price + "", price + ""));
                 GoodsDetailsAdapter.this.notifyDataSetChanged();
 
             }
@@ -112,21 +127,19 @@ public class GoodsDetailsAdapter extends BaseAdapter {
                 count = showList.get(position).getCount();
                 count++;
                 showList.get(position).setCount(count);
-                context.calculateTotalPrice(1, price, new Goods(FoodDetail.getName(), "0", "0","0", FoodDetail.getFoodID(),"","0.00", FoodDetail.getFoodID(),FoodDetail.getFoodID(),"0.00",price+"",price+""));
+                context.calculateTotalPrice(1, price, new Goods(FoodDetail.getName(), "0", "0", "0", FoodDetail.getFoodID(), "", "0.00", FoodDetail.getFoodID(), FoodDetail.getFoodID(), "0.00", price + "", price + ""));
                 GoodsDetailsAdapter.this.notifyDataSetChanged();
             }
         });
         return convertView;
     }
-    /**
-     * 根据指定的SID获得Foods集合
-     * @param SID
-     */
-    public void refresh(String SID) {
 
-        notifyDataSetChanged();
-    }
-    public void refresh(){
+    public void refresh(List<Goods> goodses) {
+        if (goodses == null) {
+            this.goodsList = new ArrayList<>();
+        } else {
+            goodsList = goodses;
+        }
         notifyDataSetChanged();
     }
 
@@ -138,5 +151,6 @@ public class GoodsDetailsAdapter extends BaseAdapter {
         private TextView mGoodsPrice;//商品价格
         private ImageView mGoodsAdd;    //增加
         private ImageView mGoodsReduce; //减少
+        private TextView mSellNum;//销售数量
     }
 }

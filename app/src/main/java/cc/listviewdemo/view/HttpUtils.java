@@ -21,13 +21,30 @@ import cc.listviewdemo.config.Config;
  * 邮箱：1031066280@qq.com
  */
 public class HttpUtils {
+    /**
+     * 执行添加操作只能访问一次
+     * @param method
+     * @param map
+     * @param listener
+     */
+    public static void loadSave(String method, Map<String, String> map, final LoadJsonListener listener) {
+        load(method, map, listener, true);
+    }
 
     public static void loadJson(String method, Map<String, String> map, final LoadJsonListener listener) {
+        load(method, map, listener, false);
+    }
+
+    public static void load(String method, Map<String, String> map, final LoadJsonListener listener, boolean isSave) {
         String url;
         if (method.equals("version")) {
             url = Config.DOWN_PATH + method + ".aspx?1=1";
         } else {
-            url = Config.PATH + method + ".aspx?1=1";
+            if (method.contains("shop")) {
+                url = Config.URL + method + ".aspx?1=1";
+            } else {
+                url = Config.PATH + method + ".aspx?1=1";
+            }
         }
         if (map != null) {
             Iterator i = map.entrySet().iterator();
@@ -36,6 +53,7 @@ public class HttpUtils {
             }
             url = url.replace(" ", "%20");
         }
+
         JsonObjectRequest json = new JsonObjectRequest(
                 url, null,
                 new Response.Listener<JSONObject>() {
@@ -46,17 +64,19 @@ public class HttpUtils {
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Toast.makeText(BaseApplication.getContext(),error.toString(),Toast.LENGTH_SHORT).show();
+                Toast.makeText(BaseApplication.getContext(), error.toString(), Toast.LENGTH_SHORT).show();
                 listener.load(null);
             }
         });
-        json.setRetryPolicy(
-                new DefaultRetryPolicy(
-                        500000,//默认超时时间，应设置一个稍微大点儿的，例如本处的500000
-                        DefaultRetryPolicy.DEFAULT_MAX_RETRIES,//默认最大尝试次数
-                        DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
-                )
-        );
+        if (!isSave) {
+            json.setRetryPolicy(
+                    new DefaultRetryPolicy(
+                            500000,//默认超时时间，应设置一个稍微大点儿的，例如本处的500000
+                            DefaultRetryPolicy.DEFAULT_MAX_RETRIES,//默认最大尝试次数
+                            DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
+                    )
+            );
+        }
         if (BaseApplication.mQueue != null) {
             BaseApplication.mQueue = Volley.newRequestQueue(BaseApplication.getContext());
         }

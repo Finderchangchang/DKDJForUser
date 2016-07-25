@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="130dp"
+    android:layout_height="110dp"
     android:background="?android:attr/selectableItemBackground"
     android:descendantFocusability="blocksDescendants"
     android:orientation="vertical"
@@ -21,8 +21,8 @@
 
             <ImageView
                 android:id="@+id/iv"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_width="116dp"
+                android:layout_height="78dp"
                 android:src="@mipmap/no_img" />
             <TextView
                 android:id="@+id/shop_no_open_tv"
@@ -54,7 +54,8 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:layout_marginTop="3dp">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -86,14 +87,15 @@
                 android:id="@+id/tag_gv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:numColumns="2"></GridView>
+                android:numColumns="2"
+                android:scrollbars="none"></GridView>
 
         </LinearLayout>
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="15dp"
+        android:layout_height="8dp"
         android:background="#efefef"></LinearLayout>
 
 </LinearLayout>

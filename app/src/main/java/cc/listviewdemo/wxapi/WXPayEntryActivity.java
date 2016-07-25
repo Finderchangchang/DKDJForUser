@@ -14,7 +14,12 @@ import android.os.Bundle;
 import android.widget.Toast;
 
 import cc.listviewdemo.R;
+import cc.listviewdemo.activity.ConfirmOrderActivity;
+import cc.listviewdemo.activity.OrderDetailActivity;
+import cc.listviewdemo.activity.SHDetailsActivity;
 import cc.listviewdemo.config.Config;
+import cc.listviewdemo.config.SaveKey;
+import cc.listviewdemo.view.Utils;
 
 public class WXPayEntryActivity extends Activity implements IWXAPIEventHandler{
 	
@@ -27,7 +32,6 @@ public class WXPayEntryActivity extends Activity implements IWXAPIEventHandler{
         
     	api = WXAPIFactory.createWXAPI(this, Config.APP_ID);
         api.handleIntent(getIntent(), this);
-		Toast.makeText(WXPayEntryActivity.this,"resp.errCode:",Toast.LENGTH_SHORT).show();
     }
 
 	@Override
@@ -43,12 +47,25 @@ public class WXPayEntryActivity extends Activity implements IWXAPIEventHandler{
 
 	@Override
 	public void onResp(BaseResp resp) {
-		Toast.makeText(WXPayEntryActivity.this,"resp.errCode:"+resp.errCode,Toast.LENGTH_SHORT).show();
 		if (resp.getType() == ConstantsAPI.COMMAND_PAY_BY_WX) {
-			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-			builder.setTitle("app_tip");
-			builder.setMessage("error");
-			builder.show();
+			switch (resp.errCode){
+				case 0:
+					Toast.makeText(WXPayEntryActivity.this,"支付成功",Toast.LENGTH_SHORT).show();
+					break;
+				default:
+					Toast.makeText(WXPayEntryActivity.this,"支付失败",Toast.LENGTH_SHORT).show();
+					break;
+			}
+			if(ConfirmOrderActivity.mInstance!=null){
+				ConfirmOrderActivity.mInstance.finish();
+			}
+			if(SHDetailsActivity.mInstance!=null){
+				SHDetailsActivity.mInstance.finish();
+			}
+			WXPayEntryActivity.this.finish();
+			if(OrderDetailActivity.mInstance!=null){
+				OrderDetailActivity.closeThis();
+			}
 		}
 	}
 }

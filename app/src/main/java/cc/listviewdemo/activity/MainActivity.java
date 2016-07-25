@@ -80,6 +80,7 @@ public class MainActivity extends BaseActivity {
     String userId;
     Map<String, String> map;
     NormalDialog dialog;
+
     @Override
     public void initViews() {
         setContentView(R.layout.activity_main);
@@ -119,6 +120,7 @@ public class MainActivity extends BaseActivity {
         }
         checkForUpdate();//验证是否需要更新
     }
+
     /**
      * 点击事件处理
      *
@@ -191,7 +193,9 @@ public class MainActivity extends BaseActivity {
         }
         transaction.commit();
     }
+
     Version model;
+
     /**
      * 检查更新
      */
@@ -201,9 +205,19 @@ public class MainActivity extends BaseActivity {
         HttpUtils.loadJson("version", map, new HttpUtils.LoadJsonListener() {
             @Override
             public void load(JSONObject obj) {
-                    model = new Gson().fromJson(obj.toString(),Version.class);
-                if (Double.parseDouble(model.getVersion()) > Double.parseDouble(Utils.getVersion())) {//最新版本大于当前版本
-                    dialog=new NormalDialog(MainActivity.mInstance);
+                model = new Gson().fromJson(obj.toString(), Version.class);
+                String old_version = Utils.getVersion();
+                String new_version = model.getVersion();
+                boolean result=false;
+                if(Integer.parseInt(new_version.substring(0,1))>Integer.parseInt(old_version.substring(0,1))){
+                    result=true;
+                }else{
+                    if(Double.parseDouble(new_version.substring(2))>Double.parseDouble(old_version.substring(2))){
+                        result=true;
+                    }
+                }
+                if (result) {//最新版本大于当前版本
+                    dialog = new NormalDialog(MainActivity.mInstance);
                     dialog.setOnPositiveListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -237,6 +251,7 @@ public class MainActivity extends BaseActivity {
         downloadTask task = new downloadTask(model.getDownload(), threadNum, filepath);
         task.start();
     }
+
     /**
      * 多线程文件下载
      *
@@ -298,7 +313,7 @@ public class MainActivity extends BaseActivity {
                     msg.getData().putInt("size", downloadedAllSize);
                     Thread.sleep(1000);// 休息1秒后再读取下载进度
                 }
-                if(isfinished){
+                if (isfinished) {
                     installApk(file);
                 }
 
@@ -312,6 +327,7 @@ public class MainActivity extends BaseActivity {
 
         }
     }
+
     //安装apk
     protected void installApk(File file) {
         Intent intent = new Intent();
@@ -321,6 +337,7 @@ public class MainActivity extends BaseActivity {
         intent.setDataAndType(Uri.fromFile(file), "application/vnd.android.package-archive");
         startActivity(intent);
     }
+
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
@@ -329,6 +346,7 @@ public class MainActivity extends BaseActivity {
         }
         return super.onKeyDown(keyCode, event);
     }
+
     // 定义一个变量，来标识是否退出
     private static boolean isExit = false;
 
@@ -340,11 +358,11 @@ public class MainActivity extends BaseActivity {
             isExit = false;
         }
     };
+
     private void exit() {
         if (!isExit) {
             isExit = true;
             ToastShort("再按一次退出程序");
-            // 利用handler延迟发送更改状态信息
             mHandler.sendEmptyMessageDelayed(0, 2000);
         } else {
             finish();
@@ -359,6 +377,7 @@ public class MainActivity extends BaseActivity {
         Utils.WriteString(SaveKey.KEY_LAT, "");
         Utils.WriteString(SaveKey.KEY_LON, "");
     }
+
     public void onSaveInstanceState(Bundle outState) {
         // TODO Auto-generated method stub
         //Log.v("LH", "onSaveInstanceState"+outState);

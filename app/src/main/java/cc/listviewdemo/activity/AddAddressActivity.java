@@ -115,7 +115,7 @@ public class AddAddressActivity extends BaseActivity {
                 map.put("userid", Utils.ReadString(SaveKey.KEY_UserId));
                 map.put("op", "-1");
                 map.put("dataid", model.getDataid());
-                HttpUtils.loadJson("SaveUserAddress", map, new HttpUtils.LoadJsonListener() {
+                HttpUtils.loadSave("SaveUserAddress", map, new HttpUtils.LoadJsonListener() {
                     @Override
                     public void load(JSONObject obj) {
                         try {

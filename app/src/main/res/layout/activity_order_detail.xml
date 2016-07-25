@@ -65,7 +65,8 @@
         <ListView
             android:id="@+id/order_detail_lv"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"></ListView>
+            android:layout_height="wrap_content"
+            ></ListView>
 
         <LinearLayout
             android:id="@+id/tv_expInfo"
@@ -173,12 +174,12 @@
             android:orientation="horizontal">
 
             <TextView
-                android:id="@+id/mBtnReorder"
+                android:id="@+id/cancel_tv"
                 android:layout_width="0dp"
                 android:layout_height="fill_parent"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:text="再来一单"
+                android:text="取消订单"
                 android:textColor="#999999"
                 android:textSize="13sp" />
 

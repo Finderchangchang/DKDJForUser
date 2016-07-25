@@ -69,11 +69,9 @@ public class AddressListActivity extends BaseActivity {
                 String address = addressModel.getAddress();
                 if(address.contains("|")){
                     if(address.split("\\|").length==3){
-//                        holder.setText(R.id.address_tv, address.split("\\|")[1] + " " + address.split("\\|")[2]);
                         address=address.split("\\|")[1]+" "+address.split("\\|")[2];
                     }else{
                         address=address.replace("\\|"," ");
-//                        holder.setText(R.id.address_tv, address.replace("\\|"," "));
                     }
                 }
                 if(address.length()>13){

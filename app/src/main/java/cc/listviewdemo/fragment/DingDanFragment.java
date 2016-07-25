@@ -54,7 +54,6 @@ public class DingDanFragment extends BaseFragment {
     @Override
     public void initViews() {
         setContentView(R.layout.frag_dingdan);
-        map = new HashMap<>();
         no_beans = new ArrayList<>();
         have_beans = new ArrayList<>();
     }
@@ -62,14 +61,13 @@ public class DingDanFragment extends BaseFragment {
     @Override
     public void onHiddenChanged(boolean hidden) {
         super.onHiddenChanged(hidden);
-        if(!hidden){//显示
-            no_beans = new ArrayList<>();
-            have_beans = new ArrayList<>();
+        if (!hidden) {//显示
             initDingDan();
         }
     }
 
     OrderList orderList;
+
     @Override
     public void initEvents() {
         mAdapter = new CommonAdapter<OrderList.OrderlistBean>(MainActivity.mInstance, no_beans, R.layout.item_order) {
@@ -91,7 +89,7 @@ public class DingDanFragment extends BaseFragment {
                                     state = "商家已接单";
                                 }
                             } else if (orderList.getState().equals("4")) {
-                                state = "商家拒接此单";
+                                state = "订单已取消";//商家拒接此单
                             } else if (orderList.getState().equals("7")) {
                                 state = "正在匹配骑手";
                             } else {
@@ -117,21 +115,27 @@ public class DingDanFragment extends BaseFragment {
         main_lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
-                Utils.IntentPost(OrderDetailActivity.class, new Utils.putListener() {
-                    @Override
-                    public void put(Intent intent) {
-                        if (isComplement) {
-                            intent.putExtra("orderId", have_beans.get(position).getOrderID());
-                        } else {
-                            intent.putExtra("orderId", no_beans.get(position).getOrderID());
-                        }
-                    }
-                });
+                Intent intent = new Intent();
+                intent.setClass(MainActivity.mInstance, OrderDetailActivity.class);
+                if (isComplement) {
+                    intent.putExtra("orderId", have_beans.get(position).getOrderID());
+                } else {
+                    intent.putExtra("orderId", no_beans.get(position).getOrderID());
+                }
+                startActivityForResult(intent, 1);
             }
         });
         initDingDan();
     }
-    private void initDingDan(){
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == 1) {
+            initDingDan();
+        }
+    }
+
+    private void initDingDan() {
         userId = Utils.ReadString(SaveKey.KEY_UserId);//获得当前用户ID
         if (userId.equals("")) {
             Utils.IntentPost(LoginActivity.class, new Utils.putListener() {
@@ -141,9 +145,12 @@ public class DingDanFragment extends BaseFragment {
                 }
             });
         } else {
+            map = new HashMap<>();
             map.put("userid", userId);
             map.put("pageindex", "1");
             map.put("pagesize", "100");
+            no_beans = new ArrayList<>();
+            have_beans = new ArrayList<>();
             HttpUtils.loadJson("GetOrderListByUserId", map, new HttpUtils.LoadJsonListener() {
                 @Override
                 public void load(JSONObject obj) {
@@ -175,44 +182,39 @@ public class DingDanFragment extends BaseFragment {
         }
     }
 
-    int position = 0;
 
     private void setClick(int btn) {
         no_order_tv.setVisibility(View.GONE);
         switch (btn) {
             case 1:
-                if (position == 2 || position == 0) {
-                    if (no_beans.size() > 0) {
-                        mAdapter.refresh(no_beans);
-                        no_order_tv.setVisibility(View.GONE);
-                        main_lv.setVisibility(View.VISIBLE);
-                    } else {
-                        no_order_tv.setVisibility(View.VISIBLE);
-                        main_lv.setVisibility(View.GONE);
-                    }
-                    no_success_btn.setTextColor(getResources().getColor(R.color.white));
-                    no_success_btn.setBackgroundResource(R.drawable.order_btn_pressed);
-                    have_success_btn.setTextColor(getResources().getColor(R.color.colorPrimary));
-                    have_success_btn.setBackgroundResource(R.drawable.order_btn_normal);
-                    position = 1;
+                if (no_beans.size() > 0) {
+                    mAdapter.refresh(no_beans);
+                    no_order_tv.setVisibility(View.GONE);
+                    main_lv.setVisibility(View.VISIBLE);
+                } else {
+                    no_order_tv.setVisibility(View.VISIBLE);
+                    main_lv.setVisibility(View.GONE);
                 }
+                no_success_btn.setTextColor(getResources().getColor(R.color.white));
+                no_success_btn.setBackgroundResource(R.drawable.order_btn_pressed);
+                have_success_btn.setTextColor(getResources().getColor(R.color.colorPrimary));
+                have_success_btn.setBackgroundResource(R.drawable.order_btn_normal);
+                mAdapter.refresh(no_beans);
                 break;
             case 2:
-                if (position == 1) {
-                    if (have_beans.size() > 0) {
-                        mAdapter.refresh(have_beans);
-                        no_order_tv.setVisibility(View.GONE);
-                        main_lv.setVisibility(View.VISIBLE);
-                    } else {
-                        no_order_tv.setVisibility(View.VISIBLE);
-                        main_lv.setVisibility(View.GONE);
-                    }
-                    have_success_btn.setTextColor(getResources().getColor(R.color.white));
-                    have_success_btn.setBackgroundResource(R.drawable.order_btn_pressed);
-                    no_success_btn.setTextColor(getResources().getColor(R.color.colorPrimary));
-                    no_success_btn.setBackgroundResource(R.drawable.order_btn_normal);
-                    position = 2;
+                if (have_beans.size() > 0) {
+                    mAdapter.refresh(have_beans);
+                    no_order_tv.setVisibility(View.GONE);
+                    main_lv.setVisibility(View.VISIBLE);
+                } else {
+                    no_order_tv.setVisibility(View.VISIBLE);
+                    main_lv.setVisibility(View.GONE);
                 }
+                have_success_btn.setTextColor(getResources().getColor(R.color.white));
+                have_success_btn.setBackgroundResource(R.drawable.order_btn_pressed);
+                no_success_btn.setTextColor(getResources().getColor(R.color.colorPrimary));
+                no_success_btn.setBackgroundResource(R.drawable.order_btn_normal);
+                mAdapter.refresh(have_beans);
                 break;
         }
     }
