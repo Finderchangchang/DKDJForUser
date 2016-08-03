@@ -199,7 +199,6 @@ public class ConfirmOrderActivity extends BaseActivity {
                 wx_cb.setChecked(true);
                 break;
             case R.id.sure_lock_btn://调用支付接口
-
                 if (!address_tv.getText().equals("")) {//支付宝
                     if (TextUtils.isEmpty(Config.PARTNER) || TextUtils.isEmpty(Config.RSA_PRIVATE) || TextUtils.isEmpty(Config.SELLER)) {
                         new AlertDialog.Builder(this).setTitle("警告").setMessage("需要配置PARTNER | RSA_PRIVATE| SELLER")
@@ -283,6 +282,7 @@ public class ConfirmOrderActivity extends BaseActivity {
                 Message message = new Message();
                 message.obj = price + ";" + orderid;
                 mHandlerTest1.sendMessage(message);
+                sure_lock_btn.setClickable(false);
                 Looper.loop();
             }
 

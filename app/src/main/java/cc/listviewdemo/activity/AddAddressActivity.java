@@ -84,7 +84,7 @@ public class AddAddressActivity extends BaseActivity {
             String name = model.getReceiver();
             if (name.contains(" ") && name.split(" ").length == 2) {
                 name_et.setText(name.split(" ")[0]);//姓名
-                if (name.split(" ")[0].equals("先生")) {
+                if (name.split(" ")[1].equals("先生")) {
                     setSexIsMan(true);
                 } else {
                     setSexIsMan(false);
@@ -162,7 +162,7 @@ public class AddAddressActivity extends BaseActivity {
                     map.put("mobilephone", tel_et.getText().toString().trim());
 //                  map.put("lat", "");(目前没用到)
 //                  map.put("lng", "");
-                    HttpUtils.loadJson("SaveUserAddress", map, new HttpUtils.LoadJsonListener() {
+                    HttpUtils.loadSave("SaveUserAddress", map, new HttpUtils.LoadJsonListener() {
                         @Override
                         public void load(JSONObject obj) {
                             try {

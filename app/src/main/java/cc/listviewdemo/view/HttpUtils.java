@@ -1,5 +1,7 @@
 package cc.listviewdemo.view;
 
+import android.net.Uri;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.android.volley.DefaultRetryPolicy;
@@ -49,11 +51,16 @@ public class HttpUtils {
         if (map != null) {
             Iterator i = map.entrySet().iterator();
             while (i.hasNext()) {
-                url = url + "&" + i.next().toString();
+                String link=i.next().toString();
+                if(isSave) {
+                    url = url + "&" + link.split("=")[0] +"="+ Uri.encode(link.split("=")[1]);
+                }else{
+                    url = url + "&" + link;
+                }
             }
             url = url.replace(" ", "%20");
         }
-
+        Log.v("Tag",url);
         JsonObjectRequest json = new JsonObjectRequest(
                 url, null,
                 new Response.Listener<JSONObject>() {
