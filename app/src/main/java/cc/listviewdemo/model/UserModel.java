@@ -1,11 +1,13 @@
 package cc.listviewdemo.model;
 
+import java.io.Serializable;
+
 /**
  * 用户表
  * 作者：lwj on 2016/7/3 16:31
  * 邮箱：1031066280@qq.com
  */
-public class UserModel {
+public class UserModel implements Serializable{
     private int id;
     /**
      * count : 1

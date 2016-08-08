@@ -5,4 +5,6 @@
     <color name="colorAccent">#FF4081</color>
     <color name="smallLab">#979797</color>
     <color name="white">#fff</color>
+    <color name="total_bg">#EEEFEF</color>
+    <color name="line_bg">#DDDDDD</color>
 </resources>

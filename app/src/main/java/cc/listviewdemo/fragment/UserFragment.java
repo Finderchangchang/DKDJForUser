@@ -19,6 +19,7 @@ import java.util.Map;
 
 import cc.listviewdemo.R;
 import cc.listviewdemo.activity.AddressListActivity;
+import cc.listviewdemo.activity.UserInfoActivity;
 import cc.listviewdemo.base.BaseFragment;
 import cc.listviewdemo.activity.MainActivity;
 import cc.listviewdemo.activity.RegUserActivity;
@@ -71,6 +72,12 @@ public class UserFragment extends BaseFragment {
                                         .into(iv_my_icon);
                             }
                             username_tv.setText(model.getUsername());
+                            Utils.IntentPost(UserInfoActivity.class, new Utils.putListener() {
+                                @Override
+                                public void put(Intent intent) {
+                                    intent.putExtra("user",model);
+                                }
+                            });
                         }
                     }
                 }

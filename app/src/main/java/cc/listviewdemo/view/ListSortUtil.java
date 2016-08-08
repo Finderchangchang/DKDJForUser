@@ -27,12 +27,12 @@ public class ListSortUtil<T> {
                     String newStr = sortField.substring(0, 1).toUpperCase() + sortField.replaceFirst("\\w", "");
                     String methodStr = "get" + newStr;
 
-                    Method method1 = (obj1).getClass().getMethod(methodStr, null);
-                    Method method2 = (obj2).getClass().getMethod(methodStr, null);
+                    Method method1 = (obj1).getClass().getMethod(methodStr);
+                    Method method2 = (obj2).getClass().getMethod(methodStr);
                     if (sortMode != null && "desc".equals(sortMode)) {
-                        retVal = method2.invoke(obj2, null).toString().compareTo(method1.invoke(((T) obj1), null).toString()); // 倒序
+                        retVal = method2.invoke(obj2).toString().compareTo(method1.invoke(((T) obj1)).toString()); // 倒序
                     } else {
-                        retVal = method1.invoke(obj1, null).toString().compareTo(method2.invoke(((T) obj2), null).toString()); // 正序
+                        retVal = method1.invoke(obj1).toString().compareTo(method2.invoke(((T) obj2)).toString()); // 正序
                     }
                 } catch (Exception e) {
 
