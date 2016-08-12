@@ -2,7 +2,6 @@ package cc.listviewdemo.base;
 
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import net.tsz.afinal.FinalActivity;
@@ -16,7 +15,6 @@ import net.tsz.afinal.FinalDb;
  */
 public abstract class BaseActivity extends FinalActivity {
     public FinalDb finalDb;
-    TextView title_name_tv;
     public Toolbar toolbar;
 
     public void onCreate(Bundle savedInstanceState) {
@@ -27,12 +25,18 @@ public abstract class BaseActivity extends FinalActivity {
     }
 
 
-
     public abstract void initViews();
 
     public abstract void initEvents();
 
-    public void ToastShort(String mes) {
-        Toast.makeText(this, mes, Toast.LENGTH_SHORT).show();
+    private Toast toast = null;
+
+    public void ToastShort(String msg) {
+        if (toast == null) {
+            toast = Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT);
+        } else {
+            toast.setText(msg);
+        }
+        toast.show();
     }
 }

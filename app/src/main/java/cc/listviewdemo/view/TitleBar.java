@@ -33,13 +33,17 @@ public class TitleBar extends LinearLayout {
         back_iv.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                onLeftClick.onClick();
+                if (onLeftClick != null) {
+                    onLeftClick.onClick();
+                }
             }
         });
         right_tv.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                onRightClick.onClick();
+                if (onRightClick != null) {
+                    onRightClick.onClick();
+                }
             }
         });
         /**
@@ -76,6 +80,13 @@ public class TitleBar extends LinearLayout {
                     right_tv.setTextSize(a.getDimensionPixelSize(attr, (int) TypedValue.applyDimension(
                             TypedValue.COMPLEX_UNIT_SP, 14, getResources().getDisplayMetrics())));
                     break;
+                case R.styleable.TitleBar_no_left_img:
+                    if(!a.getBoolean(attr,false)){//默认存在（false）
+                        back_iv.setVisibility(VISIBLE);
+                    }else{
+                        back_iv.setVisibility(GONE);
+                    }
+                    break;
             }
         }
         a.recycle();
@@ -83,6 +94,7 @@ public class TitleBar extends LinearLayout {
 
     private OnLeftClick onLeftClick;
     private OnRightClick onRightClick;
+
     public void setLeftClick(OnLeftClick onLeftClick) {
         this.onLeftClick = onLeftClick;
     }
@@ -102,7 +114,8 @@ public class TitleBar extends LinearLayout {
     public interface OnLeftClick {
         void onClick();
     }
-    public interface OnRightClick{
+
+    public interface OnRightClick {
         void onClick();
     }
 }

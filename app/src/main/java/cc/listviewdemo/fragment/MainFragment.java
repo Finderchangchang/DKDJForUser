@@ -5,6 +5,8 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -63,7 +65,6 @@ public class MainFragment extends BaseFragment implements IFMainView {
     @CodeNote(id = R.id.shoptype_gv)
     GridView shoptype_gv;
     FMainListener mListener;
-
     @Override
     public void initViews() {
         setContentView(R.layout.frag_main);
@@ -84,15 +85,13 @@ public class MainFragment extends BaseFragment implements IFMainView {
         public void onReceiveLocation(BDLocation location) {
             map.put("pageindex", "1");//pageindex=1&pagesize=20&lat=38.893189&lng=115.508560
             map.put("pagesize", "100");
-            String lat = "0";
-            String lon = "0";
+            String lat;
+            String lon;
             lat = "38.894431";
             lon = "115.504949";
             if (null != location && location.getLocType() != BDLocation.TypeServerError) {
-//                lat = location.getLatitude() + "";
-//                lon = location.getLongitude() + "";
-//                lat = "38.894431";
-//                lon = "115.504949";
+                lat = location.getLatitude() + "";
+                lon = location.getLongitude() + "";
             } else {
                 dizhi_tv.setText("无法定位>");
             }
@@ -165,6 +164,7 @@ public class MainFragment extends BaseFragment implements IFMainView {
                 return new NetworkImageHolderView();
             }
         }, array);
+        convenientBanner.startTurning(10 * 1000);
     }
 
     /**

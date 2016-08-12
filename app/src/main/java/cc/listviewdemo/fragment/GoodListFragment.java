@@ -30,6 +30,7 @@ import java.util.Map;
 import cc.listviewdemo.R;
 import cc.listviewdemo.activity.GoodDetailActivity;
 import cc.listviewdemo.activity.LoginActivity;
+import cc.listviewdemo.activity.TelAndLoginActivity;
 import cc.listviewdemo.base.BaseFragment;
 import cc.listviewdemo.activity.ConfirmOrderActivity;
 import cc.listviewdemo.activity.SHDetailsActivity;
@@ -222,7 +223,7 @@ public class GoodListFragment extends BaseFragment implements IFGoodListView {
                 SHDetailsActivity.mInstance.ToastShort("购物车不能为空");
             }
         } else {
-            Utils.IntentPost(LoginActivity.class, new Utils.putListener() {
+            Utils.IntentPost(TelAndLoginActivity.class, new Utils.putListener() {
                 @Override
                 public void put(Intent intent) {
                     intent.putExtra("isGWC", true);

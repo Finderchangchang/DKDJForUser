@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -19,6 +20,7 @@ import java.util.Map;
 
 import cc.listviewdemo.R;
 import cc.listviewdemo.activity.AddressListActivity;
+import cc.listviewdemo.activity.TelAndLoginActivity;
 import cc.listviewdemo.activity.UserInfoActivity;
 import cc.listviewdemo.base.BaseFragment;
 import cc.listviewdemo.activity.MainActivity;
@@ -34,18 +36,23 @@ import cc.listviewdemo.view.Utils;
  * 邮箱：1031066280@qq.com
  */
 public class UserFragment extends BaseFragment {
-    @CodeNote(id = R.id.logined_container, click = "onClick")
-    LinearLayout logined_container;
     @CodeNote(id = R.id.username_tv)
     TextView username_tv;
-    @CodeNote(id = R.id.iv_my_icon)
+    @CodeNote(id = R.id.iv_my_icon, click = "onClick")
     ImageView iv_my_icon;
     @CodeNote(id = R.id.tv_myaddress, click = "onClick")
     TextView tv_myaddress;
     String userId;//当前登录的用户ID
     Map<String, String> map;
-    @CodeNote(id=R.id.kefu_tel_tv,click = "onClick")
+    @CodeNote(id = R.id.kefu_tel_tv, click = "onClick")
     TextView kefu_tel_tv;
+    @CodeNote(id = R.id.yue_tv)
+    TextView yue_tv;
+    @CodeNote(id = R.id.daijin_tv)
+    TextView daijin_tv;
+    @CodeNote(id = R.id.shoucang_tv)
+    TextView shoucang_tv;
+
     private UserModel model;
 
     @Override
@@ -55,48 +62,62 @@ public class UserFragment extends BaseFragment {
     }
 
     @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+        refreshUI();
+    }
+
+    @Override
     public void initEvents() {
+        refreshUI();
+    }
+
+    /**
+     * 刷新当前UI
+     */
+    private void refreshUI() {
         userId = Utils.ReadString(SaveKey.KEY_UserId);
-        map.put("userid", userId);
-        if (!userId.equals("")) {//当前用户为登录状态
-            //根据用户ID加载当前用户信息
-            HttpUtils.loadJson("GetUserInfo", map, new HttpUtils.LoadJsonListener() {
-                @Override
-                public void load(JSONObject obj) {
-                    if (obj != null) {
-                        model = new Gson().fromJson(obj.toString(), UserModel.class);
-                        if (model != null) {
-                            if (!model.getPic().equals("")) {//设置头像
-                                Glide.with(MainActivity.mInstance)
-                                        .load(model.getPic()).error(R.mipmap.user_icon)
-                                        .into(iv_my_icon);
-                            }
-                            username_tv.setText(model.getUsername());
-                            Utils.IntentPost(UserInfoActivity.class, new Utils.putListener() {
-                                @Override
-                                public void put(Intent intent) {
-                                    intent.putExtra("user",model);
+        if (!Utils.ReadString(SaveKey.KEY_UserId).equals("")) {
+            map.put("userid", userId);
+            if (!userId.equals("")) {//当前用户为登录状态
+                //根据用户ID加载当前用户信息
+                HttpUtils.loadJson("GetUserInfo", map, new HttpUtils.LoadJsonListener() {
+                    @Override
+                    public void load(JSONObject obj) {
+                        if (obj != null) {
+                            model = new Gson().fromJson(obj.toString(), UserModel.class);
+                            if (model != null) {
+                                if (!model.getPic().equals("")) {//设置头像
+                                    Glide.with(MainActivity.mInstance)
+                                            .load(model.getPic()).error(R.mipmap.user_icon)
+                                            .into(iv_my_icon);
                                 }
-                            });
+                                username_tv.setText(model.getUsername());
+                            }
                         }
                     }
-                }
-            });
+                });
+            }
+        }else{
+            iv_my_icon.setImageResource(R.mipmap.user_icon);
+            username_tv.setText("登录/注册");
+            yue_tv.setText("0");
+            daijin_tv.setText("0");
+            shoucang_tv.setText("0");
         }
     }
 
     public void onClick(View view) {
+        userId = Utils.ReadString(SaveKey.KEY_UserId);
         switch (view.getId()) {
-            case R.id.logined_container:
+            case R.id.iv_my_icon:
                 if (username_tv.getText().toString().equals("登录/注册")) {
-                    Utils.IntentPost(RegUserActivity.class, new Utils.putListener() {
-                        @Override
-                        public void put(Intent intent) {
-                            intent.putExtra("position", 2);
-                        }
-                    });
+                    Intent intent = new Intent(MainActivity.mInstance, TelAndLoginActivity.class);
+                    startActivityForResult(intent, 21);
                 } else {
-                    MainActivity.mInstance.ToastShort("敬请期待");
+                    Intent intent = new Intent(MainActivity.mInstance, UserInfoActivity.class);
+                    intent.putExtra("user", model);
+                    startActivityForResult(intent, 1);
                 }
                 break;
             case R.id.tv_myaddress:
@@ -111,6 +132,13 @@ public class UserFragment extends BaseFragment {
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
                 break;
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == 10 || resultCode == 1) {//resultCode:10,从注册页面返回。1.从登录页面返回
+            refreshUI();
         }
     }
 }

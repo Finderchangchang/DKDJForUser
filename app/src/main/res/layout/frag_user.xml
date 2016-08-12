@@ -67,7 +67,7 @@
                     android:textSize="12.5dp" />
 
                 <TextView
-                    android:id="@+id/tv_money"
+                    android:id="@+id/yue_tv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="0dp"
@@ -116,7 +116,7 @@
                     android:textSize="12.5dp" />
 
                 <TextView
-                    android:id="@+id/tv_number1"
+                    android:id="@+id/daijin_tv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10.0dp"
@@ -166,7 +166,7 @@
                     android:textSize="12.5dp" />
 
                 <TextView
-                    android:id="@+id/tv_number2"
+                    android:id="@+id/shoucang_tv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5.0dp"
@@ -196,8 +196,8 @@
 
     <TextView
         android:id="@+id/tv_line1_sys"
-        android:layout_width="fill_parent"
-        android:layout_height="1.0px"
+        android:layout_width="match_parent"
+        android:layout_height="1.0dp"
         android:background="#eeeeee" />
 
     <LinearLayout
@@ -219,7 +219,7 @@
 
         <TextView
             android:id="@+id/tv_vline1_sys"
-            android:layout_width="1.0px"
+            android:layout_width="1.0dp"
             android:layout_height="fill_parent"
             android:background="#eeeeee" />
 
@@ -237,7 +237,7 @@
 
         <TextView
             android:id="@+id/tv_vline2_sys"
-            android:layout_width="0.5dp"
+            android:layout_width="1dp"
             android:layout_height="fill_parent"
             android:background="#eeeeee" />
 
@@ -253,6 +253,10 @@
             android:text="我的评价"
             android:textColor="#333333" />
     </LinearLayout>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#eeeeee" />
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">

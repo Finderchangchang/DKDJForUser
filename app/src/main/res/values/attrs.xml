@@ -9,5 +9,6 @@
         <attr name="centerTextSize" format="dimension" />
         <attr name="centerTextColor" format="color" />
         <attr name="rightText" format="string" />
+        <attr name="no_left_img" format="boolean"/> <!--true,没有左侧图，false，有左侧图-->
     </declare-styleable>
 </resources>

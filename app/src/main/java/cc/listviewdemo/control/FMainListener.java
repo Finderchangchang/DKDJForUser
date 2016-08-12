@@ -49,7 +49,7 @@ public class FMainListener {
                     }
                     mView.loadGG(list);
                 } catch (JSONException e) {
-                    e.printStackTrace();
+
                 }
             }
         });

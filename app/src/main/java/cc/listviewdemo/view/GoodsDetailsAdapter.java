@@ -72,18 +72,13 @@ public class GoodsDetailsAdapter extends BaseAdapter {
             holder.mGoodsAdd = (ImageView) convertView.findViewById(R.id.add_iv);
             holder.mGoodsReduce = (ImageView) convertView.findViewById(R.id.reduce);
             holder.mSmallIv = (ImageView) convertView.findViewById(R.id.notice_iv);
-            holder.mSellNum= (TextView) convertView.findViewById(R.id.sell_num_tv);
+            holder.mSellNum = (TextView) convertView.findViewById(R.id.sell_num_tv);
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
         holder.mGoodsName.setText(FoodDetail.getName());
-        Glide.with(context)
-                .load(FoodDetail.getIcon())
-                .centerCrop()
-                .placeholder(R.mipmap.no_img)
-                .crossFade()
-                .into(holder.mMainIv);
+        Glide.with(context).load(FoodDetail.getIcon()).asBitmap().centerCrop().placeholder(R.mipmap.no_img).into(new MyBitmapImageViewTarget(holder.mMainIv));
         int num = FoodDetail.getCount();
         if (num == 0) {
             holder.mGoodsNum.setVisibility(View.GONE);
@@ -116,7 +111,7 @@ public class GoodsDetailsAdapter extends BaseAdapter {
                 count = showList.get(position).getCount();
                 count--;
                 showList.get(position).setCount(count);
-                context.calculateTotalPrice(-1, -price,-Double.parseDouble(FoodDetail.getPackageFree()), new Goods(FoodDetail.getName(), "0", "0", "0", FoodDetail.getFoodID(), "", "0.00", FoodDetail.getFoodID(), FoodDetail.getFoodID(), "0.00", price + "", price + "",FoodDetail.getPackageFree()));
+                context.calculateTotalPrice(-1, -price, -Double.parseDouble(FoodDetail.getPackageFree()), new Goods(FoodDetail.getName(), "0", "0", "0", FoodDetail.getFoodID(), "", "0.00", FoodDetail.getFoodID(), FoodDetail.getFoodID(), "0.00", price + "", price + "", FoodDetail.getPackageFree()));
                 GoodsDetailsAdapter.this.notifyDataSetChanged();
 
             }
@@ -127,7 +122,7 @@ public class GoodsDetailsAdapter extends BaseAdapter {
                 count = showList.get(position).getCount();
                 count++;
                 showList.get(position).setCount(count);
-                context.calculateTotalPrice(1, price,Double.parseDouble(FoodDetail.getPackageFree()), new Goods(FoodDetail.getName(), "0", "0", "0", FoodDetail.getFoodID(), "", "0.00", FoodDetail.getFoodID(), FoodDetail.getFoodID(), "0.00", price + "", price + "",FoodDetail.getPackageFree()));
+                context.calculateTotalPrice(1, price, Double.parseDouble(FoodDetail.getPackageFree()), new Goods(FoodDetail.getName(), "0", "0", "0", FoodDetail.getFoodID(), "", "0.00", FoodDetail.getFoodID(), FoodDetail.getFoodID(), "0.00", price + "", price + "", FoodDetail.getPackageFree()));
                 GoodsDetailsAdapter.this.notifyDataSetChanged();
             }
         });

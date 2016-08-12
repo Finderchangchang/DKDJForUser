@@ -111,12 +111,7 @@ public class CommonViewHolder {
 
     public CommonViewHolder setGlideImage(int viewId, String url) {
         ImageView view = getView(viewId);
-        Glide.with(mContext)
-                .load(url)
-                .centerCrop()
-                .placeholder(R.mipmap.no_img)
-                .crossFade()
-                .into(view);
+        Glide.with(mContext).load(url).asBitmap().centerCrop().placeholder(R.mipmap.no_img).into(new MyBitmapImageViewTarget(view));
         return this;
     }
 

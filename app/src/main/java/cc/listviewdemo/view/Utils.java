@@ -34,6 +34,8 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Random;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import cc.listviewdemo.R;
 import cc.listviewdemo.base.BaseApplication;
@@ -45,6 +47,12 @@ import cc.listviewdemo.config.SaveKey;
 public class Utils {
     public static String getString(int key) {
         return BaseApplication.getContext().getString(key);
+    }
+
+    public static final boolean isMobileNo(String mobiles) {
+        Pattern p = Pattern.compile("13\\d{9}|14[57]\\d{8}|15[012356789]\\d{8}|18[01256789]\\d{8}|17[0678]\\d{8}");
+        Matcher m = p.matcher(mobiles);
+        return m.matches();
     }
 
     /*

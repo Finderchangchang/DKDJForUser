@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -22,6 +23,7 @@ import cc.listviewdemo.R;
 import cc.listviewdemo.activity.LoginActivity;
 import cc.listviewdemo.activity.MainActivity;
 import cc.listviewdemo.activity.OrderDetailActivity;
+import cc.listviewdemo.activity.TelAndLoginActivity;
 import cc.listviewdemo.base.BaseFragment;
 import cc.listviewdemo.config.SaveKey;
 import cc.listviewdemo.model.OrderList;
@@ -49,6 +51,12 @@ public class DingDanFragment extends BaseFragment {
     List<OrderList.OrderlistBean> have_beans;
     @CodeNote(id = R.id.no_order_tv)
     TextView no_order_tv;
+    @CodeNote(id = R.id.order_list_ll)
+    LinearLayout order_list_ll;
+    @CodeNote(id = R.id.no_login_ll)
+    LinearLayout no_login_ll;
+    @CodeNote(id = R.id.order_login_btn, click = "onClick")
+    Button order_login_btn;
     boolean isComplement = false;
 
     @Override
@@ -136,15 +144,8 @@ public class DingDanFragment extends BaseFragment {
     }
 
     private void initDingDan() {
-        userId = Utils.ReadString(SaveKey.KEY_UserId);//获得当前用户ID
-        if (userId.equals("")) {
-            Utils.IntentPost(LoginActivity.class, new Utils.putListener() {
-                @Override
-                public void put(Intent intent) {
-                    intent.putExtra("position", 1);
-                }
-            });
-        } else {
+        if (!Utils.ReadString(SaveKey.KEY_UserId).equals("")) {
+            userId = Utils.ReadString(SaveKey.KEY_UserId);//获得当前用户ID
             map = new HashMap<>();
             map.put("userid", userId);
             map.put("pageindex", "1");
@@ -166,7 +167,13 @@ public class DingDanFragment extends BaseFragment {
                     setClick(1);
                 }
             });
+            order_list_ll.setVisibility(View.VISIBLE);
+            no_login_ll.setVisibility(View.GONE);
+        } else {
+            order_list_ll.setVisibility(View.GONE);
+            no_login_ll.setVisibility(View.VISIBLE);
         }
+
     }
 
     public void onClick(View view) {
@@ -178,6 +185,10 @@ public class DingDanFragment extends BaseFragment {
             case R.id.have_success_btn:
                 setClick(2);
                 isComplement = true;
+                break;
+            case R.id.order_login_btn://跳转到登录页面
+                Intent intent = new Intent(MainActivity.mInstance, TelAndLoginActivity.class);
+                startActivityForResult(intent, 21);
                 break;
         }
     }

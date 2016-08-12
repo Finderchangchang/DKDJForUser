@@ -46,11 +46,7 @@
 
         </activity>
         <activity android:name=".activity.StartActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -98,7 +94,16 @@
             android:exported="true"
             android:launchMode="singleTop" />
         <activity android:name=".activity.GoodDetailActivity" />
-        <activity android:name=".activity.UserInfoActivity"/>
+        <activity android:name=".activity.UserInfoActivity" />
+        <activity android:name=".activity.TelAndLoginActivity" />
+
+        <activity android:name=".activity.GetNearlyShopActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>
