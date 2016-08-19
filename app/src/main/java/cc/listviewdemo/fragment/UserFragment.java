@@ -27,7 +27,10 @@ import cc.listviewdemo.activity.MainActivity;
 import cc.listviewdemo.activity.RegUserActivity;
 import cc.listviewdemo.config.SaveKey;
 import cc.listviewdemo.model.UserModel;
+import cc.listviewdemo.view.GlideCircleTransform;
+import cc.listviewdemo.view.GlideRoundTransform;
 import cc.listviewdemo.view.HttpUtils;
+import cc.listviewdemo.view.MyBitmapImageViewTarget;
 import cc.listviewdemo.view.Utils;
 
 /**
@@ -88,9 +91,9 @@ public class UserFragment extends BaseFragment {
                             model = new Gson().fromJson(obj.toString(), UserModel.class);
                             if (model != null) {
                                 if (!model.getPic().equals("")) {//设置头像
-                                    Glide.with(MainActivity.mInstance)
-                                            .load(model.getPic()).error(R.mipmap.user_icon)
-                                            .into(iv_my_icon);
+                                    Glide.with(MainActivity.mInstance).load(R.mipmap.no_img).asBitmap().centerCrop()
+                                            .placeholder(R.mipmap.no_img).transform(new GlideCircleTransform(MainActivity.mInstance)).
+                                            into(new MyBitmapImageViewTarget(iv_my_icon));
                                 }
                                 username_tv.setText(model.getUsername());
                             }

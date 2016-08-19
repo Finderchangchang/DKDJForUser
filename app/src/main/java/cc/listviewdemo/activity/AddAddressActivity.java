@@ -21,6 +21,7 @@ import cc.listviewdemo.base.BaseActivity;
 import cc.listviewdemo.config.SaveKey;
 import cc.listviewdemo.model.AddressModel;
 import cc.listviewdemo.view.HttpUtils;
+import cc.listviewdemo.view.TitleBar;
 import cc.listviewdemo.view.Utils;
 
 /**
@@ -30,10 +31,8 @@ import cc.listviewdemo.view.Utils;
  */
 public class AddAddressActivity extends BaseActivity {
     public static AddAddressActivity mInstance;
-    @CodeNote(id = R.id.title_name_tv)
-    TextView title_name_tv;
-    @CodeNote(id = R.id.back_iv, click = "onClick")
-    ImageView back_iv;
+    @CodeNote(id = R.id.main_tb)
+    TitleBar main_tb;
     @CodeNote(id = R.id.right_tv)
     TextView right_tv;
     @CodeNote(id = R.id.del_address_btn, click = "onClick")
@@ -65,7 +64,12 @@ public class AddAddressActivity extends BaseActivity {
 
     @Override
     public void initEvents() {
-        title_name_tv.setText("编辑地址");
+        main_tb.setLeftClick(new TitleBar.OnLeftClick() {
+            @Override
+            public void onClick() {
+                mInstance.finish();//关闭当前页面
+            }
+        });
         model = (AddressModel) getIntent().getSerializableExtra("address");
         if (model != null) {
             address = model.getAddress();

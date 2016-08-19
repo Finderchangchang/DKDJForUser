@@ -24,7 +24,7 @@
         android:id="@+id/jian_iv"
         android:layout_width="20dp"
         android:layout_height="20dp"
-        android:src="@mipmap/icon_reduce" />
+        android:src="@mipmap/goods_jian" />
 
     <TextView
         android:id="@+id/num_tv"
@@ -43,5 +43,5 @@
         android:layout_width="20dp"
         android:layout_height="20dp"
         android:layout_marginRight="10dp"
-        android:src="@mipmap/icon_add" />
+        android:src="@mipmap/goods_jia" />
 </LinearLayout>

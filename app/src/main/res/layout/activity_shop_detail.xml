@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical">
 
     <LinearLayout
@@ -10,32 +10,10 @@
         android:layout_height="170dp"
         android:background="@mipmap/topbar_bg_image"
         android:orientation="vertical">
-
-        <RelativeLayout
+        <cc.listviewdemo.view.TitleBar
+            android:id="@+id/main_tb"
             android:layout_width="match_parent"
-            android:layout_height="50dp">
-
-            <ImageView
-                android:id="@+id/back_iv"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingBottom="12.5dp"
-                android:paddingLeft="20dp"
-                android:paddingRight="20dp"
-                android:paddingTop="12.5dp"
-                android:src="@mipmap/icon_back" />
-
-            <TextView
-                android:id="@+id/shop_name_tv"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:text=""
-                android:textColor="@android:color/white"
-                android:textSize="21sp">
-
-            </TextView>
-        </RelativeLayout>
+            android:layout_height="wrap_content" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -68,14 +46,14 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="起送价￥"
-                        android:textColor="@android:color/white"/>
+                        android:textColor="@android:color/white" />
 
                     <TextView
                         android:id="@+id/start_price_tv"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="0.00"
-                        android:textColor="@android:color/white"/>
+                        android:textColor="@android:color/white" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -83,14 +61,14 @@
                         android:layout_marginLeft="5dp"
                         android:text="配送费￥"
                         android:textColor="@android:color/white"
-                        android:textSize="14sp"/>
+                        android:textSize="14sp" />
 
                     <TextView
                         android:id="@+id/pei_song_tv"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="0.00"
-                        android:textColor="@android:color/white"/>
+                        android:textColor="@android:color/white" />
                 </LinearLayout>
 
                 <TextView
@@ -99,8 +77,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="3dp"
                     android:text="公告：请提前30分钟下单，配送忙"
-                    android:textSize="10sp"
-                    android:textColor="@android:color/white"/>
+                    android:textColor="@android:color/white"
+                    android:textSize="10sp" />
 
             </LinearLayout>
 
@@ -109,18 +87,41 @@
                 android:layout_width="60dp"
                 android:layout_height="40dp"
                 android:layout_marginRight="10dp"
-                android:text="收藏"/>
+                android:text="收藏"
+                android:background="@color/white"
+                android:visibility="gone"/>
+            <LinearLayout
+                android:layout_width="60dp"
+                android:layout_height="25dp"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_marginRight="5dp"
+                android:background="@drawable/shoucang_bg">
+                <ImageView
+                    android:layout_width="19dp"
+                    android:layout_height="19dp"
+                    android:src="@mipmap/five_star"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="11sp"
+                    android:layout_marginLeft="3dp"
+                    android:textColor="@color/white"
+                    android:text="收藏"/>
+            </LinearLayout>
         </LinearLayout>
     </LinearLayout>
+
     <android.support.design.widget.TabLayout
         android:id="@+id/tab"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
+        android:layout_height="50dp"
         android:background="#fff"
-        app:tabIndicatorColor="#f00"
-        app:tabSelectedTextColor="#444"
+        app:tabIndicatorColor="@color/colorPrimaryDark"
         app:tabMode="fixed"
+        app:tabSelectedTextColor="#444"
         app:tabTextColor="#444" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="1dp"

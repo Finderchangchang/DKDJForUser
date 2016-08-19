@@ -1,103 +1,140 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/srlayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <cc.listviewdemo.view.TotalScrollView
-        android:id="@+id/main"
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/main_refresh_srl"
         android:layout_width="match_parent"
-        android:layout_height="800dp"
-        android:background="#efefef">
+        android:layout_height="match_parent">
 
-        <RelativeLayout
+        <cc.listviewdemo.view.TotalScrollView
+            android:id="@+id/main"
             android:layout_width="match_parent"
-            android:layout_height="800dp">
+            android:layout_height="wrap_content"
+            android:background="#efefef">
 
-            <LinearLayout
+
+            <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
+                android:layout_height="800dp">
 
-                <com.bigkoo.convenientbanner.ConvenientBanner
-                    android:id="@+id/guanggao_cb"
-                    android:layout_width="match_parent"
-                    android:layout_height="180dp"
-                    app:canLoop="true" />
-                <GridView
-                    android:id="@+id/shoptype_gv"
-                    android:layout_width="match_parent"
-                    android:layout_height="140dp"
-                    android:numColumns="4"
-                    android:background="@android:color/white"></GridView>
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="25dp"
-                    android:gravity="center_vertical">
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <com.bigkoo.convenientbanner.ConvenientBanner
+                        android:id="@+id/guanggao_cb"
+                        android:layout_width="match_parent"
+                        android:layout_height="180dp"
+                        app:canLoop="true" />
+
+                    <GridView
+                        android:id="@+id/shoptype_gv"
+                        android:layout_width="match_parent"
+                        android:layout_height="140dp"
+                        android:background="@android:color/white"
+                        android:numColumns="4"></GridView>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:layout_width="3dp"
+                            android:layout_height="match_parent"
+                            android:layout_marginLeft="5dp"
+                            android:background="@color/colorPrimaryDark" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="5dp"
+                            android:padding="2dp"
+                            android:text="附近商家"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+
+                    <cc.listviewdemo.view.MeasureListView
+                        android:id="@+id/main_list"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@android:color/white"
+                        android:listSelector="@android:color/transparent" />
 
                     <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="5dp"
-                        android:text="附近商家"
-                        android:textSize="12sp" />
+                        android:id="@+id/load_more_tv"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:gravity="center"
+                        android:text="努力加载中..."
+                        android:visibility="gone"></TextView>
                 </LinearLayout>
-                <cc.listviewdemo.view.MeasureListView
-                    android:id="@+id/main_list"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:listSelector="@android:color/transparent"
-                    android:background="@android:color/white"
-                     >
 
-                </cc.listviewdemo.view.MeasureListView>
-            </LinearLayout>
+            </RelativeLayout>
 
-        </RelativeLayout>
 
-    </cc.listviewdemo.view.TotalScrollView>
+        </cc.listviewdemo.view.TotalScrollView>
+    </android.support.v4.widget.SwipeRefreshLayout>
 
     <RelativeLayout
         android:id="@+id/iv"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:background="#01D8E1">
-
-        <LinearLayout
+        <!--android:background="#01D8E1"-->
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center">
+            android:layout_height="match_parent">
 
             <LinearLayout
                 android:id="@+id/xuanze_zuobiao_ll"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:layout_marginLeft="5dp"
+                android:background="@drawable/title_address_bg"
                 android:gravity="center"
-                android:paddingLeft="10dp"
+                android:paddingLeft="8dp"
                 android:paddingRight="10dp">
+
                 <ImageView
                     android:layout_width="25dp"
                     android:layout_height="25dp"
-                    android:src="@mipmap/icon_my_address"/>
+                    android:padding="3dp"
+                    android:src="@mipmap/icon_my_address" />
+
                 <TextView
                     android:id="@+id/dizhi_tv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="未知地区>"
                     android:layout_marginLeft="5dp"
-                    android:textSize="16sp"
-                    android:textColor="@android:color/white"/>
+                    android:text="正在获取你的位置"
+                    android:textColor="@android:color/white"
+                    android:textSize="16sp" />
             </LinearLayout>
-        </LinearLayout>
-        <ImageView
-            android:id="@+id/search_iv"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:src="@mipmap/chaxun"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:paddingLeft="20dp"
-            android:paddingRight="10dp"/>
 
+            <LinearLayout
+                android:id="@+id/title_search_ll"
+                android:layout_width="wrap_content"
+                android:layout_height="31dp"
+                android:layout_alignParentRight="true"
+                android:layout_centerInParent="true"
+                android:layout_marginRight="5dp"
+                android:background="@drawable/title_address_bg"
+                android:gravity="center">
+
+                <ImageView
+                    android:id="@+id/search_iv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:padding="4dp"
+                    android:src="@mipmap/chaxun" />
+            </LinearLayout>
+        </RelativeLayout>
     </RelativeLayout>
 </RelativeLayout>

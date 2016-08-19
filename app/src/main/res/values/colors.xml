@@ -2,10 +2,14 @@
 <resources>
     <color name="colorPrimary">#00D8E2</color>
     <color name="colorPrimaryDark">#00D8E2</color>
-    <color name="colorAccent">#FF4081</color>
     <color name="smallLab">#979797</color>
     <color name="white">#fff</color>
     <color name="total_bg">#EEEFEF</color>
     <color name="line_bg">#DDDDDD</color>
     <color name="choice_btn_bg">#F8F8F9</color>
+
+    <color name="left_normal_lab">#d1d0d0</color><!--左侧正常-->
+    <color name="left_normal_bg">#f6f5f5</color>
+    <color name="left_pressed_lab">#333</color><!--左侧点击-->
+    <color name="biger_line_bg">#b2b2b2</color>
 </resources>

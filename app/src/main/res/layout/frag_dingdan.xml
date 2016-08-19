@@ -8,66 +8,79 @@
     <cc.listviewdemo.view.TitleBar
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:centerText="我的订单"
-        app:no_left_img="true"/>
+        android:background="@color/colorPrimaryDark"
+        app:centerText="订单"
+        app:no_left_img="true" />
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+
         <LinearLayout
             android:id="@+id/order_list_ll"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
+
             <LinearLayout
                 android:id="@+id/total_btn_ll"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingTop="10dp"
-                android:paddingBottom="10dp">
+                android:paddingBottom="10dp"
+                android:paddingTop="10dp">
+
                 <Button
                     android:id="@+id/no_success_btn"
                     android:layout_width="0dp"
                     android:layout_height="35dp"
-                    android:layout_weight="1"
-                    android:text="未完成"
-                    android:textSize="18sp"
-                    android:textColor="#fff"
-                    android:layout_marginLeft="50dp"
+                    android:layout_marginLeft="25dp"
                     android:layout_marginRight="10dp"
-                    android:background="@drawable/order_btn_pressed"/>
+                    android:layout_weight="1"
+                    android:background="@drawable/order_btn_pressed"
+                    android:text="未完成"
+                    android:textColor="#fff"
+                    android:textSize="18sp" />
+
                 <Button
                     android:id="@+id/have_success_btn"
                     android:layout_width="0dp"
                     android:layout_height="35dp"
-                    android:layout_weight="1"
-                    android:text="已完成"
-                    android:textSize="18sp"
-                    android:textColor="#01D8E1"
-                    android:layout_marginRight="50dp"
                     android:layout_marginLeft="10dp"
-                    android:background="@drawable/order_btn_normal"/>
+                    android:layout_marginRight="25dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/order_btn_normal"
+                    android:text="已完成"
+                    android:textColor="#01D8E1"
+                    android:textSize="18sp" />
             </LinearLayout>
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="@color/list_item_line"/>
+                android:background="@color/list_item_line" />
+
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
+
                 <ListView
                     android:id="@+id/main_lv"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"></ListView>
+                    android:layout_height="match_parent"
+                    android:divider="#00000000"
+                    android:dividerHeight="0dip"></ListView>
+
                 <TextView
                     android:id="@+id/no_order_tv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
                     android:text="当前无订单"
                     android:textSize="20dp"
-                    android:layout_centerInParent="true"
-                    android:visibility="gone"/>
+                    android:visibility="gone" />
             </RelativeLayout>
         </LinearLayout>
+
         <LinearLayout
             android:id="@+id/no_login_ll"
             android:layout_width="match_parent"
@@ -75,19 +88,20 @@
             android:gravity="center"
             android:orientation="vertical"
             android:visibility="gone">
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="您还没有登录，请登录后查看订单"/>
+                android:text="您还没有登录，请登录后查看订单" />
+
             <Button
                 android:id="@+id/order_login_btn"
                 android:layout_width="150dp"
                 android:layout_height="40dp"
                 android:layout_marginTop="10dp"
-                android:text="登录/注册"
-                android:textSize="16sp"
                 android:background="@color/colorPrimaryDark"
-                />
+                android:text="登录/注册"
+                android:textSize="16sp" />
         </LinearLayout>
     </RelativeLayout>
 

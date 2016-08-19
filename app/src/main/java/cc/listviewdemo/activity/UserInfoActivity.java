@@ -97,7 +97,7 @@ public class UserInfoActivity extends BaseActivity implements View.OnClickListen
                 builder.show();
                 break;
             case R.id.touxaing_ll://头像点击
-                changePopupWindowState();
+//                changePopupWindowState();
                 break;
             case R.id.user_name_ll://用户姓名
                 break;

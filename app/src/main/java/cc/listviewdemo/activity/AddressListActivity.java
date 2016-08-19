@@ -27,6 +27,7 @@ import cc.listviewdemo.model.AddressModel;
 import cc.listviewdemo.view.CommonAdapter;
 import cc.listviewdemo.view.CommonViewHolder;
 import cc.listviewdemo.view.HttpUtils;
+import cc.listviewdemo.view.TitleBar;
 import cc.listviewdemo.view.Utils;
 
 /**
@@ -36,18 +37,15 @@ import cc.listviewdemo.view.Utils;
  */
 public class AddressListActivity extends BaseActivity {
     public static AddressListActivity mInstance;
-    @CodeNote(id = R.id.back_iv, click = "onClick")
-    ImageView back_iv;
-    @CodeNote(id = R.id.right_tv, click = "onClick")
-    TextView right_tv;//右侧文字
-    @CodeNote(id = R.id.title_name_tv)
-    TextView title_name_tv;//中间文字
+
     @CodeNote(id = R.id.main_lv)
     ListView main_lv;
     Map<String, String> map;
     String userId;
     List<AddressModel> address;
     CommonAdapter<AddressModel> mAdapter;
+    @CodeNote(id=R.id.main_tb)
+    TitleBar main_tb;
 
     @Override
     public void initViews() {
@@ -60,8 +58,18 @@ public class AddressListActivity extends BaseActivity {
     public void initEvents() {
         mInstance = this;
         userId = Utils.ReadString(SaveKey.KEY_UserId);
-        right_tv.setText("新增");
-        title_name_tv.setText("我的地址");
+        main_tb.setLeftClick(new TitleBar.OnLeftClick() {
+            @Override
+            public void onClick() {
+                mInstance.finish();
+            }
+        });
+        main_tb.setRightClick(new TitleBar.OnRightClick() {
+            @Override
+            public void onClick() {
+                startActivityForResult(new Intent(mInstance, AddAddressActivity.class), 0);
+            }
+        });
         map.put("userid", userId);
         mAdapter = new CommonAdapter<AddressModel>(MainActivity.mInstance, address, R.layout.item_address) {
             @Override
@@ -92,17 +100,6 @@ public class AddressListActivity extends BaseActivity {
             }
         });
         load();
-    }
-
-    public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.back_iv://关闭当前页面
-                mInstance.finish();
-                break;
-            case R.id.right_tv://跳转到新增页面
-                startActivityForResult(new Intent(mInstance, AddAddressActivity.class), 0);
-                break;
-        }
     }
 
     @Override

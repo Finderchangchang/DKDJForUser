@@ -16,32 +16,31 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingBottom="5dp"
         android:paddingTop="5dp"
         android:background="#e0e0e0">
-        <RelativeLayout
+        <LinearLayout
             android:id="@+id/clear_gwc_rl"
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:orientation="horizontal">
+            android:layout_width="match_parent"
+            android:layout_height="32dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"/>
             <ImageView
                 android:id="@+id/clear_iv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@mipmap/recycle_img"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentEnd="true"
-                android:layout_marginEnd="88dp" />
+                android:src="@mipmap/recycle_img"/>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="清空购物车"
-                android:layout_centerVertical="true"
-                android:layout_alignParentEnd="true"
-                android:layout_marginEnd="12dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginLeft="5dp"
                 android:id="@+id/textView" />
-        </RelativeLayout>
+        </LinearLayout>
         <TextView
             android:layout_width="match_parent"
             android:layout_height="1dp"

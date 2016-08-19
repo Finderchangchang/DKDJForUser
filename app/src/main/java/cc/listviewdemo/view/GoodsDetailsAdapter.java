@@ -15,6 +15,7 @@ import cc.listviewdemo.R;
 import cc.listviewdemo.activity.MainActivity;
 import cc.listviewdemo.fragment.GoodListFragment;
 import cc.listviewdemo.model.FoodDetail;
+import cc.listviewdemo.model.FoodType;
 import cc.listviewdemo.model.Good;
 import cc.listviewdemo.model.Goods;
 
@@ -27,11 +28,15 @@ public class GoodsDetailsAdapter extends BaseAdapter {
     private GoodListFragment context;
     private List<FoodDetail> showList = new ArrayList<>();
     private List<Goods> goodsList = new ArrayList<>();
+    private List<FoodType> foodTypeList = new ArrayList<>();
     private int count;
+    private boolean isOpen;
 
-    public GoodsDetailsAdapter(GoodListFragment context, List<FoodDetail> FoodDetailList) {
+    public GoodsDetailsAdapter(GoodListFragment context, List<FoodDetail> FoodDetailList, List<FoodType> foodTypes, boolean isOpen) {
         this.context = context;
         this.showList = FoodDetailList;
+        foodTypeList = foodTypes;
+        this.isOpen = isOpen;
     }
 
     @Override
@@ -73,12 +78,29 @@ public class GoodsDetailsAdapter extends BaseAdapter {
             holder.mGoodsReduce = (ImageView) convertView.findViewById(R.id.reduce);
             holder.mSmallIv = (ImageView) convertView.findViewById(R.id.notice_iv);
             holder.mSellNum = (TextView) convertView.findViewById(R.id.sell_num_tv);
+            holder.mTopTitle = (TextView) convertView.findViewById(R.id.top_title_tv);
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
+        if (!isOpen) {
+            holder.mGoodsAdd.setVisibility(View.GONE);
+        } else {
+            holder.mGoodsAdd.setVisibility(View.VISIBLE);
+        }
+        for (FoodType type : foodTypeList) {
+            if ((position + "").equals(type.getFirstPosition())) {
+                holder.mTopTitle.setVisibility(View.VISIBLE);
+                holder.mTopTitle.setText(type.getSortName());
+                break;
+            } else {
+                holder.mTopTitle.setVisibility(View.GONE);
+            }
+        }
         holder.mGoodsName.setText(FoodDetail.getName());
-        Glide.with(context).load(FoodDetail.getIcon()).asBitmap().centerCrop().placeholder(R.mipmap.no_img).into(new MyBitmapImageViewTarget(holder.mMainIv));
+        Glide.with(context).load(FoodDetail.getIcon()).asBitmap().centerCrop()
+                .placeholder(R.mipmap.no_img).transform(new GlideRoundTransform(MainActivity.mInstance, 10)).
+                into(new MyBitmapImageViewTarget(holder.mMainIv));
         int num = FoodDetail.getCount();
         if (num == 0) {
             holder.mGoodsNum.setVisibility(View.GONE);
@@ -88,7 +110,7 @@ public class GoodsDetailsAdapter extends BaseAdapter {
             holder.mGoodsReduce.setVisibility(View.VISIBLE);
         }
         holder.mSellNum.setText(FoodDetail.getSale());
-        holder.mGoodsPrice.setText(FoodDetail.getFoodstylelist().get(0).getPrice() + "");
+        holder.mGoodsPrice.setText("￥" + FoodDetail.getFoodstylelist().get(0).getPrice());
         double totalPrice = num * Double.parseDouble(showList.get(position).getFoodstylelist().get(0).getPrice());
         FoodDetail.setTotalMoney("￥" + totalPrice);
         holder.mGoodsNum.setText(num + "");
@@ -147,5 +169,6 @@ public class GoodsDetailsAdapter extends BaseAdapter {
         private ImageView mGoodsAdd;    //增加
         private ImageView mGoodsReduce; //减少
         private TextView mSellNum;//销售数量
+        private TextView mTopTitle;//顶部文字
     }
 }

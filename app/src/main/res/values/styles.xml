@@ -5,11 +5,20 @@
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorAccent">#000</item>
     </style>
     <!-- PopupWindow窗口动画 -->
     <style name="PopAnimationFade">
         <item name="android:windowEnterAnimation">@anim/menu_fadein</item>
         <item name="android:windowExitAnimation">@anim/menu_fadeout</item>
+    </style>
+    <style name="roomRatingBar" parent="@android:style/Widget.RatingBar">
+
+        <item name="android:progressDrawable">@drawable/ratingbar_drawable</item>
+
+        <item name="android:minHeight">3dip</item>
+
+        <item name="android:maxHeight">20dip</item>
+
     </style>
 </resources>

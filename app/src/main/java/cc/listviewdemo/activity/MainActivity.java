@@ -1,7 +1,12 @@
 package cc.listviewdemo.activity;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.FragmentTransaction;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -20,6 +25,7 @@ import net.tsz.afinal.model.ChangeItem;
 import net.tsz.afinal.model.ItemModel;
 import net.tsz.afinal.view.NormalDialog;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -36,6 +42,7 @@ import cc.listviewdemo.R;
 import cc.listviewdemo.base.BaseActivity;
 import cc.listviewdemo.base.BaseApplication;
 import cc.listviewdemo.config.SaveKey;
+import cc.listviewdemo.control.UpdateManager;
 import cc.listviewdemo.fragment.DingDanFragment;
 import cc.listviewdemo.fragment.MainFragment;
 import cc.listviewdemo.fragment.UserFragment;
@@ -88,6 +95,7 @@ public class MainActivity extends BaseActivity {
         listbtn = new ArrayList<>();
         mInstance = this;
         map = new HashMap<>();
+        hander = new UIHandler();
     }
 
     @Override
@@ -118,7 +126,7 @@ public class MainActivity extends BaseActivity {
                 }
             }
         }
-        checkForUpdate();//验证是否需要更新
+        checkForUpdates();//验证是否需要更新
     }
 
     /**
@@ -138,6 +146,133 @@ public class MainActivity extends BaseActivity {
                 setItem(2);
                 break;
         }
+    }
+
+    String dialogStr;
+    private UIHandler hander;
+
+    private void checkForUpdates() {
+        // 检查更新 如无更新则提示已经是最新版本了
+        // showDialog(dialog_checking);
+        // 如有更新则需要下载程序
+        dialogStr = "正在检查更新请稍后";
+        showDialog(322);
+        HashMap<String, String> localHashMap = new HashMap<String, String>();
+        localHashMap.put("c", "1");
+        HttpUtils.loadJson("version", localHashMap, new HttpUtils.LoadJsonListener() {
+            @Override
+            public void load(JSONObject obj) {
+                // dismissDialog()方法是用来关闭对话框的；removeDialog()方法用来将对话框从Activity的托管中移除（如果对已经移除的对话框重新进行调用showDialog
+                // ，则该对话框将进行重新创建）
+                removeDialog(322);
+                JSONObject json = null;
+                try {
+                    json = new JSONObject(obj.toString());
+                    String version = json.getString("version");
+                    Message message = new Message();
+                    int oldVersion = Integer.parseInt(getVersion().replace(".", ""));//当前app版本
+                    int newVersion = Integer.parseInt(version.replace(".", ""));//系统最新版本
+                    if (newVersion > oldVersion) {//需要更新
+                        message.what = 323;
+                        url = json.getString("download");
+                    } else {
+                        message.what = 333;
+                    }
+                    hander.sendMessage(message); // 发送消息给Handler
+                } catch (JSONException e) {
+
+                }
+            }
+        });
+    }
+
+    private String url;
+
+    @Override
+    protected Dialog onCreateDialog(int paramInt) {
+        Dialog dialog = null;
+
+        if (paramInt == 323) {
+            AlertDialog.Builder localBuilder1 = new AlertDialog.Builder(this)
+                    .setTitle("提示").setMessage("有新版本可以更新，点击下载");
+            DialogInterface.OnClickListener local3 = new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface paramDialogInterface,
+                                    int paramInt) {
+                    // 开始下载数据
+                    DownLoad();
+                }
+            };
+
+            dialog = localBuilder1.setPositiveButton("返回", null)
+                    .setNegativeButton("下载", local3).create();
+
+            return dialog;
+        }
+
+        if (paramInt == 333) {
+            dialog = null;
+
+            AlertDialog.Builder localBuilder1 = new AlertDialog.Builder(this)
+                    .setTitle("提示").setMessage("当前版本已经是最新版本");
+
+            DialogInterface.OnClickListener local3 = new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface paramDialogInterface,
+                                    int paramInt) {
+                    removeDialog(333);
+                }
+            };
+            dialog = localBuilder1.setPositiveButton("返回", local3).create();
+        }
+
+        return dialog;
+    }
+
+    UpdateManager mUpdateManager;
+
+    private void DownLoad() {
+        MainActivity.this.removeDialog(323);
+        //dialogStr = "正在下载最新版系统...";
+        //showDialog(322);
+
+        //这里来检测版本是否需要更新
+        mUpdateManager = new UpdateManager(this);
+        mUpdateManager.checkUpdateInfo(url);
+    }
+
+    private class UIHandler extends Handler {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case 333: {
+//                    showDialog(333);
+                    return;
+                }
+                case 323: {
+                    showDialog(323);
+                    return;
+                }
+            }
+
+            return;
+        }
+    }
+
+    /*
+        * 获取当前程序的版本号
+        */
+    public static String getVersion() {
+        //获取packagemanager的实例
+        PackageManager packageManager = BaseApplication.getContext().getPackageManager();
+        //getPackageName()是你当前类的包名，0代表是获取版本信息
+        PackageInfo packInfo = null;
+        try {
+            packInfo = packageManager.getPackageInfo(BaseApplication.getContext().getPackageName(), 0);
+        } catch (PackageManager.NameNotFoundException e) {
+
+        }
+        return packInfo.versionName;
     }
 
     private void setItem(int position) {
@@ -208,12 +343,12 @@ public class MainActivity extends BaseActivity {
                 model = new Gson().fromJson(obj.toString(), Version.class);
                 String old_version = Utils.getVersion();
                 String new_version = model.getVersion();
-                boolean result=false;
-                if(Integer.parseInt(new_version.substring(0,1))>Integer.parseInt(old_version.substring(0,1))){
-                    result=true;
-                }else{
-                    if(Double.parseDouble(new_version.substring(2))>Double.parseDouble(old_version.substring(2))){
-                        result=true;
+                boolean result = false;
+                if (Integer.parseInt(new_version.substring(0, 1)) > Integer.parseInt(old_version.substring(0, 1))) {
+                    result = true;
+                } else {
+                    if (Double.parseDouble(new_version.substring(2)) > Double.parseDouble(old_version.substring(2))) {
+                        result = true;
                     }
                 }
                 if (result) {//最新版本大于当前版本

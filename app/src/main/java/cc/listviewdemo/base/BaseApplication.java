@@ -8,6 +8,8 @@ import android.os.Vibrator;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
 import com.baidu.mapapi.SDKInitializer;
+import com.growingio.android.sdk.collection.Configuration;
+import com.growingio.android.sdk.collection.GrowingIO;
 
 import cc.listviewdemo.service.LocationService;
 

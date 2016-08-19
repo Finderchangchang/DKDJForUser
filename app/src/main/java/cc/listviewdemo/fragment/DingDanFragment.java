@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Map;
 
 import cc.listviewdemo.R;
-import cc.listviewdemo.activity.LoginActivity;
 import cc.listviewdemo.activity.MainActivity;
 import cc.listviewdemo.activity.OrderDetailActivity;
 import cc.listviewdemo.activity.TelAndLoginActivity;
@@ -78,27 +77,29 @@ public class DingDanFragment extends BaseFragment {
 
     @Override
     public void initEvents() {
-        mAdapter = new CommonAdapter<OrderList.OrderlistBean>(MainActivity.mInstance, no_beans, R.layout.item_order) {
+        mAdapter=new CommonAdapter<OrderList.OrderlistBean>(MainActivity.mInstance,no_beans,R.layout.item_order_small_list) {
             @Override
-            public void convert(CommonViewHolder holder, OrderList.OrderlistBean orderList, int position) {
-                holder.setGlideImage(R.id.shop_img_iv, orderList.getTogoPic());
-                holder.setText(R.id.shop_name_tv, orderList.getTogoName());
-                holder.setText(R.id.price_tv, "￥" + orderList.getTotalPrice());
+            public void convert(CommonViewHolder holder, OrderList.OrderlistBean orderlistBean, int position) {
+                holder.setListView(R.id.foodlist_listView,orderlistBean.getFoodlist());
+                holder.setText(R.id.shop_name_tv, orderlistBean.getTogoName());
+                holder.setCycleGlideImage(R.id.shop_img_iv, orderlistBean.getTogoPic());
+                holder.setText(R.id.goods_num_tv, orderlistBean.getFoodlist().size());
+                holder.setText(R.id.total_money_tv,orderlistBean.getTotalPrice()+"元");
                 String state = "未支付";
-                if (orderList.getPaystate().equals("0")) {
+                if (orderlistBean.getPaystate().equals("0")) {
                     state = "未支付";
                 } else {
-                    switch (orderList.getSendstate()) {
+                    switch (orderlistBean.getSendstate()) {
                         case "0":
-                            if (orderList.getState().equals("2")) {
-                                if (orderList.getIsShopSet().equals("0")) {
+                            if (orderlistBean.getState().equals("2")) {
+                                if (orderlistBean.getIsShopSet().equals("0")) {
                                     state = "订单已提交";
                                 } else {
                                     state = "商家已接单";
                                 }
-                            } else if (orderList.getState().equals("4")) {
+                            } else if (orderlistBean.getState().equals("4")) {
                                 state = "订单已取消";//商家拒接此单
-                            } else if (orderList.getState().equals("7")) {
+                            } else if (orderlistBean.getState().equals("7")) {
                                 state = "正在匹配骑手";
                             } else {
                                 state = "订单已取消";
@@ -115,9 +116,49 @@ public class DingDanFragment extends BaseFragment {
                             break;
                     }
                 }
-                holder.setText(R.id.state_tv, state);
+                holder.setText(R.id.shop_state_tv, state);
             }
         };
+//        mAdapter = new CommonAdapter<OrderList.OrderlistBean>(MainActivity.mInstance, no_beans, R.layout.item_order) {
+//            @Override
+//            public void convert(CommonViewHolder holder, OrderList.OrderlistBean orderList, int position) {
+//                holder.setGlideImage(R.id.shop_img_iv, orderList.getTogoPic());
+//                holder.setText(R.id.shop_name_tv, orderList.getTogoName());
+//                holder.setText(R.id.price_tv, "￥" + orderList.getTotalPrice());
+//                String state = "未支付";
+//                if (orderList.getPaystate().equals("0")) {
+//                    state = "未支付";
+//                } else {
+//                    switch (orderList.getSendstate()) {
+//                        case "0":
+//                            if (orderList.getState().equals("2")) {
+//                                if (orderList.getIsShopSet().equals("0")) {
+//                                    state = "订单已提交";
+//                                } else {
+//                                    state = "商家已接单";
+//                                }
+//                            } else if (orderList.getState().equals("4")) {
+//                                state = "订单已取消";//商家拒接此单
+//                            } else if (orderList.getState().equals("7")) {
+//                                state = "正在匹配骑手";
+//                            } else {
+//                                state = "订单已取消";
+//                            }
+//                            break;
+//                        case "1":
+//                            state = "骑手去商家取货";
+//                            break;
+//                        case "2":
+//                            state = "已取货，配送中";
+//                            break;
+//                        case "3":
+//                            state = "已送达";
+//                            break;
+//                    }
+//                }
+//                holder.setText(R.id.state_tv, state);
+//            }
+//        };
 
         main_lv.setAdapter(mAdapter);
         main_lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {

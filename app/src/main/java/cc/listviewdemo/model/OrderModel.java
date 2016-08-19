@@ -46,6 +46,9 @@ public class OrderModel implements Serializable {
     private String Remark;
     private String PayMode;
     private String Ordersource;
+    private String area;
+    private String province;
+    private String city;
 
     public OrderModel() {
 
@@ -195,5 +198,29 @@ public class OrderModel implements Serializable {
 
     public void setShopList(List<ShopListModel> shopList) {
         ShopList = shopList;
+    }
+
+    public String getArea() {
+        return area;
+    }
+
+    public void setArea(String area) {
+        this.area = area;
+    }
+
+    public String getProvince() {
+        return province;
+    }
+
+    public void setProvince(String province) {
+        this.province = province;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
     }
 }

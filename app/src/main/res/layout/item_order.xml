@@ -20,16 +20,6 @@
             android:layout_height="50dp"
             android:src="@mipmap/shop_open_status"
             android:visibility="gone"/>
-        <TextView
-            android:id="@+id/shop_no_open_tv"
-            android:layout_width="match_parent"
-            android:layout_height="20dp"
-            android:text="商家休息中"
-            android:textSize="14sp"
-            android:gravity="center"
-            android:layout_alignParentBottom="true"
-            android:background="@color/colorPrimaryDark"
-            android:visibility="gone"/>
     </RelativeLayout>
     <RelativeLayout
         android:layout_width="match_parent"

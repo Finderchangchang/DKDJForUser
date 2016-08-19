@@ -4,10 +4,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.WindowManager;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -19,17 +20,14 @@ import android.widget.TextView;
 import net.tsz.afinal.annotation.view.CodeNote;
 import net.tsz.afinal.view.TotalListView;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import cc.listviewdemo.R;
 import cc.listviewdemo.activity.GoodDetailActivity;
-import cc.listviewdemo.activity.LoginActivity;
 import cc.listviewdemo.activity.TelAndLoginActivity;
 import cc.listviewdemo.base.BaseFragment;
 import cc.listviewdemo.activity.ConfirmOrderActivity;
@@ -82,6 +80,10 @@ public class GoodListFragment extends BaseFragment implements IFGoodListView {
     RelativeLayout gwc_rl;
     private PopupWindow pop_win;
     Button pop_billing;
+    @CodeNote(id=R.id.shop_open_ll)
+    LinearLayout shop_open_ll;
+    @CodeNote(id=R.id.shop_sleep_tv)
+    TextView shop_sleep_tv;
 
     @Override
     public void initViews() {
@@ -95,7 +97,7 @@ public class GoodListFragment extends BaseFragment implements IFGoodListView {
         mTag = new HashMap<>();
     }
 
-    RelativeLayout clear_gwc_rl;
+    LinearLayout clear_gwc_rl;
     LinearLayout top_total_ll;
 
     /**
@@ -110,7 +112,7 @@ public class GoodListFragment extends BaseFragment implements IFGoodListView {
         LayoutInflater layoutInflater = (LayoutInflater) SHDetailsActivity.mInstance.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View view = layoutInflater.inflate(R.layout.pop_gwc, null);
         gouwuche_lv = (TotalListView) view.findViewById(R.id.gouwuche_lv);
-        clear_gwc_rl = (RelativeLayout) view.findViewById(R.id.clear_gwc_rl);
+        clear_gwc_rl = (LinearLayout) view.findViewById(R.id.clear_gwc_rl);
         top_total_ll = (LinearLayout) view.findViewById(R.id.top_total_ll);
         top_total_ll.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -141,28 +143,32 @@ public class GoodListFragment extends BaseFragment implements IFGoodListView {
         pop_win.setBackgroundDrawable(new BitmapDrawable());
         pop_win.showAtLocation(v, Gravity.TOP, 0, frame.top);
     }
-
+    private boolean isOpen=true;
     @Override
     public void initEvents() {
+        if(("1").equals(shop.getStatus())){
+            shop_open_ll.setVisibility(View.VISIBLE);
+            shop_sleep_tv.setVisibility(View.GONE);
+        }else{
+            shop_open_ll.setVisibility(View.GONE);
+            shop_sleep_tv.setVisibility(View.VISIBLE);
+            isOpen=false;
+        }
         mListener = new GoodListListener(this, SHDetailsActivity.mInstance.shop.getDataID());
         mListener.loadType();//加载分类
-        mListener.loadFoods();//加载出所有的Goods
+
         mLefts = new GoodsClassifyAdapter(SHDetailsActivity.mInstance, mLeft);
         left_lv.setAdapter(mLefts);
         left_lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String tag = mTag.get(mLeft.get(position).getSortID());
+                String tag = mLeft.get(position).getFirstPosition();
                 if (tag != null) {
                     final int seleId = Integer.parseInt(tag);
                     right_lv.setSelection(seleId);
-                    right_lv.post(new Runnable() {
-                        public void run() {
-                            right_lv.setSelection(seleId);
-                        }
-                    });
                 }
                 mLefts.clearSelection(position);
+                top_title_tv.setText(mLeft.get(position).getSortName());
             }
         });
         billing.setBackgroundColor(getResources().getColor(R.color.smallLab));
@@ -188,6 +194,7 @@ public class GoodListFragment extends BaseFragment implements IFGoodListView {
                 holder.setText(R.id.num_tv, goods.getPNum());
             }
         };
+
     }
 
     List<ShopListModel> shops;
@@ -209,16 +216,16 @@ public class GoodListFragment extends BaseFragment implements IFGoodListView {
         userId = Utils.ReadString(SaveKey.KEY_UserId);
         if (!userId.equals("")) {
             if (count > 0) {
-                shop.setGoodses(goods);
-                shops.add(new ShopListModel(shop.getLng(), shop.getLat(), shop.getDataID(), shop.getSendmoney(), shop.getTogoName(), goods));//添加商品到商户，再将商户信息添加到shop集合中。
-                Utils.IntentPost(ConfirmOrderActivity.class, new Utils.putListener() {
-                    @Override
-                    public void put(Intent intent) {
-                        OrderModel model = new OrderModel(userId,
-                                Utils.getNormalTime(), "", shop.getDataID(), "2", shops);
-                        intent.putExtra("order", model);
-                    }
-                });
+                    shop.setGoodses(goods);
+                    shops.add(new ShopListModel(shop.getLng(), shop.getLat(), shop.getDataID(), shop.getSendmoney(), shop.getTogoName(), goods));//添加商品到商户，再将商户信息添加到shop集合中。
+                    Utils.IntentPost(ConfirmOrderActivity.class, new Utils.putListener() {
+                        @Override
+                        public void put(Intent intent) {
+                            OrderModel model = new OrderModel(userId,
+                                    Utils.getNormalTime(), "", shop.getDataID(), "2", shops);
+                            intent.putExtra("order", model);
+                        }
+                    });
             } else {
                 SHDetailsActivity.mInstance.ToastShort("购物车不能为空");
             }
@@ -262,17 +269,24 @@ public class GoodListFragment extends BaseFragment implements IFGoodListView {
         if (price >= Double.parseDouble(shop.getMinmoney())) {
             billing.setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
             billing.setText("去结算");
+            billing.setEnabled(true);
         } else {
             billing.setBackgroundColor(getResources().getColor(R.color.smallLab));
             billing.setText("￥" + shop.getMinmoney() + "起送");
+            billing.setEnabled(false);
         }
         if (count > 0) {
             total_num_tv.setText(count + "");
-            total_num_tv.setVisibility(View.VISIBLE);
+            gwc_rl.setBackgroundResource(R.mipmap.have_goods_gwc);
+            total_num_rl.setVisibility(View.VISIBLE);
         } else {
-            total_num_tv.setVisibility(View.GONE);
+            gwc_rl.setBackgroundResource(R.mipmap.no_good_gwc);
+            total_num_rl.setVisibility(View.GONE);
         }
     }
+
+    @CodeNote(id = R.id.total_num_rl)
+    RelativeLayout total_num_rl;
 
     /**
      * 在集合中添加Goods
@@ -332,6 +346,10 @@ public class GoodListFragment extends BaseFragment implements IFGoodListView {
         }
     }
 
+    List<FoodType> types;
+    @CodeNote(id = R.id.top_title_tv)
+    TextView top_title_tv;
+
     /**
      * 加载商品分类列表
      *
@@ -339,13 +357,18 @@ public class GoodListFragment extends BaseFragment implements IFGoodListView {
      */
     @Override
     public void loadGoodType(List<FoodType> mList) {
-        new ListSortUtil<FoodType>().sort(mList, "SortID", "asc");
+        types = mList;
         mLefts.refresh(mList);
         mLeft = mList;
+        if (mLeft.size() > 0) {
+            top_title_tv.setText(mLeft.get(0).getSortName());
+        }
+        mListener.loadFoods();//加载出所有的Goods
     }
 
     List<FoodDetail> mTotalList;
     Map<String, String> mTag;
+    boolean scrollFlag = false;// 标记是否滑动
 
     /**
      * 加载出所有的商品列表
@@ -353,39 +376,87 @@ public class GoodListFragment extends BaseFragment implements IFGoodListView {
      * @param mList
      */
     @Override
-    public void loadGoodDetails(final List<FoodDetail> mList) {
-        new ListSortUtil<FoodDetail>().sort(mList, "FoodType", "asc");
-        mTag = getSortID(mList);
-        detailsAdapter = new GoodsDetailsAdapter(this, mList);
-        right_lv.setAdapter(detailsAdapter);
-        right_lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
-                Utils.IntentPost(GoodDetailActivity.class, new Utils.putListener() {
-                    @Override
-                    public void put(Intent intent) {
-                        intent.putExtra("detail", mList.get(position));
+    public void loadGoodDetails(List<FoodDetail> mList) {
+        final List<FoodDetail> xx = SortByFoodType(mList, types);
+        if (xx.size() > 0) {
+            getSortID(xx);
+            detailsAdapter = new GoodsDetailsAdapter(this, xx, mLeft,isOpen);
+            right_lv.setAdapter(detailsAdapter);
+            right_lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
+                    Utils.IntentPost(GoodDetailActivity.class, new Utils.putListener() {
+                        @Override
+                        public void put(Intent intent) {
+                            intent.putExtra("detail", xx.get(position));
+                        }
+                    });
+                }
+            });
+
+            right_lv.setOnScrollListener(new AbsListView.OnScrollListener() {
+                @Override
+                public void onScrollStateChanged(AbsListView view, int scrollState) {
+                    switch (scrollState) {
+                        // 当不滚动时
+                        case SCROLL_STATE_IDLE:// 是当屏幕停止滚动时
+                            scrollFlag = false;
+                            break;
+                        case SCROLL_STATE_TOUCH_SCROLL:// 滚动时
+                            scrollFlag = true;
+                            break;
+                        case SCROLL_STATE_FLING:// 是当用户由于之前划动屏幕并抬起手指，屏幕产生惯性滑动时
+                            scrollFlag = true;
+                            break;
                     }
-                });
-            }
-        });
+                }
+
+                @Override
+                public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                    if (scrollFlag) {
+                        for (int i = 0; i < mLeft.size(); i++) {
+                            if ((firstVisibleItem + "").equals(mLeft.get(i).getFirstPosition())) {
+                                mLefts.clearSelection(i);
+                                top_title_tv.setText(mLeft.get(i).getSortName());
+                                left_lv.setSelection(left_lv.getFirstVisiblePosition());
+                            }
+                        }
+                    }
+                }
+            });
+        }
     }
+
+    private List<FoodDetail> SortByFoodType(List<FoodDetail> mfoods, List<FoodType> mtypes) {
+        List<FoodDetail> mains = new ArrayList<>();
+        for (FoodType type : mtypes) {
+            for (FoodDetail foodDetail : mfoods) {
+                if (foodDetail.getFoodType().equals(type.getSortID())) {
+                    mains.add(foodDetail);
+                }
+            }
+        }
+        return mains;
+    }
+
 
     /**
      * 获得List中的model分类
      */
-    private Map getSortID(List<FoodDetail> mList) {
-        Map<String, String> map = new HashMap<>();
+
+    private void getSortID(List<FoodDetail> list) {
         String result = "";
-        for (int i = 0; i < mList.size(); i++) {
-            if (result.equals("")) {
-                map.put(mList.get(i).getFoodType(), i + "");
-            } else {
-                if (!result.equals(mList.get(i).getFoodType())) {
-                    map.put(mList.get(i).getFoodType(), i + "");
+        int typeId = 0;
+        for (int i = 0; i < list.size(); i++) {
+            String type = list.get(i).getFoodType();
+            if (!result.equals(type)) {
+                if (!mLeft.get(typeId).getSortID().equals(type)) {
+                    typeId++;
                 }
+                mLeft.get(typeId).setFirstPosition(i + "");
+                result = type;
+                typeId++;
             }
         }
-        return map;
     }
 }

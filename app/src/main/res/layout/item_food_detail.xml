@@ -1,10 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="80dp"
+    android:layout_height="105dp"
     android:descendantFocusability="blocksDescendants"
     android:gravity="center_vertical"
     android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/top_title_tv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/left_normal_bg"
+        android:paddingBottom="5dp"
+        android:paddingLeft="10dp"
+        android:paddingTop="5dp"
+        android:text="精品美食"
+        android:textSize="16sp" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -32,6 +43,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="薯条"
+                    android:textColor="#000"
                     android:textSize="15sp" />
 
                 <LinearLayout
@@ -45,21 +57,23 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="月售"
-                        android:textSize="11sp"/>
+                        android:textSize="12sp" />
 
                     <TextView
                         android:id="@+id/sell_num_tv"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="5dp"
+                        android:layout_marginLeft="2dp"
                         android:text="10"
-                        android:textSize="11sp"/>
+                        android:textSize="12sp" />
 
                     <ImageView
                         android:id="@+id/notice_iv"
-                        android:layout_width="10dp"
-                        android:layout_height="10dp"
-                        android:layout_marginLeft="5dp" />
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:layout_marginLeft="5dp"
+                        android:src="@mipmap/tuijian_icon"
+                        android:visibility="gone"/>
                 </LinearLayout>
 
                 <TextView
@@ -69,7 +83,7 @@
                     android:layout_marginTop="3dp"
                     android:text="15.0"
                     android:textColor="@color/red"
-                    android:textStyle="bold"/>
+                    android:textSize="15sp" />
             </LinearLayout>
 
             <LinearLayout
@@ -82,9 +96,9 @@
 
                 <ImageView
                     android:id="@+id/reduce"
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:src="@mipmap/icon_reduce"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:src="@mipmap/goods_jian"
                     android:visibility="gone" />
 
                 <TextView
@@ -98,15 +112,15 @@
                     android:padding="4dp"
                     android:text="0"
                     android:textColor="@android:color/black"
-                    android:textSize="18sp"
+                    android:textSize="20sp"
                     android:visibility="gone" />
 
                 <ImageView
                     android:id="@+id/add_iv"
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
                     android:layout_marginRight="10dp"
-                    android:src="@mipmap/icon_add" />
+                    android:src="@mipmap/goods_jia" />
             </LinearLayout>
         </RelativeLayout>
 
@@ -115,7 +129,6 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="0.5dp"
-        android:layout_marginLeft="10dp"
         android:background="@color/smallLab" />
 
 </LinearLayout>

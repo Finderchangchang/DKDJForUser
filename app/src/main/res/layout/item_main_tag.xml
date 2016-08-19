@@ -1,16 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal" android:layout_width="wrap_content"
-    android:layout_height="15dp"
-    android:gravity="center_vertical">
+    android:orientation="horizontal" android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:paddingLeft="12dp">
     <ImageView
         android:id="@+id/iv"
-        android:layout_width="10dp"
-        android:layout_height="10dp" />
+        android:layout_width="15dp"
+        android:layout_height="15dp"
+        android:src="@mipmap/ic_lancher"
+        android:layout_margin="5dp"/>
     <TextView
         android:id="@+id/tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="10sp"
+        android:textSize="14sp"
+        android:text="大可转身"
         android:layout_marginLeft="5dp"/>
 </LinearLayout>

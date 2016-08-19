@@ -1,5 +1,5 @@
 apply plugin: 'com.android.application'
-
+apply plugin: 'com.growingio.android'
 android {
     compileSdkVersion 22
     buildToolsVersion "22.0.1"
@@ -9,7 +9,9 @@ android {
         minSdkVersion 14
         targetSdkVersion 22
         versionCode 1
-        versionName "0.6.1"
+        versionName "0.6.2"
+        resValue("string", "growingio_project_id", "b48539e63df0ad5f")
+        resValue("string", "growingio_url_scheme", "growing.1bd9187d050f8887")
     }
     buildTypes {
         release {
@@ -28,21 +30,15 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile 'com.growingio.android:vds-android-agent:0.9.91@aar'
+    compile fileTree(include: ['*.jar'], dir: 'libs')
     compile project(':afinal')
+    compile 'com.android.support:support-v4:22.0.+'
     compile 'com.shizhefei:ViewPagerIndicator:1.0.7'
     compile 'com.bigkoo:convenientbanner:2.0.5'
-    compile 'com.nostra13.universalimageloader:universal-image-loader:1.9.+'
     compile 'com.mcxiaoke.volley:library:1.0.18'
     compile 'com.google.code.gson:gson:2.7'
     compile 'com.google.code.gson:gson-parent:2.7'
     compile 'com.android.support:design:22.2.0'
     compile 'com.android.support:support-v13:22.2.0'
-    compile files('libs/alipaySdk-20160516.jar')
-    compile files('libs/android-support-v13.jar')
-    compile files('libs/libammsdk.jar')
-    compile files('libs/locSDK_6.23.jar')
-    compile files('libs/baidumapapi_v3_5_0.jar')
-    compile files('libs/dom4j-1.6.1.jar')
-    compile files('libs/BaiduLBS_Android.jar')
 }

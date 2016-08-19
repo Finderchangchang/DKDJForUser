@@ -11,7 +11,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="10dp"
-        app:centerText="我的账户" />
+        app:centerText="我的账户"
+        android:background="@color/colorPrimaryDark"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -41,7 +42,7 @@
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_marginRight="10dp"
-                android:background="#008877" />
+                android:src="@mipmap/no_img" />
 
             <ImageView
                 android:layout_width="20dp"
@@ -156,7 +157,7 @@
     <Button
         android:id="@+id/exit_user_btn"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
+        android:layout_height="50dp"
         android:layout_alignParentBottom="true"
         android:background="@color/colorPrimary"
         android:text="退出当前账号"

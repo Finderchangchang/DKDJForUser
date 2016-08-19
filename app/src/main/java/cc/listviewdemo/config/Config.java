@@ -10,7 +10,8 @@ public class Config {
 
     public static final String PATH = URL + "/App/Android/";
     public static final String DOWN_PATH = URL + "/download/";
-
+    public static String CookieName = "DKDJForShop";
+    public static String APKNAME = "DKDJForShop.apk";
     // 商户PID
     public static final String PARTNER = "2088421279495661";
     // 商户收款账号

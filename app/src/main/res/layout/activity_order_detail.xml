@@ -2,10 +2,15 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="#f0f0f0"
     android:orientation="vertical">
-
-    <include layout="@layout/total_title" />
+    <cc.listviewdemo.view.TitleBar
+        android:id="@+id/main_tb"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimaryDark"
+        app:centerText="订单详情"></cc.listviewdemo.view.TitleBar>
 
     <LinearLayout
         android:id="@+id/s_linearLayout2"

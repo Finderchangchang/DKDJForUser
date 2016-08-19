@@ -34,6 +34,7 @@ public class Shop implements Serializable {
     private String status;
     private int seekType;
     private String keyWord;
+    private String sentorg;
     private List<Goods> ItemList;
 
     public Shop(List<Goods> goods, String lat, String lng) {
@@ -65,6 +66,14 @@ public class Shop implements Serializable {
      * PPrice : 0.10 价格
      * Currentprice : 0.10 价格
      */
+
+    public String getSentorg() {
+        return sentorg;
+    }
+
+    public void setSentorg(String sentorg) {
+        this.sentorg = sentorg;
+    }
 
     /**
      * togoname : null

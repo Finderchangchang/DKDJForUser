@@ -45,16 +45,28 @@
         <activity android:name=".activity.MainActivity">
 
         </activity>
-        <activity android:name=".activity.StartActivity">
+        <activity android:name=".activity.SearchShopActivity"/>
+        <activity android:name=".activity.GetLocationActivity">
 
+        </activity>
+        <activity android:name=".activity.StartActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter>
+                <data android:scheme="@string/growingio_url_scheme"/>
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+            </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:scheme="wxb25da091f7dc485c" />
             </intent-filter>
-        </activity>
-        <activity android:name=".activity.LoginActivity">
-
         </activity>
         <activity android:name=".activity.SHDetailsActivity" />
         <activity android:name=".activity.ConfirmOrderActivity" />
@@ -96,14 +108,6 @@
         <activity android:name=".activity.GoodDetailActivity" />
         <activity android:name=".activity.UserInfoActivity" />
         <activity android:name=".activity.TelAndLoginActivity" />
-
-        <activity android:name=".activity.GetNearlyShopActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
     </application>
 
 </manifest>

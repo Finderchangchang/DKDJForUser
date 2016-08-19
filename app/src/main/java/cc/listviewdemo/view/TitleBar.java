@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import cc.listviewdemo.R;
@@ -21,6 +22,7 @@ public class TitleBar extends LinearLayout {
     TextView title_name_tv;
     ImageView back_iv;
     TextView right_tv;
+    RelativeLayout main_bg_rl;
 
     public TitleBar(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
@@ -30,6 +32,7 @@ public class TitleBar extends LinearLayout {
         title_name_tv = (TextView) findViewById(R.id.title_name_tv);
         back_iv = (ImageView) findViewById(R.id.back_iv);
         right_tv = (TextView) findViewById(R.id.right_tv);
+        main_bg_rl= (RelativeLayout) findViewById(R.id.main_bg_rl);
         back_iv.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -54,6 +57,9 @@ public class TitleBar extends LinearLayout {
         for (int i = 0; i < n; i++) {
             int attr = a.getIndex(i);
             switch (attr) {
+                case R.styleable.TitleBar_mainBGColor:
+                    main_bg_rl.setBackgroundColor(a.getColor(attr,getResources().getColor(R.color.colorPrimaryDark)));
+                    break;
                 case R.styleable.TitleBar_centerIsBlod:
                     title_name_tv.getPaint().setFakeBoldText(true);
                     break;
@@ -117,5 +123,8 @@ public class TitleBar extends LinearLayout {
 
     public interface OnRightClick {
         void onClick();
+    }
+    public void setCenterText(String val){
+        title_name_tv.setText(val);
     }
 }

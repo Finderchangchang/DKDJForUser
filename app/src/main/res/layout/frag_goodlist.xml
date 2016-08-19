@@ -2,27 +2,25 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#babcbc">
+    android:background="#f6f5f5">
 
-    <RelativeLayout
+    <LinearLayout
+        android:id="@+id/ll_list_main"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_above="@+id/buttom"
+        android:orientation="horizontal">
 
-        <LinearLayout
-            android:id="@+id/ll_list_main"
+        <ListView
+            android:id="@+id/parentlist"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content">
+
+        </ListView>
+
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_above="@+id/buttom"
-            android:orientation="horizontal">
-
-            <ListView
-                android:id="@+id/parentlist"
-                android:layout_width="100dp"
-                android:layout_height="match_parent"
-                android:scrollbars="none">
-
-            </ListView>
+            android:layout_height="match_parent">
 
             <ListView
                 android:id="@+id/childlist"
@@ -33,105 +31,165 @@
                 android:dividerHeight="1dip">
 
             </ListView>
-        </LinearLayout>
-
-        <View
-            android:id="@+id/view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_above="@+id/buttom"
-            android:background="#50000000"
-            android:visibility="gone" />
-
-
-        <LinearLayout
-            android:id="@+id/window"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_above="@+id/buttom"
-            android:layout_marginTop="150dp"
-            android:background="@android:color/white"
-            android:orientation="vertical"
-            android:visibility="gone">
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="30dp"
-                android:background="@color/primary_material_light"
-                android:paddingLeft="10dp"
-                android:paddingRight="10dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:text="购物车" />
-
-                <TextView
-                    android:id="@+id/clear"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:layout_centerVertical="true"
-                    android:text="清空" />
-            </RelativeLayout>
-
-            <ListView
-                android:id="@+id/list_cart"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-            </ListView>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@android:color/darker_gray" />
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="20dp" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/buttom"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:background="@android:color/white"
-            android:orientation="vertical">
 
             <TextView
+                android:id="@+id/top_title_tv"
                 android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/list_item_line"/>
+                android:layout_height="wrap_content"
+                android:background="@color/left_normal_bg"
+                android:paddingBottom="5dp"
+                android:paddingLeft="10dp"
+                android:paddingTop="5dp"
+                android:text="精品美食"
+                android:textSize="16sp" />
+        </RelativeLayout>
+
+    </LinearLayout>
+
+    <View
+        android:id="@+id/view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/buttom"
+        android:background="#50000000"
+        android:visibility="gone" />
+
+
+    <LinearLayout
+        android:id="@+id/window"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/buttom"
+        android:layout_marginTop="150dp"
+        android:background="@android:color/white"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:background="@color/primary_material_light"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:text="购物车" />
+
+            <TextView
+                android:id="@+id/clear"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:text="清空" />
+        </RelativeLayout>
+
+        <ListView
+            android:id="@+id/list_cart"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+        </ListView>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/darker_gray" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="20dp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/buttom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@android:color/white"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="0.5sp"
+            android:background="@color/list_item_line" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
             <LinearLayout
+                android:id="@+id/shop_open_ll"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
+                android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:gravity="center_vertical">
+                android:visibility="gone">
+
+                <RelativeLayout
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_alignParentBottom="true"
+                    android:layout_marginLeft="20dp">
+
+                    <RelativeLayout
+                        android:id="@+id/gwc_rl"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_centerInParent="true"
+                        android:background="@mipmap/no_good_gwc"></RelativeLayout>
+
+                    <RelativeLayout
+                        android:id="@+id/total_num_rl"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_alignParentRight="true"
+                        android:visibility="gone">
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@mipmap/good_num_gwc" />
+
+                        <TextView
+                            android:id="@+id/total_num_tv"
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:gravity="center"
+                            android:text="1"
+                            android:textColor="@android:color/white"
+                            android:textSize="10sp" />
+                    </RelativeLayout>
+                </RelativeLayout>
+
                 <LinearLayout
+                    android:id="@+id/linearLayout"
                     android:layout_width="0dp"
-                    android:layout_weight="1"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
-                    android:layout_marginLeft="80dp"
-                    android:orientation="vertical"
-                    android:id="@+id/linearLayout">
+                    android:layout_marginLeft="10dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
                     <TextView
                         android:id="@+id/price_main"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="￥0.00"
-                        android:textSize="16sp"
-                        android:textColor="@android:color/holo_red_light" />
+                        android:textColor="@android:color/holo_red_light"
+                        android:textSize="16sp" />
+
                     <TextView
                         android:id="@+id/pei_song_tv"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="配送费￥0.00"/>
+                        android:text="配送费￥0.00" />
                 </LinearLayout>
+
                 <Button
                     android:id="@+id/billing"
                     android:layout_width="150dp"
@@ -141,44 +199,19 @@
                     android:gravity="center"
                     android:textColor="@android:color/white"
                     android:textSize="18dp" />
-
-
             </LinearLayout>
-        </LinearLayout>
-    </RelativeLayout>
 
-    <RelativeLayout
-        android:id="@+id/gwc_rl"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_alignParentBottom="true"
-        android:layout_centerVertical="true"
-        android:layout_marginLeft="20dp"
-        android:layout_marginBottom="5dp"
-        android:background="@mipmap/icon_cart">
+            <TextView
+                android:id="@+id/shop_sleep_tv"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center"
+                android:text="本店休息，逛逛其他店铺吧！"
+                android:textSize="18sp"
+                android:textColor="@color/white"
+                android:background="#50000000"/>
+        </RelativeLayout>
+    </LinearLayout>
 
-        <TextView
-            android:id="@+id/total_num_tv"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_alignParentRight="true"
-            android:background="@mipmap/blue_cycle"
-            android:gravity="center"
-            android:text="1"
-            android:textSize="10sp"
-            android:textColor="@android:color/white"
-            android:visibility="gone"/>
-    </RelativeLayout>
 
-    <TextView
-        android:id="@+id/tv_count"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="54dp"
-        android:layout_marginLeft="48dp"
-        android:background="@drawable/shape_round_red"
-        android:text="1"
-        android:textColor="@android:color/holo_orange_dark"
-        android:visibility="gone" />
 </RelativeLayout>

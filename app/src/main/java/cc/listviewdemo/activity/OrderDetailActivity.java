@@ -36,6 +36,7 @@ import cc.listviewdemo.view.CommonAdapter;
 import cc.listviewdemo.view.CommonViewHolder;
 import cc.listviewdemo.view.HttpUtils;
 import cc.listviewdemo.view.SignUtils;
+import cc.listviewdemo.view.TitleBar;
 import cc.listviewdemo.view.Utils;
 import cc.listviewdemo.view.WxUtil;
 
@@ -46,8 +47,6 @@ import cc.listviewdemo.view.WxUtil;
  */
 public class OrderDetailActivity extends BaseActivity {
     public static OrderDetailActivity mInstance;
-    @CodeNote(id = R.id.title_name_tv)
-    TextView title_name_tv;
     @CodeNote(id = R.id.tv_shopName)
     TextView shopname;
     @CodeNote(id = R.id.tv_packfee)
@@ -76,21 +75,25 @@ public class OrderDetailActivity extends BaseActivity {
     TextView mBtnDoorder;
     @CodeNote(id = R.id.cancel_tv, click = "onClick")
     TextView cancel_tv;
-    @CodeNote(id = R.id.back_iv, click = "onClick")
-    ImageView back_iv;
     Map<String, String> map;
     String key = "";
     OrderDetailModel model;
     CommonAdapter<String> mAdapter;
-
+    @CodeNote(id=R.id.main_tb)
+    TitleBar main_tb;
     @Override
     public void initViews() {
         setContentView(R.layout.activity_order_detail);
         map = new HashMap<>();
-        title_name_tv.setText("订单详情");
         key = getIntent().getStringExtra("orderId");
         goods = new ArrayList<>();
         mInstance = this;
+        main_tb.setLeftClick(new TitleBar.OnLeftClick() {
+            @Override
+            public void onClick() {
+                mInstance.finish();
+            }
+        });
     }
 
     class MyThread extends Thread {
@@ -109,9 +112,6 @@ public class OrderDetailActivity extends BaseActivity {
 
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.back_iv:
-                mInstance.finish();
-                break;
             case R.id.cancel_tv:
                 if (model.getPaystate().equals("0")) {
                     OrderDetailActivity.mInstance.ToastShort("未支付订单不能取消");

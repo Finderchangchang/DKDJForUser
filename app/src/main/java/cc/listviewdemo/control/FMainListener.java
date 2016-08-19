@@ -59,11 +59,11 @@ public class FMainListener {
      * 加载shop分类
      */
     public void initShopType() {
-        Map<String,String> map=new HashMap<>();
-        map.put("pid","0");
-        map.put("indexpage","1");
-        map.put("pagesize","100");
-        map.put("languageType","2");
+        Map<String, String> map = new HashMap<>();
+        map.put("pid", "0");
+        map.put("indexpage", "1");
+        map.put("pagesize", "100");
+        map.put("languageType", "2");
         HttpUtils.loadJson("GetShopTypeList", map, new HttpUtils.LoadJsonListener() {
             @Override
             public void load(JSONObject obj) {
@@ -82,7 +82,8 @@ public class FMainListener {
     }
 
     public void initShops(Map maps) {
-        maps.put("languageType","2");
+        maps.put("pagesize", "10");
+        maps.put("languageType", "2");
         HttpUtils.loadJson("GetShopListByLocation", maps, new HttpUtils.LoadJsonListener() {
             @Override
             public void load(JSONObject obj) {

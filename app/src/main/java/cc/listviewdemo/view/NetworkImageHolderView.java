@@ -27,7 +27,7 @@ public class NetworkImageHolderView implements Holder<String> {
 
     @Override
     public void UpdateUI(Context context, int position, String data) {
-        imageView.setImageResource(R.mipmap.bg_login);
+        imageView.setImageResource(R.mipmap.no_img);
         Glide.with(MainActivity.mInstance)
                 .load(data)
                 .into(imageView);

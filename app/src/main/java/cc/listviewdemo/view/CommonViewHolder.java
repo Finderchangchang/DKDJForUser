@@ -2,6 +2,7 @@ package cc.listviewdemo.view;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
@@ -11,7 +12,9 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.RatingBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -19,6 +22,8 @@ import com.bumptech.glide.Glide;
 import java.util.List;
 
 import cc.listviewdemo.R;
+import cc.listviewdemo.activity.MainActivity;
+import cc.listviewdemo.model.OrderList;
 import cc.listviewdemo.model.Taglist;
 
 /**
@@ -115,9 +120,23 @@ public class CommonViewHolder {
         return this;
     }
 
+    public CommonViewHolder setCycleGlideImage(int viewId, String url) {
+        ImageView view = getView(viewId);
+        if (("").equals(url)) {
+            Glide.with(mContext).load(R.mipmap.no_img).asBitmap().centerCrop().transform(new GlideCircleTransform(MainActivity.mInstance)).into(new MyBitmapImageViewTarget(view));
+        } else {
+            Glide.with(mContext).load(url).asBitmap().centerCrop().placeholder(R.mipmap.no_img).transform(new GlideCircleTransform(MainActivity.mInstance)).into(new MyBitmapImageViewTarget(view));
+        }
+        return this;
+    }
+
     public CommonViewHolder setStar(int viewId, String num) {
         RatingBar rb = getView(viewId);
-        rb.setNumStars(Integer.parseInt(num));
+        if (num != null || ("").equals(num)) {
+            rb.setRating(Integer.parseInt(num));
+        } else {
+            rb.setRating(0);
+        }
         return this;
     }
 
@@ -130,16 +149,9 @@ public class CommonViewHolder {
      */
     public CommonViewHolder setTags(int viewId, List<Taglist> list) {
         GridView view = getView(viewId);
-//        int height;
-//        if((float)list.size()/2>list.size()/2){
-//            height=16*(list.size()+1);
-//        }else{
-//            height=16*list.size();
-//        }
         view.setPressed(false);
         view.setEnabled(false);
         view.setClickable(false);
-//        view.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,height));
         view.setAdapter(new CommonAdapter<Taglist>(mContext, list, R.layout.item_main_tag) {
             @Override
             public void convert(CommonViewHolder holder, Taglist taglist, int position) {
@@ -147,7 +159,21 @@ public class CommonViewHolder {
                 holder.setText(R.id.tv, taglist.getTitle());
             }
         });
-        setListViewHeightBasedOnChildren(view);
+        RelativeLayout rv = getView(R.id.tag_rl);
+        rv.setLayoutParams(new LinearLayout.LayoutParams(-1, 150));
+//        setListViewHeightBasedOnChildren(view);
+        return this;
+    }
+    public CommonViewHolder setListView(int viewId,List<OrderList.OrderlistBean.FoodlistBean> list){
+        ListView view=getView(viewId);
+        view.setAdapter(new CommonAdapter<OrderList.OrderlistBean.FoodlistBean>(mContext,list,R.layout.item_good) {
+
+            @Override
+            public void convert(CommonViewHolder holder, OrderList.OrderlistBean.FoodlistBean foodlistBean, int position) {
+                holder.setText(R.id.name_num_tv,foodlistBean.getFoodname());
+                holder.setText(R.id.total_price_tv,"X"+foodlistBean.getNum());
+            }
+        });
         return this;
     }
 
@@ -211,6 +237,12 @@ public class CommonViewHolder {
     public CommonViewHolder setImageResource(int viewId, int drawableId) {
         ImageView view = getView(viewId);
         view.setImageResource(drawableId);
+        return this;
+    }
+
+    public CommonViewHolder setTextColor(int viewId, String color) {
+        TextView view = getView(viewId);
+        view.setTextColor(Color.parseColor(color));
         return this;
     }
 

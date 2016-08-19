@@ -51,6 +51,7 @@ import cc.listviewdemo.view.CommonAdapter;
 import cc.listviewdemo.view.CommonViewHolder;
 import cc.listviewdemo.view.HttpUtils;
 import cc.listviewdemo.view.SignUtils;
+import cc.listviewdemo.view.TitleBar;
 import cc.listviewdemo.view.Utils;
 import cc.listviewdemo.view.WxUtil;
 
@@ -60,10 +61,6 @@ import cc.listviewdemo.view.WxUtil;
  */
 public class ConfirmOrderActivity extends BaseActivity {
     public static ConfirmOrderActivity mInstance;
-    @CodeNote(id = R.id.back_iv, click = "onClick")
-    ImageView back_iv;
-    @CodeNote(id = R.id.title_name_tv)
-    TextView title_name_tv;
     @CodeNote(id = R.id.address_rl, click = "onClick")
     RelativeLayout address_rl;
     @CodeNote(id = R.id.address_tv)
@@ -104,7 +101,8 @@ public class ConfirmOrderActivity extends BaseActivity {
     Map<String, String> map = new HashMap<>();
     OrderModel model;
     AddressModel address;
-
+    @CodeNote(id=R.id.main_tb)
+    TitleBar main_tb;
     @Override
     public void initViews() {
         setContentView(R.layout.activity_confirm_order);
@@ -113,8 +111,12 @@ public class ConfirmOrderActivity extends BaseActivity {
     @Override
     public void initEvents() {
         mInstance = this;
-        goods = new ArrayList<>();
-        title_name_tv.setText("我的购物车");
+        main_tb.setLeftClick(new TitleBar.OnLeftClick() {
+            @Override
+            public void onClick() {
+                mInstance.finish();
+            }
+        });
         model = (OrderModel) getIntent().getSerializableExtra("order");
         goods = model.getShopList().get(0).getItemList();//获得所有商品信息
         mAdapter = new CommonAdapter<Goods>(mInstance, goods, R.layout.item_good) {
@@ -183,9 +185,6 @@ public class ConfirmOrderActivity extends BaseActivity {
 
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.back_iv://关闭当前页面
-                mInstance.finish();
-                break;
             case R.id.address_rl://点击进入选择地址页面
                 Intent intent = new Intent(ConfirmOrderActivity.mInstance, AddAddressActivity.class);
                 startActivityForResult(intent, 0);
@@ -231,6 +230,10 @@ public class ConfirmOrderActivity extends BaseActivity {
 
                     model.setRemark(order_remark_et.getText().toString().trim());
                     List<OrderModel> orderModels = new ArrayList<>();
+                    String keys = Utils.ReadString(SaveKey.KEY_LAT_LON);//获得存储的省市县
+                    model.setProvince(keys.split(":")[2].split(",")[0]);
+                    model.setCity(keys.split(":")[2].split(",")[1]);
+                    model.setArea(keys.split(":")[2].split(",")[2]);
                     orderModels.add(model);
                     String json = new Gson().toJson(orderModels);
                     map = new HashMap<>();

@@ -62,6 +62,7 @@ public class GoodsClassifyAdapter extends BaseAdapter {
             convertView = View.inflate(context, R.layout.tab_good_type,null);
             holder = new ViewHolder();
             holder.mName = (TextView) convertView.findViewById(R.id.tv);
+            holder.left_line_tv= (TextView) convertView.findViewById(R.id.left_line_tv);
             convertView.setTag(holder);
         }else {
             holder = (ViewHolder) convertView.getTag();
@@ -71,10 +72,10 @@ public class GoodsClassifyAdapter extends BaseAdapter {
         //设置选中位置的字体和背景颜色
         if (selectedPostion == position){
             convertView.setBackgroundColor(Color.WHITE);
-            holder.mName.setTextColor(Color.GREEN);
+            holder.left_line_tv.setVisibility(View.VISIBLE);
         }else{
-            convertView.setBackgroundColor(Color.LTGRAY);
-            holder.mName.setTextColor(Color.GRAY);
+            convertView.setBackgroundColor(context.getResources().getColor(R.color.left_normal_bg));
+            holder.left_line_tv.setVisibility(View.INVISIBLE);
         }
         return convertView;
     }
@@ -82,5 +83,6 @@ public class GoodsClassifyAdapter extends BaseAdapter {
 
     class ViewHolder{
         private TextView mName;
+        private TextView left_line_tv;
     }
 }

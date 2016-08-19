@@ -11,6 +11,23 @@ public class FoodType {
     private String SortName;
     private String JOrder;
     private String icon;
+    private String firstPosition;
+
+    public FoodType() {
+    }
+
+    public FoodType(String sortID, String firstPosition) {
+        SortID = sortID;
+        this.firstPosition = firstPosition;
+    }
+
+    public String getFirstPosition() {
+        return firstPosition;
+    }
+
+    public void setFirstPosition(String firstPosition) {
+        this.firstPosition = firstPosition;
+    }
 
     public String getSortID() {
         return SortID;

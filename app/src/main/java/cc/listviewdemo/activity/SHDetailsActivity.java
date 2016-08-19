@@ -20,6 +20,9 @@ import cc.listviewdemo.R;
 import cc.listviewdemo.base.BaseActivity;
 import cc.listviewdemo.fragment.GoodListFragment;
 import cc.listviewdemo.model.Shop;
+import cc.listviewdemo.view.GlideCircleTransform;
+import cc.listviewdemo.view.GlideRoundTransform;
+import cc.listviewdemo.view.TitleBar;
 import cc.listviewdemo.view.TitleFragmentPagerAdapter;
 import cc.listviewdemo.fragment.PingLunFragment;
 import cc.listviewdemo.fragment.ShopDetailFragment;
@@ -34,10 +37,6 @@ public class SHDetailsActivity extends BaseActivity {
     TabLayout tab;
     @CodeNote(id = R.id.moretab_viewPager)
     ViewPager moretab_viewPager;
-    @CodeNote(id=R.id.back_iv,click = "onClick")
-    ImageView back_iv;//点击返回
-    @CodeNote(id=R.id.shop_name_tv)
-    TextView shop_name_tv;//顶部名称。可更改
     @CodeNote(id=R.id.shop_img_iv)
     ImageView shop_img_iv;//头像
     @CodeNote(id=R.id.start_price_tv)
@@ -48,6 +47,8 @@ public class SHDetailsActivity extends BaseActivity {
     TextView tag_tv;//公告
     @CodeNote(id=R.id.collection_btn,click = "onClick")
     Button collection_btn;//收藏按钮
+    @CodeNote(id=R.id.main_tb)
+    TitleBar main_tb;
     List<Fragment> fragments = new ArrayList<>();
     public Shop shop;
     @Override
@@ -59,16 +60,18 @@ public class SHDetailsActivity extends BaseActivity {
     public void initEvents() {
         mInstance = this;
         shop=(Shop)getIntent().getSerializableExtra("Shop");
-        Glide.with(MainActivity.mInstance)
-                .load(shop.getIcon()).error(R.mipmap.no_img)
-                .into(shop_img_iv);
+        if(("").equals(shop.getIcon())){
+            Glide.with(mInstance).load(R.mipmap.no_img).transform(new GlideCircleTransform(MainActivity.mInstance)).into(shop_img_iv);
+        }else{
+            Glide.with(mInstance).load(shop.getIcon()).error(R.mipmap.no_img).transform(new GlideCircleTransform(MainActivity.mInstance)).into(shop_img_iv);
+        }
         start_price_tv.setText(shop.getMinmoney());
-        shop_name_tv.setText(shop.getTogoName());
+        main_tb.setCenterText(shop.getTogoName());
         pei_song_tv.setText(shop.getSendmoney());//配送费
         fragments.add(new GoodListFragment());//商品列表
         fragments.add(new PingLunFragment());//评论页面
         fragments.add(new ShopDetailFragment());//商家详细信息页面
-        final TitleFragmentPagerAdapter adapter = new TitleFragmentPagerAdapter(getFragmentManager(), fragments, new String[]{"购买", "评论", "商家信息"});
+        final TitleFragmentPagerAdapter adapter = new TitleFragmentPagerAdapter(getFragmentManager(), fragments, new String[]{"点餐", "评论", "商家"});
         moretab_viewPager.setAdapter(adapter);
         tab.setupWithViewPager(moretab_viewPager);
         moretab_viewPager.setOffscreenPageLimit(2);
@@ -97,9 +100,9 @@ public class SHDetailsActivity extends BaseActivity {
 
             }
         });
-        back_iv.setOnClickListener(new View.OnClickListener() {
+        main_tb.setLeftClick(new TitleBar.OnLeftClick() {
             @Override
-            public void onClick(View v) {
+            public void onClick() {
                 SHDetailsActivity.mInstance.finish();//关闭页面
             }
         });

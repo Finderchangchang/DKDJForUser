@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/main_bg_rl"
     android:layout_width="match_parent"
-    android:layout_height="50dp"
-    android:background="@color/colorPrimary">
+    android:layout_height="50dp">
 
     <ImageView
         android:id="@+id/back_iv"
@@ -21,7 +21,7 @@
         android:gravity="center"
         android:text=""
         android:textColor="@android:color/white"
-        android:textSize="21sp">
+        android:textSize="20sp">
 
     </TextView>
 

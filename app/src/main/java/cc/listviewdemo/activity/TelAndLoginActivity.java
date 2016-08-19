@@ -110,7 +110,7 @@ public class TelAndLoginActivity extends BaseActivity {
                 num_pwd_login_tv.setBackgroundColor(getResources().getColor(R.color.white));
                 tel_login_ll.setVisibility(View.GONE);
                 num_pwd_login_ll.setVisibility(View.VISIBLE);
-                find_pwd_tv.setVisibility(View.VISIBLE);
+//                find_pwd_tv.setVisibility(View.VISIBLE);
                 break;
             case R.id.login_btn://验证手机号验证码是否为空，在判断合法性
                 if (position == 1) {
@@ -132,8 +132,14 @@ public class TelAndLoginActivity extends BaseActivity {
                         builder.show();
                     } else {
                         map=new HashMap<>();
+                        String keys=Utils.ReadString(SaveKey.KEY_LAT_LON);
                         map.put("type", "3");//快捷登录
                         map.put("tel", tel);//手机号码
+                        map.put("lat",keys.split(":")[0]);
+                        map.put("lng",keys.split(":")[1]);
+                        map.put("province",keys.split(":")[2].split(",")[0]);
+                        map.put("city",keys.split(":")[2].split(",")[1]);
+                        map.put("area",keys.split(":")[2].split(",")[2]);
                         HttpUtils.loadJson("sendcode", map, new HttpUtils.LoadJsonListener() {
                             @Override
                             public void load(JSONObject obj) {

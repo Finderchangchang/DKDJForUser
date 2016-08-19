@@ -11,7 +11,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:centerText="登录"
-        app:rightText="立即注册" />
+        app:rightText="立即注册"
+        android:background="@color/colorPrimaryDark"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -56,9 +57,9 @@
                 android:orientation="horizontal">
 
                 <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:src="#ff0099" />
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:src="@mipmap/tel_login" />
 
                 <EditText
                     android:id="@+id/tel_et"
@@ -98,9 +99,9 @@
                 android:orientation="horizontal">
 
                 <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:src="#ff0099" />
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:src="@mipmap/pwd_login" />
 
                 <EditText
                     android:id="@+id/code_et"
@@ -147,7 +148,7 @@
                 <ImageView
                     android:layout_width="20dp"
                     android:layout_height="20dp"
-                    android:src="#ff0099" />
+                    android:src="@mipmap/tel_login" />
 
                 <EditText
                     android:id="@+id/num_et"
@@ -177,7 +178,7 @@
                 <ImageView
                     android:layout_width="20dp"
                     android:layout_height="20dp"
-                    android:src="#ff0099" />
+                    android:src="@mipmap/pwd_login" />
 
                 <EditText
                     android:id="@+id/pwd_et"
@@ -187,6 +188,7 @@
                     android:layout_weight="1"
                     android:background="@null"
                     android:hint="密码"
+                    android:inputType="textPassword"
                     android:textSize="16sp" />
             </LinearLayout>
 

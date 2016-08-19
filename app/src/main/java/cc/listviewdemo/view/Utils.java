@@ -478,22 +478,6 @@ public class Utils {
         return sb.toString();
     }
 
-    /**
-     * 根据键值对读取存储在本地的数据
-     *
-     * @param key 键
-     * @return 存储的值
-     */
-    public static String ReadString(String key) {
-        SharedPreferences sp = BaseApplication.getContext().getSharedPreferences(SaveKey.KEY_Preferences_name,
-                Context.MODE_PRIVATE);
-        if (sp != null) {
-            return sp.getString(key, "");
-        } else {
-            return "";
-        }
-
-    }
 
     /**
      * 获取系统的当前日期，格式为YYYYMMDD
@@ -551,6 +535,23 @@ public class Utils {
         SharedPreferences.Editor editor = sp.edit();
         editor.putString(key, value);
         editor.commit();
+    }
+
+    /**
+     * 根据键值对读取存储在本地的数据
+     *
+     * @param key 键
+     * @return 存储的值
+     */
+    public static String ReadString(String key) {
+        SharedPreferences sp = BaseApplication.getContext().getSharedPreferences(SaveKey.KEY_Preferences_name,
+                Context.MODE_PRIVATE);
+        if (sp != null) {
+            return sp.getString(key, "");
+        } else {
+            return "";
+        }
+
     }
 
     /**

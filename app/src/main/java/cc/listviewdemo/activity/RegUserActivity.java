@@ -19,6 +19,7 @@ import java.util.TimerTask;
 
 import cc.listviewdemo.R;
 import cc.listviewdemo.base.BaseActivity;
+import cc.listviewdemo.config.SaveKey;
 import cc.listviewdemo.view.HttpUtils;
 import cc.listviewdemo.view.Utils;
 
@@ -84,15 +85,22 @@ public class RegUserActivity extends BaseActivity {
         switch (view.getId()) {
             case R.id.reg_btn://注册按钮
                 if (checkEt()) {//验证输入是否正确
+                    String keys = Utils.ReadString(SaveKey.KEY_LAT_LON);
                     map = new HashMap<>();
                     map.put("tel", login_id_et.getText().toString().trim());
                     map.put("password", pwd_et.getText().toString().trim());
+                    map.put("lat", keys.split(":")[0]);
+                    map.put("lng", keys.split(":")[1]);
+                    map.put("province", keys.split(":")[2].split(",")[0]);
+                    map.put("city", keys.split(":")[2].split(",")[1]);
+                    map.put("area", keys.split(":")[2].split(",")[2]);
                     HttpUtils.loadJson("NewRegedit", map, new HttpUtils.LoadJsonListener() {
                         @Override
                         public void load(JSONObject obj) {
                             try {
                                 String state = obj.getString("state");
                                 if (state.equals("1")) {//注册成功
+                                    Utils.WriteString(SaveKey.KEY_UserId, obj.getString("userid"));
                                     setResult(11);
                                     mInstance.finish();
                                 }
@@ -100,7 +108,7 @@ public class RegUserActivity extends BaseActivity {
                                     ToastShort(obj.getString("msg"));
                                 }
                             } catch (JSONException e) {
-                                e.printStackTrace();
+
                             }
                         }
                     });
