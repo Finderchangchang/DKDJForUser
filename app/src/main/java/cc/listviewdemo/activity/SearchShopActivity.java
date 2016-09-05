@@ -63,10 +63,15 @@ public class SearchShopActivity extends BaseActivity {
     TitleBar search_tb;
     @CodeNote(id = R.id.search_key_word_tv)
     TextView search_key_word_tv;
+    @CodeNote(id = R.id.no_internet_ll)
+    LinearLayout no_internet_ll;
+    @CodeNote(id = R.id.refresh_btn, click = "onClick")
+    Button refresh_btn;
 
     @Override
     public void initViews() {
         setContentView(R.layout.activity_search_shop);
+        Utils.WriteString(SaveKey.KEY_Load_Index, "0");
         mInstance = this;
         String keys = getIntent().getStringExtra("keyword");
         if (keys != null) {
@@ -96,12 +101,12 @@ public class SearchShopActivity extends BaseActivity {
         shop_list_lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
-                    Utils.IntentPost(SHDetailsActivity.class, new Utils.putListener() {
-                        @Override
-                        public void put(Intent intent) {
-                            intent.putExtra("Shop", shopList.get(position));
-                        }
-                    });
+                Utils.IntentPost(SHDetailsActivity.class, new Utils.putListener() {
+                    @Override
+                    public void put(Intent intent) {
+                        intent.putExtra("Shop", shopList.get(position));
+                    }
+                });
             }
         });
         hot_search_gv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -136,36 +141,41 @@ public class SearchShopActivity extends BaseActivity {
     TextView no_data_tv;
 
     private void initShops() {
-        shop_list_lv.setVisibility(View.VISIBLE);
-        hot_search_gv.setVisibility(View.GONE);
-        no_data_tv.setVisibility(View.GONE);
-        map.put("pageindex", "1");//pageindex=1&pagesize=20&lat=38.893189&lng=115.508560
-        map.put("pagesize", "10");
-        map.put("lat", Utils.ReadString(SaveKey.KEY_LAT_LON).split(":")[0]);
-        map.put("lng", Utils.ReadString(SaveKey.KEY_LAT_LON).split(":")[1]);
-        map.put("languageType", "2");
+        if (Utils.isNetworkConnected()) {//联网的时候可以进行网络访问。
+            no_internet_ll.setVisibility(View.GONE);
+            shop_list_lv.setVisibility(View.VISIBLE);
+            hot_search_gv.setVisibility(View.GONE);
+            no_data_tv.setVisibility(View.GONE);
+            map.put("pageindex", "1");//pageindex=1&pagesize=20&lat=38.893189&lng=115.508560
+            map.put("pagesize", "10");
+            map.put("lat", Utils.ReadString(SaveKey.KEY_LAT_LON).split(":")[0]);
+            map.put("lng", Utils.ReadString(SaveKey.KEY_LAT_LON).split(":")[1]);
+            map.put("languageType", "2");
 
-        HttpUtils.loadJson("GetShopListByLocation", map, new HttpUtils.LoadJsonListener() {
-            @Override
-            public void load(JSONObject obj) {
-                try {
-                    shopList = new ArrayList<>();
-                    JSONArray array = obj.getJSONArray("list");
-                    for (int i = 0; i < array.length(); i++) {
-                        shopList.add(new Gson().fromJson(array.getString(i), Shop.class));
-                    }
-                    if (shopList.size() > 0) {
-                        mShop.refresh(shopList);
-                    } else {
-                        no_data_tv.setVisibility(View.VISIBLE);
-                        shop_list_lv.setVisibility(View.GONE);
-                        hot_search_gv.setVisibility(View.GONE);
-                    }
-                } catch (JSONException e) {
+            HttpUtils.loadJson("GetShopListByLocation", map, new HttpUtils.LoadJsonListener() {
+                @Override
+                public void load(JSONObject obj) {
+                    try {
+                        shopList = new ArrayList<>();
+                        JSONArray array = obj.getJSONArray("list");
+                        for (int i = 0; i < array.length(); i++) {
+                            shopList.add(new Gson().fromJson(array.getString(i), Shop.class));
+                        }
+                        if (shopList.size() > 0) {
+                            mShop.refresh(shopList);
+                        } else {
+                            no_data_tv.setVisibility(View.VISIBLE);
+                            shop_list_lv.setVisibility(View.GONE);
+                            hot_search_gv.setVisibility(View.GONE);
+                        }
+                    } catch (JSONException e) {
 
+                    }
                 }
-            }
-        });
+            });
+        } else {
+            no_internet_ll.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
@@ -207,6 +217,8 @@ public class SearchShopActivity extends BaseActivity {
                 break;
             case R.id.back_iv:
                 mInstance.finish();
+                break;
+            case R.id.refresh_btn:
                 break;
         }
     }

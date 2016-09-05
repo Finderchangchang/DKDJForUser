@@ -1,12 +1,14 @@
 package cc.listviewdemo.model;
 
+import com.google.gson.annotations.Expose;
+
 import java.io.Serializable;
 
 /**
  * 作者：lwj on 2016/7/12 11:16
  * 邮箱：1031066280@qq.com
  */
-public class Goods implements Serializable{
+public class Goods implements Serializable {
     private int position;//Good选择的位置
     private String PName;
     private String ReveInt1;
@@ -21,11 +23,12 @@ public class Goods implements Serializable{
     private String owername;//配送费
     private String PPrice;
     private String Currentprice;
-    private String PackageFree;//打包费
+    @Expose
+    private String remark;
 
     /**
      * PName : 尝试1
-     *
+     * <p>
      * ReveInt1 : 0
      * ReveInt2 : 0
      * Material : 0
@@ -39,7 +42,7 @@ public class Goods implements Serializable{
      * PPrice : 0.10 平常价格
      * Currentprice : 0.10 现在价格
      */
-    public Goods(String PName, String reveInt1, String reveInt2, String material, String sid, String sname, String addprice, String PId, String togoId, String owername, String PPrice, String currentprice,String PackageFree) {
+    public Goods(String PName, String reveInt1, String reveInt2, String material, String sid, String sname, String addprice, String PId, String togoId, String owername, String PPrice, String currentprice, String remark) {
         this.PName = PName;
         ReveInt1 = reveInt1;
         ReveInt2 = reveInt2;
@@ -52,15 +55,15 @@ public class Goods implements Serializable{
         this.owername = owername;
         this.PPrice = PPrice;
         Currentprice = currentprice;
-        this.PackageFree=PackageFree;
+        this.remark = remark;
     }
 
-    public String getPackageFree() {
-        return PackageFree;
+    public String getRemark() {
+        return remark;
     }
 
-    public void setPackageFree(String packageFree) {
-        PackageFree = packageFree;
+    public void setRemark(String remark) {
+        this.remark = remark;
     }
 
     public String getPName() {

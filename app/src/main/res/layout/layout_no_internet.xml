@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/no_internet_ll"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:visibility="gone">
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@mipmap/no_intenet" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="15dp"
+        android:layout_marginTop="15dp"
+        android:text="您当前网络不太顺畅~"
+        android:textSize="16sp" />
+
+    <Button
+        android:id="@+id/refresh_btn"
+        android:layout_width="160dp"
+        android:layout_height="35dp"
+        android:background="@mipmap/btn_big_bg"
+        android:text="点击刷新"
+        android:textColor="@color/white" />
+</LinearLayout>

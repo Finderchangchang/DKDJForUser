@@ -13,19 +13,26 @@ import com.bumptech.glide.Glide;
 
 import net.tsz.afinal.annotation.view.CodeNote;
 
+import org.json.JSONObject;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import cc.listviewdemo.R;
 import cc.listviewdemo.base.BaseActivity;
+import cc.listviewdemo.config.SaveKey;
 import cc.listviewdemo.fragment.GoodListFragment;
 import cc.listviewdemo.model.Shop;
 import cc.listviewdemo.view.GlideCircleTransform;
 import cc.listviewdemo.view.GlideRoundTransform;
+import cc.listviewdemo.view.HttpUtils;
 import cc.listviewdemo.view.TitleBar;
 import cc.listviewdemo.view.TitleFragmentPagerAdapter;
 import cc.listviewdemo.fragment.PingLunFragment;
 import cc.listviewdemo.fragment.ShopDetailFragment;
+import cc.listviewdemo.view.Utils;
 
 /**
  * 商户信息页面
@@ -58,6 +65,7 @@ public class SHDetailsActivity extends BaseActivity {
 
     @Override
     public void initEvents() {
+        Utils.WriteString(SaveKey.KEY_Load_Index, "0");
         mInstance = this;
         shop=(Shop)getIntent().getSerializableExtra("Shop");
         if(("").equals(shop.getIcon())){
@@ -107,4 +115,5 @@ public class SHDetailsActivity extends BaseActivity {
             }
         });
     }
+
 }

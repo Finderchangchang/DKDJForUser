@@ -13,7 +13,6 @@ public class TotalScrollView extends ScrollView {
     View mView;
     View mView1;
     View mView2;
-    private OnScrollToBottomListener onScrollToBottom;
 
     public TotalScrollView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
@@ -37,15 +36,6 @@ public class TotalScrollView extends ScrollView {
             }
         }
     }
-    @Override
-    protected void onOverScrolled(int scrollX, int scrollY, boolean clampedX,
-                                  boolean clampedY) {
-        super.onOverScrolled(scrollX, scrollY, clampedX, clampedY);
-        Log.i("TAG",scrollX+":"+scrollY+":"+clampedX+":"+clampedY);
-        if(scrollY != 0 && null != onScrollToBottom){
-            onScrollToBottom.onScrollBottomListener(clampedY);
-        }
-    }
     public TotalScrollView(Context context) {
         this(context, null);
     }
@@ -66,13 +56,5 @@ public class TotalScrollView extends ScrollView {
         mView.getBackground().setAlpha(0);
         mView1.getBackground().setAlpha(255);
         mView2.getBackground().setAlpha(255);
-    }
-
-    public void setOnScrollToBottomLintener(OnScrollToBottomListener listener) {
-        onScrollToBottom = listener;
-    }
-
-    public interface OnScrollToBottomListener {
-        void onScrollBottomListener(boolean isBottom);
     }
 }

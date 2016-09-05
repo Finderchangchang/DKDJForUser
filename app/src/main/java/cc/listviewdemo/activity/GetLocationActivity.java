@@ -24,9 +24,11 @@ import com.baidu.mapapi.model.LatLng;
 
 import cc.listviewdemo.R;
 import cc.listviewdemo.base.BaseActivity;
+import cc.listviewdemo.config.SaveKey;
 import cc.listviewdemo.view.CommonAdapter;
 import cc.listviewdemo.view.CommonViewHolder;
 import cc.listviewdemo.view.TitleBar;
+import cc.listviewdemo.view.Utils;
 
 import com.baidu.mapapi.SDKInitializer;
 import com.baidu.mapapi.map.BaiduMap.OnMapStatusChangeListener;
@@ -102,6 +104,7 @@ public class GetLocationActivity extends BaseActivity implements
         // 开始定位
         mLocClient.start();
         lv_near_address = (ListView) findViewById(R.id.lv_near_address);
+        Utils.WriteString(SaveKey.KEY_Load_Index, "0");
     }
 
 	/*
@@ -143,7 +146,6 @@ public class GetLocationActivity extends BaseActivity implements
         if (bdLocation == null || mBaiduMap == null) {
             return;
         }
-
         // 定位数据
         MyLocationData data = new MyLocationData.Builder()
                 .accuracy(bdLocation.getRadius())
@@ -154,7 +156,7 @@ public class GetLocationActivity extends BaseActivity implements
 
         // 设置定位数据
         mBaiduMap.setMyLocationData(data);
-
+        String lat = bdLocation.getLatitude() + ":" + bdLocation.getLongitude();
         // 是否是第一次定位
         if (isFirstLoc) {
             isFirstLoc = false;
@@ -177,7 +179,7 @@ public class GetLocationActivity extends BaseActivity implements
 
     @Override
     public void onGetGeoCodeResult(GeoCodeResult arg0) {
-        String s = "123";
+
     }
 
     // 拿到变化地点后的附近地址
@@ -209,11 +211,12 @@ public class GetLocationActivity extends BaseActivity implements
                     String name = poiInfos.get(position).name.toString();
                     LatLng lnn = poiInfos.get(position).location;
                     Intent intent = new Intent();
-                    String lat = poiInfos.get(position).location.latitude + "";
-                    String lon = poiInfos.get(position).location.longitude + "";
+                    String lat = lnn.latitude + "";
+                    String lon = lnn.longitude + "";
                     ReverseGeoCodeResult.AddressComponent address = reverseGeoCodeResult.getAddressDetail();
-                    intent.putExtra("selectAddress", name + ":" + lat.substring(0, 9) + ":" + lon.substring(0, 10) + ":" +
-                            address.province + "," + address.city + "," + address.district);
+                    intent.putExtra("selectAddress", name + "(" + poiInfos.get(position).address + "):" + lat.substring(0, 9) + ":" + lon.substring(0, 10) + ":" +
+                            address.province + "," + address.city + "," + address.district + "," +
+                            address.street + "," + address.streetNumber);
                     setResult(99, intent);
                     finish();
                 }
@@ -223,17 +226,17 @@ public class GetLocationActivity extends BaseActivity implements
 
     @Override
     public void initViews() {
-        SDKInitializer.initialize(getApplicationContext());
         setContentView(R.layout.activity_get_location);
         initData();
     }
 
     @Override
     public void initEvents() {
+        mInstance = this;
         main_tb.setLeftClick(new TitleBar.OnLeftClick() {
             @Override
             public void onClick() {
-
+                mInstance.finish();
             }
         });
     }

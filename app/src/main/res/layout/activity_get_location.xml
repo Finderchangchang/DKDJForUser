@@ -6,32 +6,33 @@
     android:clipToPadding="false"
     android:fitsSystemWindows="true"
     android:orientation="vertical">
+
     <cc.listviewdemo.view.TitleBar
         android:id="@+id/main_tb"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:centerText="选取地址"
-        android:background="@color/colorPrimaryDark"/>
+        android:background="@color/colorPrimaryDark"
+        app:centerText="选取地址" />
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="280dp"
         android:orientation="vertical"
-        android:visibility="visible" >
+        android:visibility="visible">
 
         <com.baidu.mapapi.map.MapView
             android:id="@+id/map"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/white"
-            android:onClick="true" >
-        </com.baidu.mapapi.map.MapView>
+            android:onClick="true" />
 
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="96dp"
-            android:paddingBottom="32dp"
             android:layout_centerInParent="true"
-            android:src="@mipmap/map_remark"/>
+            android:paddingBottom="32dp"
+            android:src="@mipmap/map_remark" />
     </RelativeLayout>
 
     <ListView

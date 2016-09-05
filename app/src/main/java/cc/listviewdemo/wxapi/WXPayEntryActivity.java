@@ -21,51 +21,54 @@ import cc.listviewdemo.config.Config;
 import cc.listviewdemo.config.SaveKey;
 import cc.listviewdemo.view.Utils;
 
-public class WXPayEntryActivity extends Activity implements IWXAPIEventHandler{
-	
+public class WXPayEntryActivity extends Activity implements IWXAPIEventHandler {
+
     private IWXAPI api;
-	
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.pay_result);
-        
-    	api = WXAPIFactory.createWXAPI(this, Config.APP_ID);
+
+        api = WXAPIFactory.createWXAPI(this, Config.APP_ID);
         api.handleIntent(getIntent(), this);
     }
 
-	@Override
-	protected void onNewIntent(Intent intent) {
-		super.onNewIntent(intent);
-		setIntent(intent);
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
         api.handleIntent(intent, this);
-	}
+    }
 
-	@Override
-	public void onReq(BaseReq req) {
-	}
+    @Override
+    public void onReq(BaseReq req) {
+    }
 
-	@Override
-	public void onResp(BaseResp resp) {
-		if (resp.getType() == ConstantsAPI.COMMAND_PAY_BY_WX) {
-			switch (resp.errCode){
-				case 0:
-					Toast.makeText(WXPayEntryActivity.this,"支付成功",Toast.LENGTH_SHORT).show();
-					break;
-				default:
-					Toast.makeText(WXPayEntryActivity.this,"支付失败",Toast.LENGTH_SHORT).show();
-					break;
-			}
-			if(ConfirmOrderActivity.mInstance!=null){
-				ConfirmOrderActivity.mInstance.finish();
-			}
-			if(SHDetailsActivity.mInstance!=null){
-				SHDetailsActivity.mInstance.finish();
-			}
-			WXPayEntryActivity.this.finish();
-			if(OrderDetailActivity.mInstance!=null){
-				OrderDetailActivity.closeThis();
-			}
-		}
-	}
+    @Override
+    public void onResp(BaseResp resp) {
+        if (resp.getType() == ConstantsAPI.COMMAND_PAY_BY_WX) {
+            Utils.WriteString(SaveKey.KEY_Load_Index, "1");
+            switch (resp.errCode) {
+                case 0:
+                    Toast.makeText(WXPayEntryActivity.this, "支付成功", Toast.LENGTH_SHORT).show();
+                    if (ConfirmOrderActivity.mInstance != null) {
+                        ConfirmOrderActivity.mInstance.finish();
+                    }
+                    if (SHDetailsActivity.mInstance != null) {
+                        SHDetailsActivity.mInstance.finish();
+                    }
+                    if (OrderDetailActivity.mInstance != null) {
+                        OrderDetailActivity.closeThis();
+                    }
+                    break;
+                case -1:
+                    Toast.makeText(WXPayEntryActivity.this, "支付失败，请清理微信缓存后重试", Toast.LENGTH_SHORT).show();
+                    break;
+                default://支付失败只是关闭当前页面
+                    break;
+            }
+            WXPayEntryActivity.this.finish();
+        }
+    }
 }

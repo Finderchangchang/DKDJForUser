@@ -80,6 +80,16 @@ public class OrderList {
         private String SendTime;
         private String eattype;
         private String Packagefree;
+        private String YouHui;
+
+        public String getYouHui() {
+            return YouHui;
+        }
+
+        public void setYouHui(String youHui) {
+            YouHui = youHui;
+        }
+
         /**
          * Num : 1
          * FoodID : 6697
@@ -91,6 +101,7 @@ public class OrderList {
          * package : 0
          * isreview : 0
          */
+
 
         private List<FoodlistBean> foodlist;
 

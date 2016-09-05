@@ -1,5 +1,6 @@
 package cc.listviewdemo.fragment;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.view.View;
 import android.widget.AdapterView;
@@ -57,6 +58,7 @@ public class DingDanFragment extends BaseFragment {
     @CodeNote(id = R.id.order_login_btn, click = "onClick")
     Button order_login_btn;
     boolean isComplement = false;
+    ProgressDialog progressDialog = null;
 
     @Override
     public void initViews() {
@@ -77,14 +79,15 @@ public class DingDanFragment extends BaseFragment {
 
     @Override
     public void initEvents() {
-        mAdapter=new CommonAdapter<OrderList.OrderlistBean>(MainActivity.mInstance,no_beans,R.layout.item_order_small_list) {
+        mAdapter = new CommonAdapter<OrderList.OrderlistBean>(MainActivity.mInstance, no_beans, R.layout.item_order_small_list) {
             @Override
             public void convert(CommonViewHolder holder, OrderList.OrderlistBean orderlistBean, int position) {
-                holder.setListView(R.id.foodlist_listView,orderlistBean.getFoodlist());
+                holder.setListView(R.id.foodlist_listView, orderlistBean.getFoodlist());
                 holder.setText(R.id.shop_name_tv, orderlistBean.getTogoName());
                 holder.setCycleGlideImage(R.id.shop_img_iv, orderlistBean.getTogoPic());
                 holder.setText(R.id.goods_num_tv, orderlistBean.getFoodlist().size());
-                holder.setText(R.id.total_money_tv,orderlistBean.getTotalPrice()+"元");
+                double money = Double.parseDouble(orderlistBean.getTotalPrice()) - Double.parseDouble(orderlistBean.getYouHui());
+                holder.setText(R.id.total_money_tv, money + "元");
                 String state = "未支付";
                 if (orderlistBean.getPaystate().equals("0")) {
                     state = "未支付";
@@ -119,47 +122,6 @@ public class DingDanFragment extends BaseFragment {
                 holder.setText(R.id.shop_state_tv, state);
             }
         };
-//        mAdapter = new CommonAdapter<OrderList.OrderlistBean>(MainActivity.mInstance, no_beans, R.layout.item_order) {
-//            @Override
-//            public void convert(CommonViewHolder holder, OrderList.OrderlistBean orderList, int position) {
-//                holder.setGlideImage(R.id.shop_img_iv, orderList.getTogoPic());
-//                holder.setText(R.id.shop_name_tv, orderList.getTogoName());
-//                holder.setText(R.id.price_tv, "￥" + orderList.getTotalPrice());
-//                String state = "未支付";
-//                if (orderList.getPaystate().equals("0")) {
-//                    state = "未支付";
-//                } else {
-//                    switch (orderList.getSendstate()) {
-//                        case "0":
-//                            if (orderList.getState().equals("2")) {
-//                                if (orderList.getIsShopSet().equals("0")) {
-//                                    state = "订单已提交";
-//                                } else {
-//                                    state = "商家已接单";
-//                                }
-//                            } else if (orderList.getState().equals("4")) {
-//                                state = "订单已取消";//商家拒接此单
-//                            } else if (orderList.getState().equals("7")) {
-//                                state = "正在匹配骑手";
-//                            } else {
-//                                state = "订单已取消";
-//                            }
-//                            break;
-//                        case "1":
-//                            state = "骑手去商家取货";
-//                            break;
-//                        case "2":
-//                            state = "已取货，配送中";
-//                            break;
-//                        case "3":
-//                            state = "已送达";
-//                            break;
-//                    }
-//                }
-//                holder.setText(R.id.state_tv, state);
-//            }
-//        };
-
         main_lv.setAdapter(mAdapter);
         main_lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -168,8 +130,10 @@ public class DingDanFragment extends BaseFragment {
                 intent.setClass(MainActivity.mInstance, OrderDetailActivity.class);
                 if (isComplement) {
                     intent.putExtra("orderId", have_beans.get(position).getOrderID());
+                    intent.putExtra("normalPrice", have_beans.get(position).getYouHui());
                 } else {
                     intent.putExtra("orderId", no_beans.get(position).getOrderID());
+                    intent.putExtra("normalPrice", no_beans.get(position).getYouHui());
                 }
                 startActivityForResult(intent, 1);
             }
@@ -190,22 +154,29 @@ public class DingDanFragment extends BaseFragment {
             map = new HashMap<>();
             map.put("userid", userId);
             map.put("pageindex", "1");
-            map.put("pagesize", "100");
+            map.put("pagesize", "20");
             no_beans = new ArrayList<>();
             have_beans = new ArrayList<>();
+            progressDialog = ProgressDialog.show(MainActivity.mInstance, "",
+                    "加载中...");
             HttpUtils.loadJson("GetOrderListByUserId", map, new HttpUtils.LoadJsonListener() {
                 @Override
                 public void load(JSONObject obj) {
-                    orderList = new Gson().fromJson(obj.toString(), OrderList.class);
-                    for (int i = 0; i < orderList.getOrderlist().size(); i++) {
-                        OrderList.OrderlistBean bean = orderList.getOrderlist().get(i);
-                        if (bean.getState().equals("3")) {
-                            have_beans.add(bean);
-                        } else {
-                            no_beans.add(bean);
+                    if (obj != null) {
+                        orderList = new Gson().fromJson(obj.toString(), OrderList.class);
+                        for (int i = 0; i < orderList.getOrderlist().size(); i++) {
+                            OrderList.OrderlistBean bean = orderList.getOrderlist().get(i);
+                            if (bean.getState().equals("3")) {
+                                have_beans.add(bean);
+                            } else {
+                                no_beans.add(bean);
+                            }
                         }
+                        setClick(1);
+                        progressDialog.dismiss();
+                    } else {
+                        progressDialog.dismiss();
                     }
-                    setClick(1);
                 }
             });
             order_list_ll.setVisibility(View.VISIBLE);
@@ -214,7 +185,6 @@ public class DingDanFragment extends BaseFragment {
             order_list_ll.setVisibility(View.GONE);
             no_login_ll.setVisibility(View.VISIBLE);
         }
-
     }
 
     public void onClick(View view) {

@@ -1,5 +1,6 @@
 package cc.listviewdemo.base;
 
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.widget.Toast;
@@ -19,6 +20,7 @@ public abstract class BaseActivity extends FinalActivity {
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         finalDb = FinalDb.create(this, false);
         initViews();
         initEvents();

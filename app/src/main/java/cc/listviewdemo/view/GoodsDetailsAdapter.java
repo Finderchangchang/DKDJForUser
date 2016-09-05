@@ -1,9 +1,11 @@
 package cc.listviewdemo.view;
 
+import android.net.Uri;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -18,6 +20,7 @@ import cc.listviewdemo.model.FoodDetail;
 import cc.listviewdemo.model.FoodType;
 import cc.listviewdemo.model.Good;
 import cc.listviewdemo.model.Goods;
+import cc.listviewdemo.model.Shop;
 
 /**
  * Description:商品详细信息的适配器
@@ -31,12 +34,14 @@ public class GoodsDetailsAdapter extends BaseAdapter {
     private List<FoodType> foodTypeList = new ArrayList<>();
     private int count;
     private boolean isOpen;
+    private String shop_id;
 
-    public GoodsDetailsAdapter(GoodListFragment context, List<FoodDetail> FoodDetailList, List<FoodType> foodTypes, boolean isOpen) {
+    public GoodsDetailsAdapter(GoodListFragment context, List<FoodDetail> FoodDetailList, List<FoodType> foodTypes, boolean isOpen, String shopId) {
         this.context = context;
         this.showList = FoodDetailList;
         foodTypeList = foodTypes;
         this.isOpen = isOpen;
+        this.shop_id = shopId;
     }
 
     @Override
@@ -79,6 +84,8 @@ public class GoodsDetailsAdapter extends BaseAdapter {
             holder.mSmallIv = (ImageView) convertView.findViewById(R.id.notice_iv);
             holder.mSellNum = (TextView) convertView.findViewById(R.id.sell_num_tv);
             holder.mTopTitle = (TextView) convertView.findViewById(R.id.top_title_tv);
+            holder.add_goods_ll = (LinearLayout) convertView.findViewById(R.id.add_goods_ll);
+            holder.choice_guige_btn = (TextView) convertView.findViewById(R.id.choice_guige_btn);
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
@@ -96,6 +103,13 @@ public class GoodsDetailsAdapter extends BaseAdapter {
             } else {
                 holder.mTopTitle.setVisibility(View.GONE);
             }
+        }
+        if (FoodDetail.getAttrlist().size() > 0) {
+            holder.choice_guige_btn.setVisibility(View.VISIBLE);
+            holder.add_goods_ll.setVisibility(View.GONE);
+        } else {
+            holder.choice_guige_btn.setVisibility(View.GONE);
+            holder.add_goods_ll.setVisibility(View.VISIBLE);
         }
         holder.mGoodsName.setText(FoodDetail.getName());
         Glide.with(context).load(FoodDetail.getIcon()).asBitmap().centerCrop()
@@ -133,7 +147,7 @@ public class GoodsDetailsAdapter extends BaseAdapter {
                 count = showList.get(position).getCount();
                 count--;
                 showList.get(position).setCount(count);
-                context.calculateTotalPrice(-1, -price, -Double.parseDouble(FoodDetail.getPackageFree()), new Goods(FoodDetail.getName(), "0", "0", "0", FoodDetail.getFoodID(), "", "0.00", FoodDetail.getFoodID(), FoodDetail.getFoodID(), "0.00", price + "", price + "", FoodDetail.getPackageFree()));
+                context.calculateTotalPrice(-1, -price, -Double.parseDouble(FoodDetail.getPackageFree()), new Goods(Uri.encode(FoodDetail.getName()), "0", "0", "0", FoodDetail.getFoodID(), "", "0.00", FoodDetail.getFoodID(), shop_id, FoodDetail.getPackageFree(), price + "", price + "", FoodDetail.getName()));
                 GoodsDetailsAdapter.this.notifyDataSetChanged();
 
             }
@@ -144,7 +158,7 @@ public class GoodsDetailsAdapter extends BaseAdapter {
                 count = showList.get(position).getCount();
                 count++;
                 showList.get(position).setCount(count);
-                context.calculateTotalPrice(1, price, Double.parseDouble(FoodDetail.getPackageFree()), new Goods(FoodDetail.getName(), "0", "0", "0", FoodDetail.getFoodID(), "", "0.00", FoodDetail.getFoodID(), FoodDetail.getFoodID(), "0.00", price + "", price + "", FoodDetail.getPackageFree()));
+                context.calculateTotalPrice(1, price, Double.parseDouble(FoodDetail.getPackageFree()), new Goods(Uri.encode(FoodDetail.getName()), "0", "0", "0", FoodDetail.getFoodID(), "", "0.00", FoodDetail.getFoodID(), shop_id, FoodDetail.getPackageFree(), price + "", price + "", FoodDetail.getName()));
                 GoodsDetailsAdapter.this.notifyDataSetChanged();
             }
         });
@@ -170,5 +184,7 @@ public class GoodsDetailsAdapter extends BaseAdapter {
         private ImageView mGoodsReduce; //减少
         private TextView mSellNum;//销售数量
         private TextView mTopTitle;//顶部文字
+        private LinearLayout add_goods_ll;//显示加减商品数量
+        private TextView choice_guige_btn;//选择规格按钮
     }
 }

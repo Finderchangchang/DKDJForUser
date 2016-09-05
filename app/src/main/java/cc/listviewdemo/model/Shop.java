@@ -10,6 +10,7 @@ import java.util.List;
  */
 public class Shop implements Serializable {
     private String DataID;
+    private String Comm;
     private String TogoName;
     private String Grade;
     private String sortname;
@@ -89,6 +90,14 @@ public class Shop implements Serializable {
 
     private List<Taglist> taglist;//标签
     private List<?> promotions;//促销内容
+
+    public String getComm() {
+        return Comm;
+    }
+
+    public void setComm(String comm) {
+        Comm = comm;
+    }
 
     public String getDataID() {
         return DataID;

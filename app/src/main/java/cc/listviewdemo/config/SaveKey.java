@@ -11,4 +11,5 @@ public class SaveKey {
     public static final String KEY_LON = "LON";
     public static final String KEY_LAT_LON = "LAT_LON";
     public static final String KEY_IsWxPay = "IsWxPay";//微信支付页面跳转回来的
+    public static final String KEY_Load_Index="KEY_Load_Index";
 }

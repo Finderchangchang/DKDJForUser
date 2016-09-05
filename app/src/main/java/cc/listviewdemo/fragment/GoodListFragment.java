@@ -143,6 +143,14 @@ public class GoodListFragment extends BaseFragment implements IFGoodListView {
         pop_win.setBackgroundDrawable(new BitmapDrawable());
         pop_win.showAtLocation(v, Gravity.TOP, 0, frame.top);
     }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        shop.setGoodses(new ArrayList<Goods>());
+        shops=new ArrayList<>();
+    }
+
     private boolean isOpen=true;
     @Override
     public void initEvents() {
@@ -177,24 +185,23 @@ public class GoodListFragment extends BaseFragment implements IFGoodListView {
         mAdapter = new CommonAdapter<Goods>(SHDetailsActivity.mInstance, goods, R.layout.item_gwc_good) {
             @Override
             public void convert(CommonViewHolder holder, final Goods goods, int position) {
-                holder.setText(R.id.name_tv, goods.getPName());
+                holder.setText(R.id.name_tv, goods.getRemark());
                 holder.setText(R.id.price_tv, Integer.parseInt(goods.getPNum()) * Double.parseDouble(goods.getCurrentprice()));
                 holder.setOnClickListener(R.id.jian_iv, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        calculateTotalPrice(-1, -Double.parseDouble(goods.getCurrentprice()), -Double.parseDouble(goods.getPackageFree()), goods);
+                        calculateTotalPrice(-1, -Double.parseDouble(goods.getCurrentprice()), -Double.parseDouble(goods.getOwername()), goods);
                     }
                 });
                 holder.setOnClickListener(R.id.add_iv, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        calculateTotalPrice(1, Double.parseDouble(goods.getCurrentprice()), Double.parseDouble(goods.getPackageFree()), goods);
+                        calculateTotalPrice(1, Double.parseDouble(goods.getCurrentprice()), Double.parseDouble(goods.getOwername()), goods);
                     }
                 });
                 holder.setText(R.id.num_tv, goods.getPNum());
             }
         };
-
     }
 
     List<ShopListModel> shops;
@@ -380,7 +387,7 @@ public class GoodListFragment extends BaseFragment implements IFGoodListView {
         final List<FoodDetail> xx = SortByFoodType(mList, types);
         if (xx.size() > 0) {
             getSortID(xx);
-            detailsAdapter = new GoodsDetailsAdapter(this, xx, mLeft,isOpen);
+            detailsAdapter = new GoodsDetailsAdapter(this, xx, mLeft,isOpen,shopId);
             right_lv.setAdapter(detailsAdapter);
             right_lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override

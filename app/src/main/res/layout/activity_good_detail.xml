@@ -1,22 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical">
 
-    <RelativeLayout
+    <cc.listviewdemo.view.TitleBar
         android:layout_width="match_parent"
-        android:layout_height="50dp">
-
-        <ImageView
-            android:id="@+id/back_iv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingBottom="12.5dp"
-            android:paddingLeft="10dp"
-            android:paddingRight="20dp"
-            android:paddingTop="12.5dp"
-            android:src="@mipmap/icon_back" />
-    </RelativeLayout>
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimaryDark"
+        app:centerText="商品详情"></cc.listviewdemo.view.TitleBar>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -89,4 +82,4 @@
             android:paddingLeft="10dp"
             android:paddingTop="5dp" />
     </LinearLayout>
-</RelativeLayout>
+</LinearLayout>

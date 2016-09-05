@@ -73,7 +73,7 @@
                         android:layout_height="18dp"
                         android:layout_marginLeft="5dp"
                         android:src="@mipmap/tuijian_icon"
-                        android:visibility="gone"/>
+                        android:visibility="gone" />
                 </LinearLayout>
 
                 <TextView
@@ -86,13 +86,28 @@
                     android:textSize="15sp" />
             </LinearLayout>
 
+            <TextView
+                android:id="@+id/choice_guige_btn"
+                android:layout_width="70dp"
+                android:layout_height="30dp"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="20dp"
+                android:background="@color/colorPrimaryDark"
+                android:gravity="center"
+                android:padding="5dp"
+                android:text="选规格"
+                android:textColor="@android:color/white" />
+
             <LinearLayout
+                android:id="@+id/add_goods_ll"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_alignParentRight="true"
                 android:layout_marginRight="8dp"
                 android:gravity="center"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:visibility="gone">
 
                 <ImageView
                     android:id="@+id/reduce"

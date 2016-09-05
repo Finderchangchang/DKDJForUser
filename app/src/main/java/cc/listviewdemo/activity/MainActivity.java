@@ -18,6 +18,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.util.Util;
 import com.google.gson.Gson;
 
 import net.tsz.afinal.annotation.view.CodeNote;
@@ -46,6 +47,7 @@ import cc.listviewdemo.control.UpdateManager;
 import cc.listviewdemo.fragment.DingDanFragment;
 import cc.listviewdemo.fragment.MainFragment;
 import cc.listviewdemo.fragment.UserFragment;
+import cc.listviewdemo.model.ActivityModel;
 import cc.listviewdemo.model.UserModel;
 import cc.listviewdemo.model.Version;
 import cc.listviewdemo.view.FileDownloadThread;
@@ -87,6 +89,7 @@ public class MainActivity extends BaseActivity {
     String userId;
     Map<String, String> map;
     NormalDialog dialog;
+    int clickItem = 0;
 
     @Override
     public void initViews() {
@@ -129,6 +132,22 @@ public class MainActivity extends BaseActivity {
         checkForUpdates();//验证是否需要更新
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        String ind = Utils.ReadString(SaveKey.KEY_Load_Index);
+        if (ind == "") {
+            Utils.WriteString(SaveKey.KEY_Load_Index, "0");
+        } else {
+            setItem(Integer.parseInt(ind));
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
     /**
      * 点击事件处理
      *
@@ -138,23 +157,25 @@ public class MainActivity extends BaseActivity {
         switch (view.getId()) {
             case R.id.main_ll:
                 setItem(0);
+                Utils.WriteString(SaveKey.KEY_Load_Index, "0");
                 break;
             case R.id.search_ll:
+                Utils.WriteString(SaveKey.KEY_Load_Index, "1");
                 setItem(1);
+                IsRefresh2 = true;
                 break;
             case R.id.setting_ll:
                 setItem(2);
+                Utils.WriteString(SaveKey.KEY_Load_Index, "2");
                 break;
         }
     }
 
+    boolean IsRefresh2 = false;
     String dialogStr;
     private UIHandler hander;
 
     private void checkForUpdates() {
-        // 检查更新 如无更新则提示已经是最新版本了
-        // showDialog(dialog_checking);
-        // 如有更新则需要下载程序
         dialogStr = "正在检查更新请稍后";
         showDialog(322);
         HashMap<String, String> localHashMap = new HashMap<String, String>();
@@ -162,31 +183,32 @@ public class MainActivity extends BaseActivity {
         HttpUtils.loadJson("version", localHashMap, new HttpUtils.LoadJsonListener() {
             @Override
             public void load(JSONObject obj) {
-                // dismissDialog()方法是用来关闭对话框的；removeDialog()方法用来将对话框从Activity的托管中移除（如果对已经移除的对话框重新进行调用showDialog
-                // ，则该对话框将进行重新创建）
                 removeDialog(322);
-                JSONObject json = null;
-                try {
-                    json = new JSONObject(obj.toString());
-                    String version = json.getString("version");
-                    Message message = new Message();
-                    int oldVersion = Integer.parseInt(getVersion().replace(".", ""));//当前app版本
-                    int newVersion = Integer.parseInt(version.replace(".", ""));//系统最新版本
-                    if (newVersion > oldVersion) {//需要更新
-                        message.what = 323;
-                        url = json.getString("download");
-                    } else {
-                        message.what = 333;
-                    }
-                    hander.sendMessage(message); // 发送消息给Handler
-                } catch (JSONException e) {
+                if (obj != null) {
+                    try {
+                        JSONObject json = new JSONObject(obj.toString());
+                        String version = json.getString("version");
+                        Message message = new Message();
+                        int oldVersion = Integer.parseInt(Utils.getVersion().replace(".", ""));//当前app版本
+                        int newVersion = Integer.parseInt(version.replace(".", ""));//系统最新版本
+                        if (newVersion > oldVersion) {//需要更新
+                            message.what = 323;
+                            url = json.getString("download");
+                            content = json.getString("content");
+                        } else {
+                            message.what = 333;
+                        }
+                        hander.sendMessage(message); // 发送消息给Handler
+                    } catch (JSONException e) {
 
+                    }
                 }
             }
         });
     }
 
     private String url;
+    private String content;
 
     @Override
     protected Dialog onCreateDialog(int paramInt) {
@@ -194,7 +216,7 @@ public class MainActivity extends BaseActivity {
 
         if (paramInt == 323) {
             AlertDialog.Builder localBuilder1 = new AlertDialog.Builder(this)
-                    .setTitle("提示").setMessage("有新版本可以更新，点击下载");
+                    .setTitle("提示").setMessage(content);
             DialogInterface.OnClickListener local3 = new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface paramDialogInterface,
@@ -211,8 +233,6 @@ public class MainActivity extends BaseActivity {
         }
 
         if (paramInt == 333) {
-            dialog = null;
-
             AlertDialog.Builder localBuilder1 = new AlertDialog.Builder(this)
                     .setTitle("提示").setMessage("当前版本已经是最新版本");
 
@@ -259,22 +279,12 @@ public class MainActivity extends BaseActivity {
         }
     }
 
-    /*
-        * 获取当前程序的版本号
-        */
-    public static String getVersion() {
-        //获取packagemanager的实例
-        PackageManager packageManager = BaseApplication.getContext().getPackageManager();
-        //getPackageName()是你当前类的包名，0代表是获取版本信息
-        PackageInfo packInfo = null;
-        try {
-            packInfo = packageManager.getPackageInfo(BaseApplication.getContext().getPackageName(), 0);
-        } catch (PackageManager.NameNotFoundException e) {
 
-        }
-        return packInfo.versionName;
-    }
-
+    /**
+     * 选择指定Fragment
+     *
+     * @param position
+     */
     private void setItem(int position) {
         //恢复成未点击状态
         listbtn.get(mClick).getTv().setTextColor(getResources().getColor(R.color.bottom_normal_lab));//正常字体颜色
@@ -329,150 +339,13 @@ public class MainActivity extends BaseActivity {
         transaction.commit();
     }
 
-    Version model;
-
     /**
-     * 检查更新
-     */
-    private void checkForUpdate() {
-        map = new HashMap<>();
-        map.put("c", "1");
-        HttpUtils.loadJson("version", map, new HttpUtils.LoadJsonListener() {
-            @Override
-            public void load(JSONObject obj) {
-                model = new Gson().fromJson(obj.toString(), Version.class);
-                String old_version = Utils.getVersion();
-                String new_version = model.getVersion();
-                boolean result = false;
-                if (Integer.parseInt(new_version.substring(0, 1)) > Integer.parseInt(old_version.substring(0, 1))) {
-                    result = true;
-                } else {
-                    if (Double.parseDouble(new_version.substring(2)) > Double.parseDouble(old_version.substring(2))) {
-                        result = true;
-                    }
-                }
-                if (result) {//最新版本大于当前版本
-                    dialog = new NormalDialog(MainActivity.mInstance);
-                    dialog.setOnPositiveListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            doDownload();
-                            dialog.dismiss();
-                        }
-                    });
-                    dialog.setMiddleMessage("有新版本需要更新");
-                    dialog.show();
-                }
-            }
-        });
-    }
-
-    /**
-     * 下载准备工作，获取SD卡路径、开启线程
-     */
-    private void doDownload() {
-        // 获取SD卡路径
-        String path = Environment.getExternalStorageDirectory()
-                + "/dkdj/";
-        File file = new File(path);
-        // 如果SD卡目录不存在创建
-        if (!file.exists()) {
-            file.mkdir();
-        }
-
-        String fileName = "dkdj.apk";
-        int threadNum = 5;
-        String filepath = path + fileName;
-        downloadTask task = new downloadTask(model.getDownload(), threadNum, filepath);
-        task.start();
-    }
-
-    /**
-     * 多线程文件下载
+     * 点击两次关闭APP
      *
-     * @author yangxiaolong
-     * @2014-8-7
+     * @param keyCode
+     * @param event
+     * @return
      */
-    class downloadTask extends Thread {
-        private String downloadUrl;// 下载链接地址
-        private int threadNum;// 开启的线程数
-        private String filePath;// 保存文件路径地址
-        private int blockSize;// 每一个线程的下载量
-
-        public downloadTask(String downloadUrl, int threadNum, String fileptah) {
-            this.downloadUrl = downloadUrl;
-            this.threadNum = threadNum;
-            this.filePath = fileptah;
-        }
-
-        @Override
-        public void run() {
-
-            FileDownloadThread[] threads = new FileDownloadThread[threadNum];
-            try {
-                URL url = new URL(downloadUrl);
-                URLConnection conn = url.openConnection();
-                // 读取下载文件总大小
-                int fileSize = conn.getContentLength();
-                if (fileSize <= 0) {
-                    System.out.println("读取文件失败");
-                    return;
-                }
-                // 计算每条线程下载的数据长度
-                blockSize = (fileSize % threadNum) == 0 ? fileSize / threadNum
-                        : fileSize / threadNum + 1;
-
-                File file = new File(filePath);
-                for (int i = 0; i < threads.length; i++) {
-                    // 启动线程，分别下载每个线程需要下载的部分
-                    threads[i] = new FileDownloadThread(url, file, blockSize,
-                            (i + 1));
-                    threads[i].setName("Thread:" + i);
-                    threads[i].start();
-                }
-
-                boolean isfinished = false;
-                int downloadedAllSize = 0;
-                while (!isfinished) {
-                    isfinished = true;
-                    // 当前所有线程下载总量
-                    downloadedAllSize = 0;
-                    for (int i = 0; i < threads.length; i++) {
-                        downloadedAllSize += threads[i].getDownloadLength();
-                        if (!threads[i].isCompleted()) {
-                            isfinished = false;
-                        }
-                    }
-                    // 通知handler去更新视图组件
-                    Message msg = new Message();
-                    msg.getData().putInt("size", downloadedAllSize);
-                    Thread.sleep(1000);// 休息1秒后再读取下载进度
-                }
-                if (isfinished) {
-                    installApk(file);
-                }
-
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
-        }
-    }
-
-    //安装apk
-    protected void installApk(File file) {
-        Intent intent = new Intent();
-        //执行动作
-        intent.setAction(Intent.ACTION_VIEW);
-        //执行的数据类型
-        intent.setDataAndType(Uri.fromFile(file), "application/vnd.android.package-archive");
-        startActivity(intent);
-    }
-
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
@@ -511,6 +384,11 @@ public class MainActivity extends BaseActivity {
         BaseApplication.locationService.stop();
         Utils.WriteString(SaveKey.KEY_LAT, "");
         Utils.WriteString(SaveKey.KEY_LON, "");
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
     }
 
     public void onSaveInstanceState(Bundle outState) {

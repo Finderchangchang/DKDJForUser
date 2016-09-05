@@ -17,9 +17,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:layout_marginTop="27.0dp"
             android:layout_marginLeft="30dp"
             android:layout_marginRight="30dp"
+            android:layout_marginTop="27.0dp"
             android:orientation="vertical">
 
             <ImageView
@@ -210,7 +210,7 @@
             android:layout_width="0dp"
             android:layout_height="106.5dp"
             android:layout_weight="1"
-            android:drawableTop="@mipmap/tixingda"
+            android:drawableTop="@mipmap/xiaoxida"
             android:gravity="center"
             android:paddingBottom="5.0dp"
             android:paddingTop="10.0dp"
@@ -242,33 +242,36 @@
             android:background="#eeeeee" />
 
         <TextView
-            android:id="@+id/tv_myevaluate"
+            android:id="@+id/about_app_tv"
             android:layout_width="0dp"
             android:layout_height="fill_parent"
             android:layout_weight="1"
-            android:drawableTop="@mipmap/xiaoxida"
+            android:drawableTop="@mipmap/tixingda"
             android:gravity="center"
             android:paddingBottom="5.0dp"
             android:paddingTop="10.0dp"
-            android:text="我的评价"
+            android:text="系统设置"
             android:textColor="#333333" />
     </LinearLayout>
+
     <TextView
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="#eeeeee" />
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+
         <TextView
             android:id="@+id/kefu_tel_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="客服电话：4001-663779"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
+            android:padding="10dp"
+            android:text="客服电话：4001-663779"
             android:textColor="@color/colorPrimaryDark"
-            android:textSize="21dp"
-            android:padding="10dp"/>
+            android:textSize="21dp" />
     </RelativeLayout>
 </LinearLayout>

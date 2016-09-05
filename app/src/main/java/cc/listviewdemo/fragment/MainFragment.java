@@ -2,8 +2,12 @@ package cc.listviewdemo.fragment;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.os.Handler;
+import android.os.Message;
+import android.os.SystemClock;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -12,14 +16,27 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 import com.baidu.location.Poi;
+import com.baidu.mapapi.map.MyLocationData;
 import com.baidu.mapapi.model.LatLng;
+import com.baidu.mapapi.search.core.PoiInfo;
+import com.baidu.mapapi.search.geocode.GeoCodeResult;
+import com.baidu.mapapi.search.geocode.GeoCoder;
+import com.baidu.mapapi.search.geocode.OnGetGeoCoderResultListener;
+import com.baidu.mapapi.search.geocode.ReverseGeoCodeOption;
+import com.baidu.mapapi.search.geocode.ReverseGeoCodeResult;
 import com.bigkoo.convenientbanner.ConvenientBanner;
 import com.bigkoo.convenientbanner.holder.CBViewHolderCreator;
 
@@ -48,6 +65,13 @@ import cc.listviewdemo.view.MeasureListView;
 import cc.listviewdemo.view.NetworkImageHolderView;
 import cc.listviewdemo.view.TotalScrollView;
 import cc.listviewdemo.view.Utils;
+import in.srain.cube.image.ImageLoader;
+import in.srain.cube.image.ImageLoaderFactory;
+import in.srain.cube.views.ptr.PtrClassicDefaultHeader;
+import in.srain.cube.views.ptr.PtrDefaultHandler;
+import in.srain.cube.views.ptr.PtrFrameLayout;
+import in.srain.cube.views.ptr.PtrUIHandler;
+import in.srain.cube.views.ptr.indicator.PtrIndicator;
 
 /**
  * 首页Fragment
@@ -64,10 +88,9 @@ public class MainFragment extends BaseFragment implements IFMainView {
     @CodeNote(id = R.id.shop_img_iv)
     ImageView shop_img_iv;
     @CodeNote(id = R.id.main_list)
-    MeasureListView main_list;
+    ListView main_list;
     CommonAdapter<Shop> mAdapter;
     CommonAdapter<ShopType> mShopTypeAdapter;
-    List<String> mList;
     List<ShopType> mShopTypeList;
     List<Shop> mShopDetailsList;
     @CodeNote(id = R.id.guanggao_cb)
@@ -75,42 +98,45 @@ public class MainFragment extends BaseFragment implements IFMainView {
     @CodeNote(id = R.id.shoptype_gv)
     GridView shoptype_gv;
     FMainListener mListener;
-    @CodeNote(id = R.id.xuanze_zuobiao_ll, click = "onClick")
+    @CodeNote(id = R.id.xuanze_zuobiao_ll)
     LinearLayout xuanze_zuobiao_ll;
     @CodeNote(id = R.id.title_search_ll, click = "onClick")
     LinearLayout title_search_ll;
     Map<String, String> map;
-    @CodeNote(id = R.id.main_refresh_srl)
-    SwipeRefreshLayout main_refresh_srl;
+    @CodeNote(id = R.id.ptr)
+    PtrFrameLayout ptr;
+    ImageLoader imageLoader;
+    @CodeNote(id = R.id.xuanze_zuobiao_rl, click = "onClick")
+    RelativeLayout xuanze_zuobiao_rl;
 
     @Override
     public void initViews() {
         setContentView(R.layout.frag_main);
-
-        mList = new ArrayList<>();
         mShopTypeList = new ArrayList<>();
         mShopDetailsList = new ArrayList<>();
         mListener = new FMainListener(this, MainActivity.mInstance);
-        progressDialog = ProgressDialog.show(MainActivity.mInstance, "",
-                "加载中...");
         LocationClientOption option = new LocationClientOption();
-        option.setOpenGps(true); //打开GPRS
-        option.setAddrType("all");//返回的定位结果包含地址信息
-        option.setPriority(LocationClientOption.GpsFirst); // 设置GPS优先
-        option.setLocationMode(LocationClientOption.LocationMode.Hight_Accuracy);
+        option.setCoorType("bd09ll");
+        option.setIsNeedAddress(true);
+        option.setIsNeedLocationDescribe(true);
         option.setIsNeedLocationPoiList(true);
-        mLocClient=new LocationClient(MainActivity.mInstance);
+        option.setLocationMode(LocationClientOption.LocationMode.Hight_Accuracy);
+        option.setOpenGps(true);
+        mLocClient = new LocationClient(MainActivity.mInstance);
         mLocClient.setLocOption(option);
         mLocClient.registerLocationListener(dbListener);
         mLocClient.start();
     }
+
     /**
      * 定位SDK的核心类
      */
     private LocationClient mLocClient;
+
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.xuanze_zuobiao_ll:
+            case R.id.xuanze_zuobiao_rl:
+                isIntent = true;
                 startActivityForResult(new Intent(MainActivity.mInstance, GetLocationActivity.class), 0);
                 break;
             case R.id.title_search_ll:
@@ -119,80 +145,123 @@ public class MainFragment extends BaseFragment implements IFMainView {
         }
     }
 
+    boolean isIntent = false;
+
+
+    /**
+     * @param requestCode
+     * @param resultCode
+     * @param data
+     */
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        isIntent = false;
         switch (resultCode) {//重新获取坐标，刷新当前页面
             case 99:
                 String address = data.getStringExtra("selectAddress");
                 String[] vals = address.split(":");
-                dizhi_tv.setText(vals[0]);
-                map = new HashMap<>();
+                dizhi_tv.setText(vals[0].split("\\(")[0]);
                 Utils.WriteString(SaveKey.KEY_LAT_LON, vals[1] + ":" + vals[2] + ":" + vals[3]);
-                map.put("lat", vals[1]);
-                map.put("lng", vals[2]);
-                page_size=1;
-                map.put("pageindex", page_size+"");
-                mListener.initShops(map);
+                page_size = 1;
+                loadShop(vals[1], vals[2]);
                 break;
         }
     }
 
+    private GeoCoder geoCoder;
     /***
      * 定位结果回调，重写onReceiveLocation方法，可以直接拷贝如下代码到自己工程中修改
      */
     private BDLocationListener dbListener = new BDLocationListener() {
         @Override
         public void onReceiveLocation(BDLocation location) {//首次定位，加载第一页
-            map = new HashMap<>();
-            String lat;
-            String lon;
-            lat = "38.893125";
-            lon = "115.508290";
-            if (null != location && location.getLocType() != BDLocation.TypeServerError) {
-                lat = location.getLatitude() + "";
-                lon = location.getLongitude() + "";
-            } else {
-                dizhi_tv.setText("无法定位>");
-            }
-            Utils.WriteString(SaveKey.KEY_LAT_LON, lat + ":" + lon + ":" +
-                    location.getProvince() + "," + location.getCity() + "," + location.getDistrict());
-            map.put("lat", lat);
-            map.put("lng", lon);
-            page_size=1;
-            map.put("pageindex", page_size+"");
-            mListener.initShops(map);
-            if (location.getPoiList() != null && !location.getPoiList().isEmpty()) {
-                Poi poi = (Poi) location.getPoiList().get(0);
-                dizhi_tv.setText(poi.getName());
+            // 创建GeoCoder实例对象
+            geoCoder = GeoCoder.newInstance();
+            // 发起反地理编码请求(经纬度->地址信息)
+            ReverseGeoCodeOption reverseGeoCodeOption = new ReverseGeoCodeOption();
+            // 设置反地理编码位置坐标
+            reverseGeoCodeOption.location(new LatLng(location.getLatitude(), location.getLongitude()));
+            geoCoder.reverseGeoCode(reverseGeoCodeOption);
+            if (!isIntent) {
+                // 设置查询结果监听者
+                geoCoder.setOnGetGeoCodeResultListener(new OnGetGeoCoderResultListener() {
+                    @Override
+                    public void onGetGeoCodeResult(GeoCodeResult geoCodeResult) {
+
+                    }
+
+                    @Override
+                    public void onGetReverseGeoCodeResult(ReverseGeoCodeResult reverseGeoCodeResult) {
+                        List<PoiInfo> poiInfos = reverseGeoCodeResult.getPoiList();
+                        String name = poiInfos.get(0).name.toString();
+                        LatLng lnn = poiInfos.get(0).location;
+                        String lat = (lnn.latitude + "").substring(0, 9);
+                        String lon = (lnn.longitude + "").substring(0, 10);
+                        page_size = 1;
+                        loadShop(lat, lon);
+                        dizhi_tv.setText(name);
+                        ReverseGeoCodeResult.AddressComponent address = reverseGeoCodeResult.getAddressDetail();
+                        Utils.WriteString(SaveKey.KEY_LAT_LON, name + "(" + poiInfos.get(0).address + "):" + lat + ":" + lon + ":" +
+                                address.province + "," + address.city + "," + address.district + "," +
+                                address.street + "," + address.streetNumber);
+                    }
+                });
             }
         }
-
     };
+    private int index = 0;
 
     @Override
     public void initEvents() {
-        mListener.initGG();//加载广告
-        mListener.initShopType();
+        imageLoader = ImageLoaderFactory.create(MainActivity.mInstance);
+        PtrClassicDefaultHeader defaultHeader = new PtrClassicDefaultHeader(MainActivity.mInstance);//1.默认经典头布局
+        ptr.setHeaderView(defaultHeader);//给Ptr添加头布局
+        ptr.addPtrUIHandler(defaultHeader);//使头布局的状态和刷新状态同步
+        if (Utils.isNetworkConnected()) {
+            progressDialog = ProgressDialog.show(MainActivity.mInstance, "",
+                    "加载中...");
+            mListener.initGG();//加载广告
+            mListener.initShopType();
+        }
         main.setTitleView(iv, xuanze_zuobiao_ll, title_search_ll);//设置需要显示隐藏的view
-        main.setOnScrollToBottomLintener(new TotalScrollView.OnScrollToBottomListener() {
+        main.setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public void onScrollBottomListener(boolean isBottom) {
-                Log.i("TAGS",isBottom+":"+isLoadMore+":"+load_more_tv.getVisibility());
-                if(isBottom&&!isLoadMore&&load_more_tv.getVisibility()==View.VISIBLE){
-                    String loca = Utils.ReadString(SaveKey.KEY_LAT_LON);
-                    map.put("lat", loca.split(":")[0]);
-                    map.put("lng", loca.split(":")[1]);
-                    map.put("pageindex", (page_size++)+"");
-                    mListener.initShops(map);
-                    isLoadMore=true;
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_MOVE:
+                        index++;
+                        break;
                 }
+                if (event.getAction() == MotionEvent.ACTION_UP && index > 0) {
+                    index = 0;
+                    View view = ((ScrollView) v).getChildAt(0);
+                    if (view.getMeasuredHeight() - 100 <= v.getScrollY() + v.getHeight()) {
+                        if (!isBottom) {
+                            String loca = Utils.ReadString(SaveKey.KEY_LAT_LON);
+                            if (!loca.equals("::,,")) {
+                                if (Utils.isNetworkConnected()) {
+                                    page_size = page_size + 1;
+                                    loadShop(loca.split(":")[1], loca.split(":")[2]);
+                                } else {//无网加载底部
+
+                                }
+                            }
+                        }
+                    }
+                }
+                return false;
             }
         });
         //附近商家
         mAdapter = new CommonAdapter<Shop>(MainActivity.mInstance, mShopDetailsList, R.layout.item_main_shop) {
             @Override
             public void convert(final CommonViewHolder holder, final Shop detail, int position) {
-                holder.setText(R.id.title_tv, detail.getTogoName());
+                if (detail.getTogoName().length() > 10) {
+                    holder.setText(R.id.title_tv, detail.getTogoName().substring(0, 10) + "...");
+                } else {
+                    holder.setText(R.id.title_tv, detail.getTogoName());
+                }
+
                 holder.setGlideImage(R.id.iv, detail.getIcon());
                 holder.setText(R.id.qisong_num_tv, "￥" + detail.getMinmoney());//起送价
                 if (("0.0").equals(detail.getSendmoney()) || ("0").equals(detail.getSendmoney())) {
@@ -201,7 +270,9 @@ public class MainFragment extends BaseFragment implements IFMainView {
                     holder.setText(R.id.peisong_num_tv, "￥" + detail.getSendmoney() + "  配送费");//配送费
                 }
                 holder.setText(R.id.sell_num_tv, "月售" + detail.getSales() + "单");
-                holder.setTags(R.id.tag_gv, detail.getTaglist());
+
+                holder.setTag(R.id.tag_gv, detail.getTaglist(), tag_height);
+
                 if (!detail.getStatus().equals("1")) {
                     holder.setVisible(R.id.shop_no_open_iv, true);
                 } else {
@@ -213,36 +284,7 @@ public class MainFragment extends BaseFragment implements IFMainView {
                 } else {
                     holder.setVisible(R.id.spall_icon_tv, false);
                 }
-                holder.setStar(R.id.start_num_rb, detail.getStar());
-                if (detail.getTaglist().size() > 0) {//标签数大于0
-                    final TextView isOpen_tv = holder.getView(R.id.is_open_tv);
-                    final TextView activity_num_tv = holder.getView(R.id.activity_num_tv);
-                    final RelativeLayout rv = holder.getView(R.id.tag_rl);
-                    holder.setText(R.id.activity_num_tv, detail.getTaglist().size());
-                    if (Integer.parseInt(activity_num_tv.getText().toString().trim()) > 2) {
-                        holder.setOnClickListener(R.id.tag_rl, new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                String isOpen = isOpen_tv.getText().toString();
-                                String activity_num = activity_num_tv.getText().toString();
-                                if (isOpen.equals("2")) {
-                                    rv.setLayoutParams(new LinearLayout.LayoutParams(-1, detail.getTaglist().size() * 79));
-                                    isOpen_tv.setText(activity_num);
-                                    holder.setImageResource(R.id.is_open_iv, R.mipmap.jiantou_up);
-                                } else {
-                                    rv.setLayoutParams(new LinearLayout.LayoutParams(-1, 150));
-                                    isOpen_tv.setText("2");
-                                    holder.setImageResource(R.id.is_open_iv, R.mipmap.jiantou_down);
-                                }
-                            }
-                        });
-                    } else {
-                        holder.setVisible(R.id.activity_num_ll, false);
-                    }
-                } else {//隐藏标签
-                    holder.setVisible(R.id.tag_rl, false);
-                }
-
+                holder.setStar(R.id.start_num_rb, "5");//detail.getStar()
             }
         };
         main_list.setAdapter(mAdapter);
@@ -255,20 +297,68 @@ public class MainFragment extends BaseFragment implements IFMainView {
             }
         };
         shoptype_gv.setAdapter(mShopTypeAdapter);
-        main_refresh_srl.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+        ptr.setPtrHandler(new PtrDefaultHandler() {
             @Override
-            public void onRefresh() {
+            public void onRefreshBegin(PtrFrameLayout frame) {
                 String loca = Utils.ReadString(SaveKey.KEY_LAT_LON);
-                page_size=1;
-                map.put("lat", loca.split(":")[0]);
-                map.put("lng", loca.split(":")[1]);
-                map.put("pageindex", page_size+"");
-                mListener.initShops(map);
+                if (Utils.isNetworkConnected()) {
+                    if (!loca.equals("::,,")) {
+                        page_size = 1;
+                        loadShop(loca.split(":")[1], loca.split(":")[2]);
+                        mListener.initGG();//加载广告
+                        mListener.initShopType();
+                        isBottom = false;
+                    } else {
+                        iv.setVisibility(View.VISIBLE);
+                        ptr.refreshComplete();
+                    }
+                } else {
+                    ptr.refreshComplete();
+                }
             }
         });
+//        load_more_tv.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
+//                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+//        load_more_height = load_more_tv.getMeasuredHeight();
+        View view = View.inflate(MainActivity.mInstance, R.layout.item_main_shop, null);
+        view.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
+                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+        item_heigh = view.getMeasuredHeight();
+        View total_ll = View.inflate(MainActivity.mInstance, R.layout.item_main_tag, null);
+        total_ll.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
+                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+        tag_height = total_ll.getMeasuredHeight();
     }
-    int page_size=1;
-    boolean isLoadMore=false;
+
+    /**
+     * 加载
+     */
+    private void loadShop(String lat, String lng) {
+        map = new HashMap<>();
+        map.put("lat", lat);
+        map.put("lng", lng);
+        map.put("pageindex", page_size + "");
+        mListener.initShops(map);
+    }
+
+    int item_heigh = 0;//shop的item的高度
+    int tag_height = 0;//标签的高度
+    int load_more_height = 0;//加载更多的高度
+    int page_size = 1;
+    boolean isLoadMore = false;
+
+    private void initListviewHeight() {
+        int total_height = item_heigh * mShopDetailsList.size() + 5;
+        for (Shop shop : mShopDetailsList) {
+            if (shop.getTaglist().size() > 3) {
+                total_height = total_height + 3 * tag_height;
+            } else {
+                total_height = total_height + shop.getTaglist().size() * tag_height;
+            }
+        }
+        main_list.setLayoutParams(new LinearLayout.LayoutParams(-1, total_height));
+    }
+
     /**
      * @param array 商品类型
      */
@@ -306,36 +396,76 @@ public class MainFragment extends BaseFragment implements IFMainView {
 
     @CodeNote(id = R.id.load_more_tv)
     TextView load_more_tv;
+    boolean isBottom = false;
 
+    /**
+     * @param record 总数量
+     * @param page   当前页数
+     * @param total  所有页数
+     * @param list   店铺信息合集
+     */
     @Override
-    public void loadNearSH(int record, int page, int total, final List<Shop> list) {
-        if(page_size>1) {
+    public void loadNearSH(int record, final int page, final int total, final List<Shop> list) {
+        if (page == total) {
+            isBottom = true;
+        }
+        if (page_size > 1) {
             mShopDetailsList.addAll(list);
-        }else {
-            mShopDetailsList=list;
-        }
-        mAdapter.refresh(mShopDetailsList);
-        progressDialog.dismiss();
-        isLoadMore=false;
-        if (main_refresh_srl.isRefreshing()) {
-            main_refresh_srl.setRefreshing(false);
-        }
-        if (page < total) {
-            load_more_tv.setVisibility(View.VISIBLE);
         } else {
-            load_more_tv.setVisibility(View.GONE);
+            mShopDetailsList = list;
+        }
+
+        mAdapter.refresh(mShopDetailsList);
+        getTotalHeightofListView(mAdapter);
+        if (progressDialog != null) {
+            progressDialog.dismiss();
+        }
+        isLoadMore = false;
+        ptr.refreshComplete();
+        if (page < total) {
+            main_list.addFooterView(load_more_tv);
+        } else {
+            main_list.removeFooterView(load_more_tv);
         }
         main_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
-                    Utils.IntentPost(SHDetailsActivity.class, new Utils.putListener() {
-                        @Override
-                        public void put(Intent intent) {
-                            intent.putExtra("Shop", mShopDetailsList.get(position));
-                        }
-                    });
-
+                Utils.IntentPost(SHDetailsActivity.class, new Utils.putListener() {
+                    @Override
+                    public void put(Intent intent) {
+                        intent.putExtra("Shop", mShopDetailsList.get(position));
+                    }
+                });
             }
         });
     }
+
+    /**
+     * 根据CommonAdapter计算Listview的高度
+     *
+     * @param mAdapter
+     */
+    public void getTotalHeightofListView(CommonAdapter mAdapter) {
+        if (mAdapter == null) {
+            return;
+        }
+        if (page_size == 1) {
+            nowHeight = 0;
+        }
+        int totalHeight = 0;
+        for (int i = 10 * (page_size - 1); i < mAdapter.getCount(); i++) {
+            View mView = mAdapter.getView(i, null, main_list);
+            mView.measure(
+                    View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
+                    View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+            totalHeight += mView.getMeasuredHeight();
+        }
+        nowHeight = totalHeight + nowHeight;
+        ViewGroup.LayoutParams params = main_list.getLayoutParams();
+        params.height = nowHeight + (main_list.getDividerHeight() * (mAdapter.getCount() - 1));
+        main_list.setLayoutParams(params);
+        main_list.requestLayout();
+    }
+
+    int nowHeight = 0;//当前ListView高度
 }

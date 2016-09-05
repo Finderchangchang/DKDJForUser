@@ -1,17 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@color/list_item_line"
     android:orientation="vertical">
+
     <cc.listviewdemo.view.TitleBar
         android:id="@+id/main_tb"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:centerText="编辑地址"
-        android:background="@color/colorPrimaryDark"/>
+        android:background="@color/colorPrimaryDark"
+        app:centerText="编辑地址" />
+
     <LinearLayout
+        android:id="@+id/address_ll"
         android:layout_width="match_parent"
         android:layout_height="42dp"
         android:layout_marginTop="10dp"
@@ -26,21 +28,22 @@
             android:text="地址："
             android:textSize="16sp" />
 
-        <EditText
+        <TextView
             android:id="@+id/address_et"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginLeft="20dp"
             android:background="@null"
+            android:hint="收货人地址"
             android:textSize="14sp"
-            android:hint="收货人地址"/>
+            android:gravity="center_vertical"/>
 
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="42dp"
-        android:layout_marginTop="0.5dp"
+        android:layout_marginTop="10dp"
         android:background="@color/white"
         android:gravity="center_vertical"
         android:orientation="horizontal">
@@ -65,7 +68,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="42dp"
-        android:layout_marginTop="0.5dp"
+        android:layout_marginTop="10dp"
         android:background="@color/white"
         android:gravity="center_vertical"
         android:orientation="horizontal">
@@ -80,47 +83,51 @@
         <EditText
             android:id="@+id/name_et"
             android:layout_width="0dp"
-            android:layout_weight="1"
             android:layout_height="match_parent"
             android:layout_marginLeft="20dp"
+            android:layout_weight="1"
             android:background="@null"
-            android:textSize="14sp"
-            android:hint="收货人姓名" />
+            android:hint="收货人姓名"
+            android:textSize="14sp" />
+
         <CheckBox
             android:id="@+id/xiansheng_cb"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
             android:background="@drawable/blue_checkbox"
             android:button="@null"
             android:checked="true"
-            android:clickable="false"/>
+            android:clickable="false" />
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
             android:text="先生"
-            android:textSize="18sp"
-            android:layout_marginLeft="5dp"/>
+            android:textSize="18sp" />
+
         <CheckBox
             android:id="@+id/nvshi_cb"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:layout_marginLeft="30dp"
             android:background="@drawable/blue_checkbox"
             android:button="@null"
-            android:clickable="false"
-            android:layout_marginLeft="30dp"/>
+            android:clickable="false" />
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="女士"
-            android:textSize="18sp"
             android:layout_marginLeft="5dp"
-            android:layout_marginRight="10dp"/>
+            android:layout_marginRight="10dp"
+            android:text="女士"
+            android:textSize="18sp" />
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="42dp"
-        android:layout_marginTop="0.5dp"
+        android:layout_marginTop="10dp"
         android:background="@color/white"
         android:gravity="center_vertical"
         android:orientation="horizontal">
@@ -138,32 +145,40 @@
             android:layout_height="match_parent"
             android:layout_marginLeft="20dp"
             android:background="@null"
-            android:textSize="14sp"
-            android:hint="收货人电话"/>
+            android:hint="收货人电话"
+            android:textSize="14sp" />
     </LinearLayout>
-    <Button
-        android:id="@+id/save_address_btn"
-        android:layout_width="160dp"
-        android:layout_height="35dp"
-        android:text="确认地址"
-        android:textSize="16sp"
-        android:textColor="@color/white"
-        android:background="@color/colorPrimaryDark"
-        android:layout_marginTop="10dp"
-        android:layout_gravity="center"/>
-    <LinearLayout
+
+    <TextView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"></LinearLayout>
+        android:layout_weight="1" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/save_address_btn"
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:layout_marginTop="10dp"
+            android:layout_weight="1"
+            android:background="@color/colorPrimaryDark"
+            android:text="保存地址"
+            android:textColor="@color/white"
+            android:textSize="18sp" />
+    </LinearLayout>
+
     <Button
         android:id="@+id/del_address_btn"
         android:layout_width="match_parent"
         android:layout_height="45dp"
-        android:text="删除该地址"
-        android:textSize="18sp"
-        android:textColor="@color/white"
-        android:background="@color/colorPrimaryDark"
-        android:layout_marginTop="10dp"
         android:layout_gravity="center"
-        android:visibility="gone"/>
+        android:layout_marginTop="5dp"
+        android:background="@color/colorPrimaryDark"
+        android:text="删除地址"
+        android:textColor="@color/white"
+        android:textSize="18sp"
+        android:visibility="gone" />
 </LinearLayout>

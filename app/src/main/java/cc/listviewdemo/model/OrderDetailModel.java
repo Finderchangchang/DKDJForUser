@@ -72,8 +72,26 @@ public class OrderDetailModel {
     private String OrderID;
     private String SentTime;
     private String Remark;
+    private String isfirst;
     private List<String> foodlist;
     private List<?> Promotions;
+    private List<ActivityModel> HuoDong;
+
+    public String getIsfirst() {
+        return isfirst;
+    }
+
+    public void setIsfirst(String isfirst) {
+        this.isfirst = isfirst;
+    }
+
+    public List<ActivityModel> getHuoDong() {
+        return HuoDong;
+    }
+
+    public void setHuoDong(List<ActivityModel> huoDong) {
+        HuoDong = huoDong;
+    }
 
     public String getTotalPrice() {
         return TotalPrice;

@@ -10,6 +10,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import net.tsz.afinal.annotation.view.CodeNote;
 
@@ -40,6 +41,8 @@ public class UserInfoActivity extends BaseActivity implements View.OnClickListen
     LinearLayout update_pwd_ll;
     @CodeNote(id = R.id.bd_tel_ll, click = "click")
     LinearLayout bd_tel_ll;
+    @CodeNote(id = R.id.tel_tv)
+    TextView tel_tv;
     PopupWindow pop;
     RelativeLayout menu_view;
     Button photo_manager_btn;
@@ -63,6 +66,7 @@ public class UserInfoActivity extends BaseActivity implements View.OnClickListen
 
     @Override
     public void initEvents() {
+        Utils.WriteString(SaveKey.KEY_Load_Index,"2");
         menu_view.setOnClickListener(this);
         photo_manager_btn.setOnClickListener(this);
         camera_btn.setOnClickListener(this);
@@ -77,6 +81,12 @@ public class UserInfoActivity extends BaseActivity implements View.OnClickListen
                 LinearLayout.LayoutParams.WRAP_CONTENT, true);
         pop.setAnimationStyle(R.style.PopAnimationFade);
         pop.setBackgroundDrawable(new BitmapDrawable());
+        String phone = model.getPhone();
+        if (phone != "" || phone != null) {
+            if (phone.length() == 11) {
+                tel_tv.setText(phone.replace(phone.substring(3, 7), "****"));
+            }
+        }
     }
 
     public void click(View view) {
@@ -89,7 +99,7 @@ public class UserInfoActivity extends BaseActivity implements View.OnClickListen
                 builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        setResult(10,new Intent());
+                        setResult(10, new Intent());
                         Utils.WriteString(SaveKey.KEY_UserId, "");
                         UserInfoActivity.mInstance.finish();
                     }
@@ -100,6 +110,7 @@ public class UserInfoActivity extends BaseActivity implements View.OnClickListen
 //                changePopupWindowState();
                 break;
             case R.id.user_name_ll://用户姓名
+                ToastShort("敬请期待...");
                 break;
             case R.id.update_pwd_ll://修改密码
                 break;

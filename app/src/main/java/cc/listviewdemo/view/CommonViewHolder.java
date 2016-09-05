@@ -8,6 +8,7 @@ import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -15,16 +16,23 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.RatingBar;
 import android.widget.RelativeLayout;
+import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import cc.listviewdemo.R;
 import cc.listviewdemo.activity.MainActivity;
+import cc.listviewdemo.model.CommentModel;
 import cc.listviewdemo.model.OrderList;
 import cc.listviewdemo.model.Taglist;
+import in.srain.cube.image.CubeImageView;
+import in.srain.cube.image.ImageLoader;
 
 /**
  * Created by liuliu on 2015/11/16   16:29
@@ -46,6 +54,41 @@ public class CommonViewHolder {
         mConvertView = LayoutInflater.from(context).inflate(layoutId, parent,
                 false);
         mConvertView.setTag(this);
+    }
+
+
+    public CommonViewHolder setTag(int viewId, final List<Taglist> list, final int tag_height) {
+//        LinearLayoutForListView lv = getView(viewId);
+        ListView lv = getView(viewId);
+        final RelativeLayout rv = getView(R.id.tag_rl);
+        final TextView isOpen_tv = getView(R.id.is_open_tv);
+        TagAdapter adapter = new TagAdapter(mContext, list);
+        lv.setAdapter(adapter);
+        if (list.size() > 3) {//标签数大于2
+            final Button btn = getView(R.id.btn);
+            btn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    setText(R.id.activity_num_tv, list.size());
+                    String isOpen = isOpen_tv.getText().toString();
+                    if (isOpen.equals("2")) {//默认未打开2.打开了
+                        rv.setLayoutParams(new LinearLayout.LayoutParams(-1, list.size() * tag_height));
+                        isOpen_tv.setText("4");
+                        setImageResource(R.id.is_open_iv, R.mipmap.jiantou_up);
+                    } else {
+                        isOpen_tv.setText("2");
+                        rv.setLayoutParams(new LinearLayout.LayoutParams(-1, tag_height * 3));
+                        setImageResource(R.id.is_open_iv, R.mipmap.jiantou_down);
+                    }
+                }
+            });
+            setVisible(R.id.activity_num_ll, true);
+            rv.setLayoutParams(new LinearLayout.LayoutParams(-1, tag_height * 3));
+        } else {//标签数小于等于2
+            rv.setLayoutParams(new LinearLayout.LayoutParams(-1, tag_height * list.size()));
+            setVisible(R.id.activity_num_ll, false);
+        }
+        return this;
     }
 
     public CommonViewHolder setHeight(int viewId, int height) {
@@ -114,8 +157,14 @@ public class CommonViewHolder {
         return this;
     }
 
-    public CommonViewHolder setGlideImage(int viewId, String url) {
-        ImageView view = getView(viewId);
+    public CommonViewHolder setCubeImage(int viewId, ImageLoader loader, String url) {
+        CubeImageView view = getView(viewId);
+        view.loadImage(loader, url);
+        return this;
+    }
+
+    public CommonViewHolder setGlideImage(int viewId, final String url) {
+        final ImageView view = getView(viewId);
         Glide.with(mContext).load(url).asBitmap().centerCrop().placeholder(R.mipmap.no_img).into(new MyBitmapImageViewTarget(view));
         return this;
     }
@@ -123,7 +172,7 @@ public class CommonViewHolder {
     public CommonViewHolder setCycleGlideImage(int viewId, String url) {
         ImageView view = getView(viewId);
         if (("").equals(url)) {
-            Glide.with(mContext).load(R.mipmap.no_img).asBitmap().centerCrop().transform(new GlideCircleTransform(MainActivity.mInstance)).into(new MyBitmapImageViewTarget(view));
+            Glide.with(mContext).load(R.mipmap.no_img_no_bk).asBitmap().centerCrop().transform(new GlideCircleTransform(MainActivity.mInstance)).into(new MyBitmapImageViewTarget(view));
         } else {
             Glide.with(mContext).load(url).asBitmap().centerCrop().placeholder(R.mipmap.no_img).transform(new GlideCircleTransform(MainActivity.mInstance)).into(new MyBitmapImageViewTarget(view));
         }
@@ -140,71 +189,18 @@ public class CommonViewHolder {
         return this;
     }
 
-    /**
-     * 设置标签
-     *
-     * @param viewId GridView的Id
-     * @param list   标签内容集合
-     * @return this
-     */
-    public CommonViewHolder setTags(int viewId, List<Taglist> list) {
-        GridView view = getView(viewId);
-        view.setPressed(false);
-        view.setEnabled(false);
-        view.setClickable(false);
-        view.setAdapter(new CommonAdapter<Taglist>(mContext, list, R.layout.item_main_tag) {
-            @Override
-            public void convert(CommonViewHolder holder, Taglist taglist, int position) {
-                holder.setGlideImage(R.id.iv, taglist.getPicture());
-                holder.setText(R.id.tv, taglist.getTitle());
-            }
-        });
-        RelativeLayout rv = getView(R.id.tag_rl);
-        rv.setLayoutParams(new LinearLayout.LayoutParams(-1, 150));
-//        setListViewHeightBasedOnChildren(view);
-        return this;
-    }
-    public CommonViewHolder setListView(int viewId,List<OrderList.OrderlistBean.FoodlistBean> list){
-        ListView view=getView(viewId);
-        view.setAdapter(new CommonAdapter<OrderList.OrderlistBean.FoodlistBean>(mContext,list,R.layout.item_good) {
-
+    public CommonViewHolder setListView(int viewId, List<OrderList.OrderlistBean.FoodlistBean> list) {
+        ListView view = getView(viewId);
+        view.setAdapter(new CommonAdapter<OrderList.OrderlistBean.FoodlistBean>(mContext, list, R.layout.item_good) {
             @Override
             public void convert(CommonViewHolder holder, OrderList.OrderlistBean.FoodlistBean foodlistBean, int position) {
-                holder.setText(R.id.name_num_tv,foodlistBean.getFoodname());
-                holder.setText(R.id.total_price_tv,"X"+foodlistBean.getNum());
+                holder.setText(R.id.name_num_tv, foodlistBean.getFoodname());
+                holder.setText(R.id.total_price_tv, "X" + foodlistBean.getNum());
             }
         });
         return this;
     }
 
-    public static void setListViewHeightBasedOnChildren(GridView listView) {
-        // 获取listview的adapter
-        ListAdapter listAdapter = listView.getAdapter();
-        if (listAdapter == null) {
-            return;
-        }
-        // 固定列宽，有多少列
-        int col = 2;// listView.getNumColumns();
-        int totalHeight = 0;
-        // i每次加4，相当于listAdapter.getCount()小于等于4时 循环一次，计算一次item的高度，
-        // listAdapter.getCount()小于等于8时计算两次高度相加
-        for (int i = 0; i < listAdapter.getCount(); i += col) {
-            // 获取listview的每一个item
-            View listItem = listAdapter.getView(i, null, listView);
-            listItem.measure(0, 0);
-            // 获取item的高度和
-            totalHeight += listItem.getMeasuredHeight();
-        }
-
-        // 获取listview的布局参数
-        ViewGroup.LayoutParams params = listView.getLayoutParams();
-        // 设置高度
-        params.height = totalHeight;
-        // 设置margin
-        ((ViewGroup.MarginLayoutParams) params).setMargins(10, 10, 10, 10);
-        // 设置参数
-        listView.setLayoutParams(params);
-    }
 
     //获取知道textview的值
     public String getText(int viewId) {
@@ -286,7 +282,6 @@ public class CommonViewHolder {
         }
         return this;
     }
-
     public int getPosition() {
         return mPosition;
     }

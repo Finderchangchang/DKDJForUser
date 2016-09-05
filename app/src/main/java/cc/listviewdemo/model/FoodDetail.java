@@ -25,6 +25,7 @@ public class FoodDetail implements Serializable {
     private String FoodType;
     private String TotalMoney;
     private String PackageFree;//打包费
+    private List<FoodTotalStyle> attrlist;
 
     public String getTotalMoney() {
         return TotalMoney;
@@ -42,12 +43,21 @@ public class FoodDetail implements Serializable {
         PackageFree = packageFree;
     }
 
+    public List<FoodTotalStyle> getAttrlist() {
+        return attrlist;
+    }
+
+    public void setAttrlist(List<FoodTotalStyle> attrlist) {
+        this.attrlist = attrlist;
+    }
+
     /**
      * DataId : 0
      * nprice : 0
      * Price : 2
      * Foodcurrentprice : 0
      */
+
 
     private List<FoodstylelistBean> Stylelist;
 
@@ -187,7 +197,7 @@ public class FoodDetail implements Serializable {
         this.Stylelist = foodstylelist;
     }
 
-    public static class FoodstylelistBean implements Serializable{
+    public static class FoodstylelistBean implements Serializable {
         private String DataId;
         private String nprice;
         private String Price;

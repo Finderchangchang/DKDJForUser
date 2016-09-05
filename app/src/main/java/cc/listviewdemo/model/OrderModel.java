@@ -41,6 +41,8 @@ public class OrderModel implements Serializable {
     private String GainTime;
     private String ulng;//收件人经纬度
     private String ulat;
+    private String rlng;//收件人经纬度
+    private String rlat;
     private String bid;
     private String TogoId;
     private String Remark;
@@ -63,6 +65,23 @@ public class OrderModel implements Serializable {
         Ordersource = ordersource;
         ShopList = shop;
     }
+
+    public String getRlng() {
+        return rlng;
+    }
+
+    public void setRlng(String rlng) {
+        this.rlng = rlng;
+    }
+
+    public String getRlat() {
+        return rlat;
+    }
+
+    public void setRlat(String rlat) {
+        this.rlat = rlat;
+    }
+
     /**
      * Lng : 115.509015
      * Lat : 38.894451

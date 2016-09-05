@@ -1,6 +1,10 @@
 package cc.listviewdemo.activity;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.Message;
@@ -13,6 +17,7 @@ import android.widget.Toast;
 
 import com.alipay.sdk.app.PayTask;
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 
 import net.tsz.afinal.annotation.view.CodeNote;
 
@@ -29,12 +34,16 @@ import java.util.Map;
 import cc.listviewdemo.R;
 import cc.listviewdemo.base.BaseActivity;
 import cc.listviewdemo.config.Config;
+import cc.listviewdemo.config.SaveKey;
+import cc.listviewdemo.model.ActivityModel;
+import cc.listviewdemo.model.Goods;
 import cc.listviewdemo.model.OrderDetailModel;
 import cc.listviewdemo.model.OrderGood;
 import cc.listviewdemo.model.PayResult;
 import cc.listviewdemo.view.CommonAdapter;
 import cc.listviewdemo.view.CommonViewHolder;
 import cc.listviewdemo.view.HttpUtils;
+import cc.listviewdemo.view.LinearLayoutForListView;
 import cc.listviewdemo.view.SignUtils;
 import cc.listviewdemo.view.TitleBar;
 import cc.listviewdemo.view.Utils;
@@ -59,8 +68,6 @@ public class OrderDetailActivity extends BaseActivity {
     TextView etOrderNum;
     @CodeNote(id = R.id.etUserName)
     TextView etUserName;
-
-
     @CodeNote(id = R.id.etphone)
     TextView etphone;
     @CodeNote(id = R.id.etAddress)
@@ -69,8 +76,6 @@ public class OrderDetailActivity extends BaseActivity {
     TextView etOrderType;
     @CodeNote(id = R.id.etRemark)
     TextView etRemark;
-    @CodeNote(id = R.id.order_detail_lv)
-    ListView lv;
     @CodeNote(id = R.id.mBtnDoorder, click = "onClick")
     TextView mBtnDoorder;
     @CodeNote(id = R.id.cancel_tv, click = "onClick")
@@ -79,13 +84,28 @@ public class OrderDetailActivity extends BaseActivity {
     String key = "";
     OrderDetailModel model;
     CommonAdapter<String> mAdapter;
-    @CodeNote(id=R.id.main_tb)
+    @CodeNote(id = R.id.main_tb)
     TitleBar main_tb;
+    @CodeNote(id = R.id.activity_tag_lv)
+    LinearLayoutForListView activity_tag_lv;
+    CommonAdapter<ActivityModel> mActivityAdapter;
+    List<ActivityModel> mList;
+    @CodeNote(id = R.id.good_list_lv)
+    LinearLayoutForListView good_list_lv;
+    String youhui;
+    @CodeNote(id = R.id.activity_line_view)
+    View activity_line_view;
+    Dialog dialog = null;//弹出框
+    ProgressDialog progressDialog;//加载进度条
+
     @Override
     public void initViews() {
+        Utils.WriteString(SaveKey.KEY_Load_Index, "1");
         setContentView(R.layout.activity_order_detail);
         map = new HashMap<>();
+        mList = new ArrayList<>();
         key = getIntent().getStringExtra("orderId");
+        youhui = getIntent().getStringExtra("normalPrice");
         goods = new ArrayList<>();
         mInstance = this;
         main_tb.setLeftClick(new TitleBar.OnLeftClick() {
@@ -94,6 +114,8 @@ public class OrderDetailActivity extends BaseActivity {
                 mInstance.finish();
             }
         });
+        progressDialog = ProgressDialog.show(MainActivity.mInstance, "",
+                "加载中...");
     }
 
     class MyThread extends Thread {
@@ -118,24 +140,34 @@ public class OrderDetailActivity extends BaseActivity {
                 } else {
                     switch (model.getIsShopSet()) {
                         case "0":
-                            map = new HashMap<>();
-                            map.put("orderid", model.getOrderID());
-                            map.put("state", "2");
-                            map.put("shopid", model.getTogoId());
-                            HttpUtils.loadJson("/App/shop/saveorderstate", map, new HttpUtils.LoadJsonListener() {
-                                @Override
-                                public void load(JSONObject obj) {
-                                    try {
-                                        if (!obj.getString("state").equals("0")) {
-                                            OrderDetailActivity.mInstance.ToastShort("取消成功");
-                                        } else {
-                                            OrderDetailActivity.mInstance.ToastShort("取消失败");
-                                        }
-                                    } catch (JSONException e) {
+                            AlertDialog.Builder localBuilder1 = new AlertDialog.Builder(this)
+                                    .setTitle("提示").setMessage("确定要取消当前订单？");
 
-                                    }
-                                }
-                            });
+                            dialog = localBuilder1.setPositiveButton("返回", null)
+                                    .setNegativeButton("确定", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            map = new HashMap<>();
+                                            map.put("orderid", model.getOrderID());
+                                            map.put("state", "2");
+                                            map.put("shopid", model.getTogoId());
+                                            HttpUtils.loadJson("/App/shop/saveorderstate", map, new HttpUtils.LoadJsonListener() {
+                                                @Override
+                                                public void load(JSONObject obj) {
+                                                    try {
+                                                        if (!obj.getString("state").equals("0")) {
+                                                            OrderDetailActivity.mInstance.ToastShort("取消成功");
+                                                        } else {
+                                                            OrderDetailActivity.mInstance.ToastShort("取消失败");
+                                                        }
+                                                    } catch (JSONException e) {
+
+                                                    }
+                                                }
+                                            });
+                                        }
+                                    }).create();
+                            dialog.show();
                             break;
                         case "1":
                             OrderDetailActivity.mInstance.ToastShort("配送小哥正在路上，请耐心等待");
@@ -148,51 +180,55 @@ public class OrderDetailActivity extends BaseActivity {
                 break;
             case R.id.mBtnDoorder:
                 if (mBtnDoorder.getText().equals("去支付")) {
-                    map = new HashMap<String, String>();
-                    map.put("orderid", key);
-                    map.put("price", model.getTotalPrice());
-                    HttpUtils.loadJson("buildpaynum", map, new HttpUtils.LoadJsonListener() {
-                        @Override
-                        public void load(JSONObject obj) {
-                            try {
-                                String path = obj.getString("batch");//获得OrderID
-                                if (model.getPayMode().equals("1")) {
-                                    String orderInfo = getOrderInfo("大可到家Android支付", "body", model.getTotalPrice() + "", path);
-                                    String sign = sign(orderInfo);
-                                    try {
-                                        sign = URLEncoder.encode(sign, "UTF-8");
-                                    } catch (UnsupportedEncodingException e) {
+                    if (model.getIsfirst().equals("False")) {
+                        mInstance.ToastShort("订单已过期，请重新下单");
+                    } else {
+                        map = new HashMap<String, String>();
+                        map.put("orderid", key);
+                        map.put("price", normal_price + "");
+                        HttpUtils.loadJson("buildpaynum", map, new HttpUtils.LoadJsonListener() {
+                            @Override
+                            public void load(JSONObject obj) {
+                                try {
+                                    String path = obj.getString("batch");//获得OrderID
+                                    if (model.getPayMode().equals("1")) {
+                                        String orderInfo = getOrderInfo("大可到家Android支付", "body", model.getTotalPrice() + "", path);
+                                        String sign = sign(orderInfo);
+                                        try {
+                                            sign = URLEncoder.encode(sign, "UTF-8");
+                                        } catch (UnsupportedEncodingException e) {
 
-                                    }
-                                    /**
-                                     * 完整的符合支付宝参数规范的订单信息
-                                     */
-                                    final String payInfo = orderInfo + "&sign=\"" + sign + "\"&" + getSignType();
-                                    Runnable payRunnable = new Runnable() {
-
-                                        @Override
-                                        public void run() {
-                                            // 构造PayTask 对象
-                                            PayTask alipay = new PayTask(OrderDetailActivity.this);
-                                            // 调用支付接口，获取支付结果
-                                            String result = alipay.pay(payInfo, true);
-                                            Message msg = new Message();
-                                            msg.what = 1;
-                                            msg.obj = result;
-                                            mHandler.sendMessage(msg);
                                         }
-                                    };
-                                    Thread payThread = new Thread(payRunnable);
-                                    payThread.start();
-                                } else {
-                                    new MyThread(path, model.getTotalPrice()).start();
+                                        /**
+                                         * 完整的符合支付宝参数规范的订单信息
+                                         */
+                                        final String payInfo = orderInfo + "&sign=\"" + sign + "\"&" + getSignType();
+                                        Runnable payRunnable = new Runnable() {
+
+                                            @Override
+                                            public void run() {
+                                                // 构造PayTask 对象
+                                                PayTask alipay = new PayTask(OrderDetailActivity.this);
+                                                // 调用支付接口，获取支付结果
+                                                String result = alipay.pay(payInfo, true);
+                                                Message msg = new Message();
+                                                msg.what = 1;
+                                                msg.obj = result;
+                                                mHandler.sendMessage(msg);
+                                            }
+                                        };
+                                        Thread payThread = new Thread(payRunnable);
+                                        payThread.start();
+                                    } else {
+                                        new MyThread(path, model.getTotalPrice()).start();
+                                    }
+                                } catch (JSONException e) {
+
                                 }
-                            } catch (JSONException e) {
 
                             }
-
-                        }
-                    });
+                        });
+                    }
                 } else {
                     ToastShort("敬请期待...");
                 }
@@ -315,49 +351,75 @@ public class OrderDetailActivity extends BaseActivity {
 
     List<OrderGood> goods;
     List<String> list = new ArrayList<String>();
+    double normal_price;
 
     @Override
     public void initEvents() {
         map.put("orderid", key);
+        progressDialog.show();
         HttpUtils.loadJson("GetOrderDetailByOrderId", map, new HttpUtils.LoadJsonListener() {
             @Override
             public void load(JSONObject obj) {
-                model = new Gson().fromJson(obj.toString(), OrderDetailModel.class);
-                shopname.setText(model.getTogoName());
-                tv_packfee.setText(model.getPackagefree());
-                tv_sentmoney.setText(model.getSendmoney());
-                mEtSum.setText(model.getTotalPrice());
-                etOrderNum.setText(model.getOrderID());
-                etUserName.setText(model.getUserName());
-                etphone.setText(model.getTel());
-                etAddress.setText(model.getAddress());
-                if (model.getPayMode().equals("1")) {
-                    etOrderType.setText("支付宝");
-                } else {
-                    etOrderType.setText("微信");
-                }
-                if (model.getFoodlist().size() > 0) {
-                    String foods = model.getFoodlist().get(0);
-                    for (int i = 0; i < foods.split("]").length; i++) {
-                        String name = foods.split("]")[i].split(":")[5].split(",")[0].replace("\"", "");
-                        String num = foods.split("]")[i].split(":")[1].split(",")[0];
-                        String price = foods.split("]")[i].split(":")[3].split(",")[0];
-                        list.add(name + "*" + num + ":" + price);
+                if (obj != null) {
+                    model = new Gson().fromJson(obj.toString(), OrderDetailModel.class);
+                    shopname.setText(model.getTogoName());
+                    tv_packfee.setText(model.getPackagefree());
+                    tv_sentmoney.setText(model.getSendmoney());
+                    normal_price = (Double.parseDouble(model.getTotalPrice()) - Double.parseDouble(youhui));
+                    mEtSum.setText(normal_price + "");
+                    etOrderNum.setText(model.getOrderID());
+                    etUserName.setText(model.getUserName());
+                    etphone.setText(model.getTel());
+                    etAddress.setText(model.getAddress());
+                    if (model.getPayMode().equals("1")) {
+                        etOrderType.setText("支付宝");
+                    } else {
+                        etOrderType.setText("微信");
                     }
-                }
-                etRemark.setText(model.getRemark());
-                mAdapter = new CommonAdapter<String>(OrderDetailActivity.this, list, R.layout.item_good) {
-                    @Override
-                    public void convert(CommonViewHolder holder, String str, int position) {
-                        holder.setText(R.id.name_num_tv, str.split(":")[0]);
-                        holder.setText(R.id.total_price_tv, str.split(":")[1]);
+                    if (model.getFoodlist().size() > 0) {
+                        for (String foods : model.getFoodlist()) {
+                            for (int i = 0; i < foods.split("]").length; i++) {
+                                String name = foods.split("]")[i].split(":")[5].split(",")[0].replace("\"", "");
+                                String num = foods.split("]")[i].split(":")[1].split(",")[0];
+                                String price = foods.split("]")[i].split(":")[3].split(",")[0];
+                                list.add(name + "*" + num + ":" + price);
+                            }
+                        }
                     }
-                };
-                lv.setAdapter(mAdapter);
-                if (!model.getPaymoney().equals("0.00")) {
-                    mBtnDoorder.setText("催单");
+                    etRemark.setText(model.getRemark());
+                    mAdapter = new CommonAdapter<String>(OrderDetailActivity.this, list, R.layout.item_good_list) {
+                        @Override
+                        public void convert(CommonViewHolder holder, String str, int position) {
+                            holder.setText(R.id.name_num_tv, str.split(":")[0]);
+                            holder.setText(R.id.total_price_tv, str.split(":")[1]);
+                        }
+                    };
+                    good_list_lv.setAdapter(mAdapter);
+                    if (!model.getPaymoney().equals("0.00")) {
+                        mBtnDoorder.setText("催单");
+                    } else {
+                        mBtnDoorder.setText("去支付");
+                    }
+                    if (model.getHuoDong().size() > 0) {
+                        mActivityAdapter = new CommonAdapter<ActivityModel>(mInstance, model.getHuoDong(), R.layout.item_activity_tag) {
+                            @Override
+                            public void convert(CommonViewHolder holder, ActivityModel activityModel, int position) {
+                                holder.setGlideImage(R.id.activity_tag_iv, activityModel.get活动图片());
+                                holder.setText(R.id.activity_desc_tv, activityModel.get活动名称());
+                                if (!("0").equals(activityModel.get优惠())) {
+                                    holder.setText(R.id.youhui_price_tv, "-￥" + activityModel.get优惠());
+                                } else {
+                                    holder.setVisible(R.id.youhui_price_tv, false);
+                                }
+                            }
+                        };
+                    } else {
+                        activity_line_view.setVisibility(View.GONE);
+                    }
+                    activity_tag_lv.setAdapter(mActivityAdapter);
+                    progressDialog.dismiss();
                 } else {
-                    mBtnDoorder.setText("去支付");
+                    progressDialog.dismiss();
                 }
             }
         });

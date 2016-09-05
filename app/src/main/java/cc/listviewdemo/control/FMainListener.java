@@ -2,6 +2,7 @@ package cc.listviewdemo.control;
 
 
 import android.content.Context;
+import android.util.Log;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
@@ -39,17 +40,19 @@ public class FMainListener {
         HttpUtils.loadJson("specialad", null, new HttpUtils.LoadJsonListener() {
             @Override
             public void load(JSONObject obj) {
-                try {
-                    List<String> list = new ArrayList<>();
-                    JSONArray array = obj.getJSONArray("foodtypelist");
-                    for (int i = 0; i < array.length(); i++) {
-                        Gson gson = new Gson();
-                        ShopType type = gson.fromJson(array.getString(i), ShopType.class);
-                        list.add(type.getSortName());
-                    }
-                    mView.loadGG(list);
-                } catch (JSONException e) {
+                if (obj != null) {
+                    try {
+                        List<String> list = new ArrayList<>();
+                        JSONArray array = obj.getJSONArray("foodtypelist");
+                        for (int i = 0; i < array.length(); i++) {
+                            Gson gson = new Gson();
+                            ShopType type = gson.fromJson(array.getString(i), ShopType.class);
+                            list.add(type.getSortName());
+                        }
+                        mView.loadGG(list);
+                    } catch (JSONException e) {
 
+                    }
                 }
             }
         });
@@ -67,15 +70,17 @@ public class FMainListener {
         HttpUtils.loadJson("GetShopTypeList", map, new HttpUtils.LoadJsonListener() {
             @Override
             public void load(JSONObject obj) {
-                try {
-                    List<ShopType> list = new ArrayList<>();
-                    JSONArray array = obj.getJSONArray("datalist");
-                    for (int i = 0; i < array.length(); i++) {
-                        list.add(new Gson().fromJson(array.getString(i), ShopType.class));
+                if (obj != null) {
+                    try {
+                        List<ShopType> list = new ArrayList<>();
+                        JSONArray array = obj.getJSONArray("datalist");
+                        for (int i = 0; i < array.length(); i++) {
+                            list.add(new Gson().fromJson(array.getString(i), ShopType.class));
+                        }
+                        mView.load8Item(list);
+                    } catch (JSONException e) {
+
                     }
-                    mView.load8Item(list);
-                } catch (JSONException e) {
-                    e.printStackTrace();
                 }
             }
         });
@@ -84,18 +89,23 @@ public class FMainListener {
     public void initShops(Map maps) {
         maps.put("pagesize", "10");
         maps.put("languageType", "2");
+        maps.put("sortname", "SortNum");
         HttpUtils.loadJson("GetShopListByLocation", maps, new HttpUtils.LoadJsonListener() {
             @Override
             public void load(JSONObject obj) {
-                try {
-                    List<Shop> list = new ArrayList<>();
-                    JSONArray array = obj.getJSONArray("list");
-                    for (int i = 0; i < array.length(); i++) {
-                        list.add(new Gson().fromJson(array.getString(i), Shop.class));
-                    }
-                    mView.loadNearSH(obj.getInt("record"), obj.getInt("page"), obj.getInt("total"), list);
-                } catch (JSONException e) {
+                if (obj != null) {
+                    try {
+                        List<Shop> list = new ArrayList<>();
+                        JSONArray array = obj.getJSONArray("list");
+                        for (int i = 0; i < array.length(); i++) {
+                            list.add(new Gson().fromJson(array.getString(i), Shop.class));
+                        }
+                        mView.loadNearSH(obj.getInt("record"), obj.getInt("page"), obj.getInt("total"), list);
+                    } catch (JSONException e) {
 
+                    }
+                }else{
+                    mView.loadNearSH(0,0,0,null);
                 }
             }
         });

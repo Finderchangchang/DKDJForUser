@@ -34,7 +34,7 @@ public class TelAndLoginActivity extends BaseActivity {
     public static TelAndLoginActivity mInstance;
     @CodeNote(id = R.id.tel_login_tv, click = "onClick")
     Button tel_login_tv;
-    @CodeNote(id=R.id.login_tb)
+    @CodeNote(id = R.id.login_tb)
     TitleBar login_tb;
     @CodeNote(id = R.id.num_pwd_login_tv, click = "onClick")
     Button num_pwd_login_tv;
@@ -67,19 +67,21 @@ public class TelAndLoginActivity extends BaseActivity {
     public void initViews() {
         setContentView(R.layout.activity_tel_login);
     }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        switch (resultCode){
+        switch (resultCode) {
             case 11:
                 setResult(1);
                 mInstance.finish();
                 break;
         }
     }
+
     @Override
     public void initEvents() {
-        mInstance=this;
+        mInstance = this;
         login_tb.setLeftClick(new TitleBar.OnLeftClick() {
             @Override
             public void onClick() {
@@ -89,7 +91,7 @@ public class TelAndLoginActivity extends BaseActivity {
         login_tb.setRightClick(new TitleBar.OnRightClick() {
             @Override
             public void onClick() {
-                startActivityForResult(new Intent(mInstance,RegUserActivity.class),22);
+                startActivityForResult(new Intent(mInstance, RegUserActivity.class), 22);
             }
         });
     }
@@ -126,25 +128,24 @@ public class TelAndLoginActivity extends BaseActivity {
                         builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-
                             }
                         });
                         builder.show();
                     } else {
-                        map=new HashMap<>();
-                        String keys=Utils.ReadString(SaveKey.KEY_LAT_LON);
+                        map = new HashMap<>();
+                        String keys = Utils.ReadString(SaveKey.KEY_LAT_LON);
                         map.put("type", "3");//快捷登录
                         map.put("tel", tel);//手机号码
-                        map.put("lat",keys.split(":")[0]);
-                        map.put("lng",keys.split(":")[1]);
-                        map.put("province",keys.split(":")[2].split(",")[0]);
-                        map.put("city",keys.split(":")[2].split(",")[1]);
-                        map.put("area",keys.split(":")[2].split(",")[2]);
+                        map.put("lat", keys.split(":")[0]);
+                        map.put("lng", keys.split(":")[1]);
+                        map.put("province", keys.split(":")[2].split(",")[0]);
+                        map.put("city", keys.split(":")[2].split(",")[1]);
+                        map.put("area", keys.split(":")[2].split(",")[2]);
                         HttpUtils.loadJson("sendcode", map, new HttpUtils.LoadJsonListener() {
                             @Override
                             public void load(JSONObject obj) {
                                 try {
-                                    if(obj.getString("msg").equals("用户信息获取成功")){//跳转到首页
+                                    if (obj.getString("msg").equals("用户信息获取成功")) {//跳转到首页
                                         Utils.WriteString(SaveKey.KEY_UserId, obj.getString("userid"));
                                         setResult(1);
                                         mInstance.finish();//直接关闭当前页面
@@ -159,7 +160,7 @@ public class TelAndLoginActivity extends BaseActivity {
                     if (num_et.getText().toString().equals("") || pwd_et.getText().toString().equals("")) {
                         ToastShort("账号或密码不能为空，请重新输入");
                     } else {
-                        map=new HashMap<>();
+                        map = new HashMap<>();
                         map.put("username", num_et.getText().toString().trim());//用户名
                         map.put("password", pwd_et.getText().toString().trim());//密码
                         HttpUtils.loadJson("Login", map, new HttpUtils.LoadJsonListener() {
@@ -169,7 +170,7 @@ public class TelAndLoginActivity extends BaseActivity {
                                     if (obj != null) {
                                         if (obj.getString("state").equals("1")) {
                                             ToastShort("登录成功");
-                                            if(RegUserActivity.mInstance!=null){
+                                            if (RegUserActivity.mInstance != null) {
                                                 RegUserActivity.mInstance.finish();
                                             }
                                             Utils.WriteString(SaveKey.KEY_UserId, obj.getString("userid"));
@@ -218,7 +219,7 @@ public class TelAndLoginActivity extends BaseActivity {
                     }, 1000, 1000);
                     recLen = 60;
                     tel = tel_et.getText().toString().trim();
-                    map=new HashMap<>();
+                    map = new HashMap<>();
                     map.put("type", "2");//仅发送验证码
                     map.put("tel", tel);//密码
                     HttpUtils.loadJson("sendcode", map, new HttpUtils.LoadJsonListener() {

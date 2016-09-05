@@ -1,7 +1,7 @@
 package cc.listviewdemo.model;
 
 /**
- * 食物分类
+ * 菜品小分类
  * 作者：lwj on 2016/7/3 16:27
  * 邮箱：1031066280@qq.com
  */

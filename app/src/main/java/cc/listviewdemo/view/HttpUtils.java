@@ -7,14 +7,18 @@ import android.widget.Toast;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.gson.JsonArray;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.Iterator;
 import java.util.Map;
 
+import cc.listviewdemo.activity.MainActivity;
 import cc.listviewdemo.base.BaseApplication;
 import cc.listviewdemo.config.Config;
 
@@ -25,6 +29,7 @@ import cc.listviewdemo.config.Config;
 public class HttpUtils {
     /**
      * 执行添加操作只能访问一次
+     *
      * @param method
      * @param map
      * @param listener
@@ -51,16 +56,17 @@ public class HttpUtils {
         if (map != null) {
             Iterator i = map.entrySet().iterator();
             while (i.hasNext()) {
-                String link=i.next().toString();
-                if(isSave) {
-                    url = url + "&" + link.split("=")[0] +"="+ Uri.encode(link.split("=")[1]);
-                }else{
+                String link = i.next().toString();
+                if (isSave) {
+                    url = url + "&" + link.split("=")[0] + "=" + Uri.encode(link.split("=")[1]);
+                } else {
                     url = url + "&" + link;
                 }
             }
             url = url.replace(" ", "%20");
         }
-        Log.v("Tag",url);
+        Log.e("XX", url);
+
         JsonObjectRequest json = new JsonObjectRequest(
                 url, null,
                 new Response.Listener<JSONObject>() {
@@ -71,7 +77,7 @@ public class HttpUtils {
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Toast.makeText(BaseApplication.getContext(), error.toString(), Toast.LENGTH_SHORT).show();
+                String s = "";
                 listener.load(null);
             }
         });
@@ -88,6 +94,41 @@ public class HttpUtils {
             BaseApplication.mQueue = Volley.newRequestQueue(BaseApplication.getContext());
         }
         BaseApplication.mQueue.add(json);
+        BaseApplication.mQueue.start();
+    }
+
+    public static void load(String method, Map<String, String> map, final LoadArrayListener listener) {
+        String url = Config.PATH + method + ".aspx?1=1";
+
+        if (map != null) {
+            Iterator i = map.entrySet().iterator();
+            while (i.hasNext()) {
+                url = url + "&" + i.next().toString();
+            }
+            url = url.replace(" ", "%20");
+        }
+        Log.e("XX", url);
+        JsonArrayRequest arrayRequest = new JsonArrayRequest(url, new Response.Listener<JSONArray>() {
+            @Override
+            public void onResponse(JSONArray response) {
+                listener.load(response);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                listener.load(null);
+            }
+        });
+        if (BaseApplication.mQueue != null) {
+            BaseApplication.mQueue = Volley.newRequestQueue(BaseApplication.getContext());
+        }
+        BaseApplication.mQueue.add(arrayRequest);
+        BaseApplication.mQueue.start();
+    }
+
+
+    public interface LoadArrayListener {
+        void load(JSONArray obj);
     }
 
     public interface LoadJsonListener {

@@ -13,12 +13,14 @@ import com.google.gson.Gson;
 
 import net.tsz.afinal.annotation.view.CodeNote;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import cc.listviewdemo.R;
+import cc.listviewdemo.activity.AboutActivity;
 import cc.listviewdemo.activity.AddressListActivity;
 import cc.listviewdemo.activity.TelAndLoginActivity;
 import cc.listviewdemo.activity.UserInfoActivity;
@@ -55,6 +57,8 @@ public class UserFragment extends BaseFragment {
     TextView daijin_tv;
     @CodeNote(id = R.id.shoucang_tv)
     TextView shoucang_tv;
+    @CodeNote(id = R.id.about_app_tv, click = "onClick")
+    TextView about_app_tv;
 
     private UserModel model;
 
@@ -81,27 +85,37 @@ public class UserFragment extends BaseFragment {
     private void refreshUI() {
         userId = Utils.ReadString(SaveKey.KEY_UserId);
         if (!Utils.ReadString(SaveKey.KEY_UserId).equals("")) {
-            map.put("userid", userId);
             if (!userId.equals("")) {//当前用户为登录状态
+                map.put("userid", userId);
                 //根据用户ID加载当前用户信息
-                HttpUtils.loadJson("GetUserInfo", map, new HttpUtils.LoadJsonListener() {
-                    @Override
-                    public void load(JSONObject obj) {
-                        if (obj != null) {
-                            model = new Gson().fromJson(obj.toString(), UserModel.class);
-                            if (model != null) {
-                                if (!model.getPic().equals("")) {//设置头像
-                                    Glide.with(MainActivity.mInstance).load(R.mipmap.no_img).asBitmap().centerCrop()
-                                            .placeholder(R.mipmap.no_img).transform(new GlideCircleTransform(MainActivity.mInstance)).
-                                            into(new MyBitmapImageViewTarget(iv_my_icon));
+                if (Utils.isNetworkConnected()) {
+                    HttpUtils.loadJson("GetUserInfo", map, new HttpUtils.LoadJsonListener() {
+                        @Override
+                        public void load(JSONObject obj) {
+                            if (obj != null) {
+                                try {
+                                    if (!obj.getString("userid").equals("-1")) {//账户存在
+                                        model = new Gson().fromJson(obj.toString(), UserModel.class);
+                                        if (model != null) {
+                                            if (!model.getPic().equals("")) {//设置头像
+                                                Glide.with(MainActivity.mInstance).load(R.mipmap.no_img).asBitmap().centerCrop()
+                                                        .placeholder(R.mipmap.no_img).transform(new GlideCircleTransform(MainActivity.mInstance)).
+                                                        into(new MyBitmapImageViewTarget(iv_my_icon));
+                                            }
+                                            username_tv.setText(model.getUsername());
+                                        }
+                                    } else {//账户不存在
+                                        Utils.WriteString(SaveKey.KEY_UserId, "");
+                                    }
+                                } catch (JSONException e) {
+
                                 }
-                                username_tv.setText(model.getUsername());
                             }
                         }
-                    }
-                });
+                    });
+                }
             }
-        }else{
+        } else {
             iv_my_icon.setImageResource(R.mipmap.user_icon);
             username_tv.setText("登录/注册");
             yue_tv.setText("0");
@@ -134,6 +148,10 @@ public class UserFragment extends BaseFragment {
                 Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + "4001663779"));
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
+                Utils.WriteString(SaveKey.KEY_Load_Index, "2");
+                break;
+            case R.id.about_app_tv://关于App相关信息
+                Utils.IntentPost(AboutActivity.class);
                 break;
         }
     }

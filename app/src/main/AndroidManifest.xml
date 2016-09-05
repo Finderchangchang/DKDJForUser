@@ -45,7 +45,7 @@
         <activity android:name=".activity.MainActivity">
 
         </activity>
-        <activity android:name=".activity.SearchShopActivity"/>
+        <activity android:name=".activity.SearchShopActivity" />
         <activity android:name=".activity.GetLocationActivity">
 
         </activity>
@@ -56,11 +56,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
             <intent-filter>
-                <data android:scheme="@string/growingio_url_scheme"/>
-                <action android:name="android.intent.action.VIEW"/>
+                <data android:scheme="growing.1bd9187d050f8887" />
+                <action android:name="android.intent.action.VIEW" />
 
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -71,10 +71,20 @@
         <activity android:name=".activity.SHDetailsActivity" />
         <activity android:name=".activity.ConfirmOrderActivity" />
         <activity android:name=".activity.AddressListActivity" />
+        <activity android:name=".activity.AboutActivity" />
+        <activity
+            android:name="com.alipay.sdk.app.H5PayActivity"
+            android:configChanges="orientation|keyboardHidden|navigation"
+            android:exported="false"
+            android:screenOrientation="behind"
+            android:windowSoftInputMode="adjustResize|stateHidden"></activity>
         <activity
             android:name=".activity.TestActivity"
             android:exported="true"
             android:launchMode="singleTop">
+
+        </activity>
+        <activity android:name=".activity.RefreshActivity">
 
         </activity>
         <activity android:name=".activity.RegUserActivity" />
@@ -98,9 +108,8 @@
             android:name="com.baidu.lbsapi.API_KEY"
             android:value="U0SXAofQxmwjyc6lSyvbzmFCUHdaYDAS" />
 
-        <activity android:name=".activity.DinweiActivity">
+        <activity android:name=".activity.DinweiActivity" />
 
-        </activity>
         <activity
             android:name=".wxapi.WXPayEntryActivity"
             android:exported="true"

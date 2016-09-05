@@ -9,9 +9,13 @@ android {
         minSdkVersion 14
         targetSdkVersion 22
         versionCode 1
-        versionName "0.6.2"
+        versionName "0.6.8"
         resValue("string", "growingio_project_id", "b48539e63df0ad5f")
         resValue("string", "growingio_url_scheme", "growing.1bd9187d050f8887")
+        ndk {
+            // 设置支持的SO库架构
+            abiFilters 'armeabi' //, 'x86', 'armeabi-v7a', 'x86_64', 'arm64-v8a'
+        }
     }
     buildTypes {
         release {
@@ -30,10 +34,11 @@ android {
 }
 
 dependencies {
-    compile 'com.growingio.android:vds-android-agent:0.9.91@aar'
+    compile 'com.growingio.android:vds-android-agent:0.9.93@aar'
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile project(':afinal')
     compile 'com.android.support:support-v4:22.0.+'
+    compile 'com.android.support:recyclerview-v7:22.0.+'
     compile 'com.shizhefei:ViewPagerIndicator:1.0.7'
     compile 'com.bigkoo:convenientbanner:2.0.5'
     compile 'com.mcxiaoke.volley:library:1.0.18'
@@ -41,4 +46,7 @@ dependencies {
     compile 'com.google.code.gson:gson-parent:2.7'
     compile 'com.android.support:design:22.2.0'
     compile 'com.android.support:support-v13:22.2.0'
+    compile 'com.tencent.bugly:crashreport:latest.release' //其中latest.release指代最新Bugly SDK版本号，也可以指定明确的版本号，例如2.1.9
+    compile 'com.tencent.bugly:nativecrashreport:latest.release' //其中latest.release指代最新Bugly NDK版本号，也可以指定明确的版本号，例如3.0
+
 }
