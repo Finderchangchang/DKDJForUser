@@ -79,17 +79,10 @@ public class GetLocationActivity extends BaseActivity implements
         mLocClient = new LocationClient(this);
         // 注册定位监听
         mLocClient.registerLocationListener(this);
-        // 定位选项
         LocationClientOption option = new LocationClientOption();
-        /**
-         * coorType - 取值有3个： 返回国测局经纬度坐标系：gcj02 返回百度墨卡托坐标系 ：bd09 返回百度经纬度坐标系
-         * ：bd09ll
-         */
         option.setCoorType("bd09ll");
         // 设置是否需要地址信息，默认为无地址
         option.setIsNeedAddress(true);
-        // 设置是否需要返回位置语义化信息，可以在BDLocation.getLocationDescribe()中得到数据，ex:"在天安门附近"，
-        // 可以用作地址信息的补充
         option.setIsNeedLocationDescribe(true);
         // 设置是否需要返回位置POI信息，可以在BDLocation.getPoiList()中得到数据
         option.setIsNeedLocationPoiList(true);

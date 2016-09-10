@@ -36,13 +36,15 @@ public class BaseApplication extends Application {
         mVibrator = (Vibrator) getApplicationContext().getSystemService(Service.VIBRATOR_SERVICE);
         SDKInitializer.initialize(getApplicationContext());
         Cube.onCreate(this);
+        //流量监测
         GrowingIO.startWithConfiguration(this, new Configuration()
                 .useID()
                 .trackAllFragments()
                 .setChannel("应用宝"));
+        //Bugly异常检测
         CrashReport.UserStrategy strategy = new CrashReport.UserStrategy(getApplicationContext());
         strategy.setAppVersion(Utils.getVersion());
-        CrashReport.initCrashReport(getApplicationContext(), "1105548720", false, strategy);//Bugly异常检测
+        CrashReport.initCrashReport(getApplicationContext(), "1105548720", false, strategy);
     }
 
     public static Context getContext() {

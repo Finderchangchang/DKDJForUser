@@ -136,11 +136,11 @@ public class TelAndLoginActivity extends BaseActivity {
                         String keys = Utils.ReadString(SaveKey.KEY_LAT_LON);
                         map.put("type", "3");//快捷登录
                         map.put("tel", tel);//手机号码
-                        map.put("lat", keys.split(":")[0]);
-                        map.put("lng", keys.split(":")[1]);
-                        map.put("province", keys.split(":")[2].split(",")[0]);
-                        map.put("city", keys.split(":")[2].split(",")[1]);
-                        map.put("area", keys.split(":")[2].split(",")[2]);
+                        map.put("lat", keys.split(":")[1]);
+                        map.put("lng", keys.split(":")[2]);
+                        map.put("province", keys.split(":")[3].split(",")[0]);
+                        map.put("city", keys.split(":")[3].split(",")[1]);
+                        map.put("area", keys.split(":")[3].split(",")[2]);
                         HttpUtils.loadJson("sendcode", map, new HttpUtils.LoadJsonListener() {
                             @Override
                             public void load(JSONObject obj) {

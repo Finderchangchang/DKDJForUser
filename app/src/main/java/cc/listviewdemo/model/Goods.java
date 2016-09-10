@@ -58,6 +58,39 @@ public class Goods implements Serializable {
         this.remark = remark;
     }
 
+    /**
+     * PName : 尝试1
+     * <p>
+     * ReveInt1 : 0
+     * ReveInt2 : 0
+     * Material : 0
+     * sid : 6757 商品ID
+     * sname :
+     * addprice : 0.00
+     * PId : 6757 商品ID
+     * PNum : 1 数量
+     * TogoId : 914 店铺ID
+     * owername : 0.00 配送费
+     * PPrice : 0.10 平常价格
+     * Currentprice : 0.10 现在价格
+     */
+    public Goods(String PName, String reveInt1, String reveInt2, String material, String sid, String sname, String addprice, String PId, String PNum, String togoId, String owername, String PPrice, String currentprice, String remark) {
+        this.PName = PName;
+        ReveInt1 = reveInt1;
+        ReveInt2 = reveInt2;
+        Material = material;
+        this.PNum=PNum;
+        this.sid = sid;
+        this.sname = sname;
+        this.addprice = addprice;
+        this.PId = PId;
+        TogoId = togoId;
+        this.owername = owername;
+        this.PPrice = PPrice;
+        Currentprice = currentprice;
+        this.remark = remark;
+    }
+
     public String getRemark() {
         return remark;
     }

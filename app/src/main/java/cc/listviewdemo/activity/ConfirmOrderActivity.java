@@ -110,6 +110,7 @@ public class ConfirmOrderActivity extends BaseActivity {
     TextView add_new_address_tv;
     @CodeNote(id = R.id.activity_bottom_line_tv)
     TextView activity_bottom_line_tv;//活动listview下方的横线默认隐藏。
+    String lat_log;
 
     @Override
     public void initViews() {
@@ -131,20 +132,20 @@ public class ConfirmOrderActivity extends BaseActivity {
             }
         });
         model = (OrderModel) getIntent().getSerializableExtra("order");
+        lat_log = getIntent().getStringExtra("shop_lat_lon");
         goods = model.getShopList().get(0).getItemList();//获得所有商品信息
         mAdapter = new CommonAdapter<Goods>(mInstance, goods, R.layout.item_good_list) {
             @Override
             public void convert(CommonViewHolder holder, Goods good, int position) {
                 holder.setText(R.id.name_num_tv, good.getRemark() + "*" + good.getPNum());
-                holder.setText(R.id.total_price_tv, "￥" + (Double.parseDouble(good.getCurrentprice()) * Integer.parseInt(good.getPNum())) + "");
+                holder.setText(R.id.total_price_tv, "￥" + (Double.parseDouble(good.getPPrice()) * Integer.parseInt(good.getPNum())) + "");
             }
         };
         good_list_lv.setAdapter(mAdapter);
         shop_name_tv.setText(model.getShopList().get(0).getShopName());
         for (Goods good : goods) {
             double packs = Double.parseDouble(good.getPNum()) * Double.parseDouble(good.getOwername());
-            total_price += (Double.parseDouble(good.getCurrentprice()) * Integer.parseInt(good.getPNum())) + packs;//商品价格+打包费
-            String packages = good.getOwername();
+            total_price += (Double.parseDouble(good.getPPrice()) * Integer.parseInt(good.getPNum())) + packs;//商品价格+打包费
             pack_price += packs;
         }
         pack_price_tv.setText("￥" + (pack_price) + "");//打包费
@@ -247,8 +248,8 @@ public class ConfirmOrderActivity extends BaseActivity {
         model.setAddress(Uri.encode(address.getAddress()));
         model.setReceiver(Uri.encode(address.getReceiver()));
         model.setMobilephone(address.getMobilephone());
-        model.setRlng(address.getLng());
-        model.setRlat(address.getLat());
+        model.setRlng(lat_log.split(":")[1]);
+        model.setRlat(lat_log.split(":")[0]);
         String loca = Utils.ReadString(SaveKey.KEY_LAT_LON);
         model.setUlng(loca.split(":")[1]);
         model.setUlat(loca.split(":")[2]);
@@ -306,23 +307,11 @@ public class ConfirmOrderActivity extends BaseActivity {
                     } else {
                         model.setPayMode("5");
                     }
-                    if (model.getUlng().equals("")) {
-                        if (Utils.ReadString(SaveKey.KEY_LON).equals("")) {
-                            model.setUlng("115.508560");
-                        } else {
-                            model.setUlng(Utils.ReadString(SaveKey.KEY_LON));
-                        }
-                    }
-                    if (model.getUlat().equals("")) {
-                        if (Utils.ReadString(SaveKey.KEY_LAT).equals("")) {
-                            model.setUlat("38.893189");
-                        } else {
-                            model.setUlat(Utils.ReadString(SaveKey.KEY_LAT));
-                        }
-                    }
+                    String keys = Utils.ReadString(SaveKey.KEY_LAT_LON);//获得存储的省市县
+                    model.setUlng(keys.split(":")[2]);
+                    model.setUlat(keys.split(":")[1]);
                     model.setRemark(order_remark_et.getText().toString().trim());
                     List<OrderModel> orderModels = new ArrayList<>();
-                    String keys = Utils.ReadString(SaveKey.KEY_LAT_LON);//获得存储的省市县
                     model.setProvince(keys.split(":")[3].split(",")[0]);
                     model.setCity(keys.split(":")[3].split(",")[1]);
                     model.setArea(keys.split(":")[3].split(",")[2]);

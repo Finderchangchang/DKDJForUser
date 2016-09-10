@@ -58,7 +58,7 @@ public class DingDanFragment extends BaseFragment {
     @CodeNote(id = R.id.order_login_btn, click = "onClick")
     Button order_login_btn;
     boolean isComplement = false;
-    ProgressDialog progressDialog = null;
+//    ProgressDialog progressDialog = null;
 
     @Override
     public void initViews() {
@@ -157,8 +157,8 @@ public class DingDanFragment extends BaseFragment {
             map.put("pagesize", "20");
             no_beans = new ArrayList<>();
             have_beans = new ArrayList<>();
-            progressDialog = ProgressDialog.show(MainActivity.mInstance, "",
-                    "加载中...");
+//            progressDialog = ProgressDialog.show(MainActivity.mInstance, "",
+//                    "加载中...");
             HttpUtils.loadJson("GetOrderListByUserId", map, new HttpUtils.LoadJsonListener() {
                 @Override
                 public void load(JSONObject obj) {
@@ -173,9 +173,9 @@ public class DingDanFragment extends BaseFragment {
                             }
                         }
                         setClick(1);
-                        progressDialog.dismiss();
+//                        progressDialog.dismiss();
                     } else {
-                        progressDialog.dismiss();
+//                        progressDialog.dismiss();
                     }
                 }
             });

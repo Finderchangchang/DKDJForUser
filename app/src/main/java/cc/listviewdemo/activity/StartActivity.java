@@ -2,6 +2,10 @@ package cc.listviewdemo.activity;
 
 import android.os.Handler;
 
+import com.baidu.location.BDLocation;
+import com.baidu.location.BDLocationListener;
+import com.baidu.location.LocationClient;
+import com.baidu.location.LocationClientOption;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 
@@ -27,15 +31,33 @@ import cc.listviewdemo.view.Utils;
  */
 public class StartActivity extends BaseActivity {
     public static StartActivity mInstance;
+    private LocationClient mLocClient;
+
     @Override
     public void initViews() {
         setContentView(R.layout.activity_start);
-        mInstance=this;
+        mInstance = this;
         Utils.WriteString(SaveKey.KEY_Load_Index, "0");
     }
 
     @Override
     public void initEvents() {
+//        LocationClientOption option = new LocationClientOption();
+//        option.setCoorType("bd09ll");
+//
+//        option.setIsNeedAddress(true);
+//        option.setIsNeedLocationDescribe(true);
+//        option.setIsNeedLocationPoiList(true);
+//        option.setOpenGps(true);
+//        mLocClient = new LocationClient(MainActivity.mInstance);
+//        mLocClient.setLocOption(option);
+//        mLocClient.registerLocationListener(new BDLocationListener() {
+//            @Override
+//            public void onReceiveLocation(BDLocation bdLocation) {
+//
+//            }
+//        });
+//        mLocClient.start();
         new Handler().postDelayed(new Runnable() {
             public void run() {
                 Utils.IntentPost(MainActivity.class);//延迟并跳页

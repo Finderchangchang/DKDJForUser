@@ -148,28 +148,35 @@ public class SearchShopActivity extends BaseActivity {
             no_data_tv.setVisibility(View.GONE);
             map.put("pageindex", "1");//pageindex=1&pagesize=20&lat=38.893189&lng=115.508560
             map.put("pagesize", "10");
-            map.put("lat", Utils.ReadString(SaveKey.KEY_LAT_LON).split(":")[0]);
-            map.put("lng", Utils.ReadString(SaveKey.KEY_LAT_LON).split(":")[1]);
+            map.put("lat", Utils.ReadString(SaveKey.KEY_LAT_LON).split(":")[1]);
+            map.put("lng", Utils.ReadString(SaveKey.KEY_LAT_LON).split(":")[2]);
             map.put("languageType", "2");
 
             HttpUtils.loadJson("GetShopListByLocation", map, new HttpUtils.LoadJsonListener() {
                 @Override
                 public void load(JSONObject obj) {
-                    try {
-                        shopList = new ArrayList<>();
-                        JSONArray array = obj.getJSONArray("list");
-                        for (int i = 0; i < array.length(); i++) {
-                            shopList.add(new Gson().fromJson(array.getString(i), Shop.class));
-                        }
-                        if (shopList.size() > 0) {
-                            mShop.refresh(shopList);
-                        } else {
-                            no_data_tv.setVisibility(View.VISIBLE);
-                            shop_list_lv.setVisibility(View.GONE);
-                            hot_search_gv.setVisibility(View.GONE);
-                        }
-                    } catch (JSONException e) {
+                    if (obj != null) {
+                        try {
+                            shopList = new ArrayList<>();
+                            JSONArray array = obj.getJSONArray("list");
+                            for (int i = 0; i < array.length(); i++) {
+                                shopList.add(new Gson().fromJson(array.getString(i), Shop.class));
+                            }
+                            if (shopList.size() > 0) {
+                                mShop.refresh(shopList);
+                            } else {
+                                no_data_tv.setVisibility(View.VISIBLE);
+                                shop_list_lv.setVisibility(View.GONE);
+                                hot_search_gv.setVisibility(View.GONE);
+                            }
 
+                        } catch (JSONException e) {
+
+                        }
+                    } else {//解析json出问题，显示当前无数据
+                        no_data_tv.setVisibility(View.VISIBLE);
+                        shop_list_lv.setVisibility(View.GONE);
+                        hot_search_gv.setVisibility(View.GONE);
                     }
                 }
             });

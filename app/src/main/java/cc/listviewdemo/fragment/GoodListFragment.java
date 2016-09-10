@@ -20,6 +20,7 @@ import android.widget.TextView;
 import net.tsz.afinal.annotation.view.CodeNote;
 import net.tsz.afinal.view.TotalListView;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -80,9 +81,9 @@ public class GoodListFragment extends BaseFragment implements IFGoodListView {
     RelativeLayout gwc_rl;
     private PopupWindow pop_win;
     Button pop_billing;
-    @CodeNote(id=R.id.shop_open_ll)
+    @CodeNote(id = R.id.shop_open_ll)
     LinearLayout shop_open_ll;
-    @CodeNote(id=R.id.shop_sleep_tv)
+    @CodeNote(id = R.id.shop_sleep_tv)
     TextView shop_sleep_tv;
 
     @Override
@@ -148,19 +149,20 @@ public class GoodListFragment extends BaseFragment implements IFGoodListView {
     public void onStart() {
         super.onStart();
         shop.setGoodses(new ArrayList<Goods>());
-        shops=new ArrayList<>();
+        shops = new ArrayList<>();
     }
 
-    private boolean isOpen=true;
+    private boolean isOpen = true;
+
     @Override
     public void initEvents() {
-        if(("1").equals(shop.getStatus())){
+        if (("1").equals(shop.getStatus())) {
             shop_open_ll.setVisibility(View.VISIBLE);
             shop_sleep_tv.setVisibility(View.GONE);
-        }else{
+        } else {
             shop_open_ll.setVisibility(View.GONE);
             shop_sleep_tv.setVisibility(View.VISIBLE);
-            isOpen=false;
+            isOpen = false;
         }
         mListener = new GoodListListener(this, SHDetailsActivity.mInstance.shop.getDataID());
         mListener.loadType();//加载分类
@@ -186,17 +188,17 @@ public class GoodListFragment extends BaseFragment implements IFGoodListView {
             @Override
             public void convert(CommonViewHolder holder, final Goods goods, int position) {
                 holder.setText(R.id.name_tv, goods.getRemark());
-                holder.setText(R.id.price_tv, Integer.parseInt(goods.getPNum()) * Double.parseDouble(goods.getCurrentprice()));
+                holder.setText(R.id.price_tv, Integer.parseInt(goods.getPNum()) * Double.parseDouble(goods.getPPrice()));
                 holder.setOnClickListener(R.id.jian_iv, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        calculateTotalPrice(-1, -Double.parseDouble(goods.getCurrentprice()), -Double.parseDouble(goods.getOwername()), goods);
+                        calculateTotalPrice(-1, -Double.parseDouble(goods.getPPrice()), -Double.parseDouble(goods.getOwername()), goods);
                     }
                 });
                 holder.setOnClickListener(R.id.add_iv, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        calculateTotalPrice(1, Double.parseDouble(goods.getCurrentprice()), Double.parseDouble(goods.getOwername()), goods);
+                        calculateTotalPrice(1, Double.parseDouble(goods.getPPrice()), Double.parseDouble(goods.getOwername()), goods);
                     }
                 });
                 holder.setText(R.id.num_tv, goods.getPNum());
@@ -223,16 +225,17 @@ public class GoodListFragment extends BaseFragment implements IFGoodListView {
         userId = Utils.ReadString(SaveKey.KEY_UserId);
         if (!userId.equals("")) {
             if (count > 0) {
-                    shop.setGoodses(goods);
-                    shops.add(new ShopListModel(shop.getLng(), shop.getLat(), shop.getDataID(), shop.getSendmoney(), shop.getTogoName(), goods));//添加商品到商户，再将商户信息添加到shop集合中。
-                    Utils.IntentPost(ConfirmOrderActivity.class, new Utils.putListener() {
-                        @Override
-                        public void put(Intent intent) {
-                            OrderModel model = new OrderModel(userId,
-                                    Utils.getNormalTime(), "", shop.getDataID(), "2", shops);
-                            intent.putExtra("order", model);
-                        }
-                    });
+                shop.setGoodses(goods);
+                shops.add(new ShopListModel(shop.getLng(), shop.getLat(), shop.getDataID(), shop.getSendmoney(), shop.getTogoName(), goods));//添加商品到商户，再将商户信息添加到shop集合中。
+                Utils.IntentPost(ConfirmOrderActivity.class, new Utils.putListener() {
+                    @Override
+                    public void put(Intent intent) {
+                        OrderModel model = new OrderModel(userId,
+                                Utils.getNormalTime(), "", shop.getDataID(), "2", shops);
+                        intent.putExtra("order", model);
+                        intent.putExtra("shop_lat_lon", (SHDetailsActivity.mInstance.shop.getLat() + ":" + SHDetailsActivity.mInstance.shop.getLng()));
+                    }
+                });
             } else {
                 SHDetailsActivity.mInstance.ToastShort("购物车不能为空");
             }
@@ -259,21 +262,29 @@ public class GoodListFragment extends BaseFragment implements IFGoodListView {
      * @param good    商品信息
      */
     public void calculateTotalPrice(int num, double p, double peisong, Goods good) {
-        count = count + num;
-        price = price + p;
-        if (num == 1) {
-            addGood(good);
-        } else if (num == -1) {
-            removeGood(good);
-        } else {
-            goods = new ArrayList<>();
-            price = 0;
-            count = 0;
+        if (num != -2) {
+            count = count + num;
+            price = price + p;
+            if (num == 1) {
+                addGood(good);
+            } else if (num == -1) {
+                removeGood(good);
+            } else {
+                goods = new ArrayList<>();
+                price = 0;
+                count = 0;
+            }
         }
         mAdapter.refresh(goods);
         detailsAdapter.refresh(goods);
-        price_main.setText("￥" + Math.round(price * 100) / 100.0);
-        if (price >= Double.parseDouble(shop.getMinmoney())) {
+        double money = 0;
+        int total_num = 0;
+        for (Goods go : goods) {
+            money += Double.parseDouble(go.getPPrice()) * Integer.parseInt(go.getPNum());
+            total_num += Integer.parseInt(go.getPNum());
+        }
+        price_main.setText("￥" + Math.round(money * 100) / 100.0);
+        if (money >= Double.parseDouble(shop.getMinmoney()) && money != 0) {
             billing.setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
             billing.setText("去结算");
             billing.setEnabled(true);
@@ -282,8 +293,8 @@ public class GoodListFragment extends BaseFragment implements IFGoodListView {
             billing.setText("￥" + shop.getMinmoney() + "起送");
             billing.setEnabled(false);
         }
-        if (count > 0) {
-            total_num_tv.setText(count + "");
+        if (total_num > 0) {
+            total_num_tv.setText(total_num + "");
             gwc_rl.setBackgroundResource(R.mipmap.have_goods_gwc);
             total_num_rl.setVisibility(View.VISIBLE);
         } else {
@@ -364,13 +375,17 @@ public class GoodListFragment extends BaseFragment implements IFGoodListView {
      */
     @Override
     public void loadGoodType(List<FoodType> mList) {
-        types = mList;
-        mLefts.refresh(mList);
-        mLeft = mList;
-        if (mLeft.size() > 0) {
-            top_title_tv.setText(mLeft.get(0).getSortName());
+        if (mList != null) {
+            types = mList;
+            mLefts.refresh(mList);
+            mLeft = mList;
+            if (mLeft.size() > 0) {
+                top_title_tv.setText(mLeft.get(0).getSortName());
+            }
+            mListener.loadFoods();//加载出所有的Goods
+        } else {//点击进行刷新
+
         }
-        mListener.loadFoods();//加载出所有的Goods
     }
 
     List<FoodDetail> mTotalList;
@@ -384,53 +399,67 @@ public class GoodListFragment extends BaseFragment implements IFGoodListView {
      */
     @Override
     public void loadGoodDetails(List<FoodDetail> mList) {
-        final List<FoodDetail> xx = SortByFoodType(mList, types);
-        if (xx.size() > 0) {
-            getSortID(xx);
-            detailsAdapter = new GoodsDetailsAdapter(this, xx, mLeft,isOpen,shopId);
-            right_lv.setAdapter(detailsAdapter);
-            right_lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
-                    Utils.IntentPost(GoodDetailActivity.class, new Utils.putListener() {
-                        @Override
-                        public void put(Intent intent) {
-                            intent.putExtra("detail", xx.get(position));
-                        }
-                    });
-                }
-            });
-
-            right_lv.setOnScrollListener(new AbsListView.OnScrollListener() {
-                @Override
-                public void onScrollStateChanged(AbsListView view, int scrollState) {
-                    switch (scrollState) {
-                        // 当不滚动时
-                        case SCROLL_STATE_IDLE:// 是当屏幕停止滚动时
-                            scrollFlag = false;
-                            break;
-                        case SCROLL_STATE_TOUCH_SCROLL:// 滚动时
-                            scrollFlag = true;
-                            break;
-                        case SCROLL_STATE_FLING:// 是当用户由于之前划动屏幕并抬起手指，屏幕产生惯性滑动时
-                            scrollFlag = true;
-                            break;
+        if (mList != null) {
+            final List<FoodDetail> xx = SortByFoodType(mList, types);
+            if (xx.size() > 0) {
+                getSortID(xx);
+                detailsAdapter = new GoodsDetailsAdapter(this, xx, mLeft, isOpen, shopId);
+                right_lv.setAdapter(detailsAdapter);
+                right_lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
+                        Intent intent = new Intent(SHDetailsActivity.mInstance, GoodDetailActivity.class);
+                        intent.putExtra("detail", xx.get(position));
+                        intent.putExtra("model", (Serializable) goods);
+                        intent.putExtra("shopId", SHDetailsActivity.mInstance.shop.getDataID() + ":" +
+                                SHDetailsActivity.mInstance.shop.getSendmoney() + ":" +
+                                SHDetailsActivity.mInstance.shop.getMinmoney());
+                        startActivityForResult(intent, 0);
                     }
-                }
+                });
 
-                @Override
-                public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-                    if (scrollFlag) {
-                        for (int i = 0; i < mLeft.size(); i++) {
-                            if ((firstVisibleItem + "").equals(mLeft.get(i).getFirstPosition())) {
-                                mLefts.clearSelection(i);
-                                top_title_tv.setText(mLeft.get(i).getSortName());
-                                left_lv.setSelection(left_lv.getFirstVisiblePosition());
+                right_lv.setOnScrollListener(new AbsListView.OnScrollListener() {
+                    @Override
+                    public void onScrollStateChanged(AbsListView view, int scrollState) {
+                        switch (scrollState) {
+                            // 当不滚动时
+                            case SCROLL_STATE_IDLE:// 是当屏幕停止滚动时
+                                scrollFlag = false;
+                                break;
+                            case SCROLL_STATE_TOUCH_SCROLL:// 滚动时
+                                scrollFlag = true;
+                                break;
+                            case SCROLL_STATE_FLING:// 是当用户由于之前划动屏幕并抬起手指，屏幕产生惯性滑动时
+                                scrollFlag = true;
+                                break;
+                        }
+                    }
+
+                    @Override
+                    public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                        if (scrollFlag) {
+                            for (int i = 0; i < mLeft.size(); i++) {
+                                if ((firstVisibleItem + "").equals(mLeft.get(i).getFirstPosition())) {
+                                    mLefts.clearSelection(i);
+                                    top_title_tv.setText(mLeft.get(i).getSortName());
+                                    left_lv.setSelection(left_lv.getFirstVisiblePosition());
+                                }
                             }
                         }
                     }
-                }
-            });
+                });
+            }
+        } else {//点击刷新
+
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 0 && resultCode == 11) {
+            goods = new ArrayList<>();
+            goods = (List<Goods>) data.getSerializableExtra("model");
+            calculateTotalPrice(-2, 0, 0, null);
         }
     }
 

@@ -1,10 +1,23 @@
 package cc.listviewdemo.fragment;
 
+import android.Manifest;
+import android.annotation.TargetApi;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.LocationManager;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
+import android.provider.Settings;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -108,6 +121,8 @@ public class MainFragment extends BaseFragment implements IFMainView {
     ImageLoader imageLoader;
     @CodeNote(id = R.id.xuanze_zuobiao_rl, click = "onClick")
     RelativeLayout xuanze_zuobiao_rl;
+    Dialog dialog;
+    LocationClientOption option;
 
     @Override
     public void initViews() {
@@ -115,17 +130,23 @@ public class MainFragment extends BaseFragment implements IFMainView {
         mShopTypeList = new ArrayList<>();
         mShopDetailsList = new ArrayList<>();
         mListener = new FMainListener(this, MainActivity.mInstance);
-        LocationClientOption option = new LocationClientOption();
+        option = new LocationClientOption();
         option.setCoorType("bd09ll");
         option.setIsNeedAddress(true);
         option.setIsNeedLocationDescribe(true);
         option.setIsNeedLocationPoiList(true);
-        option.setLocationMode(LocationClientOption.LocationMode.Hight_Accuracy);
         option.setOpenGps(true);
-        mLocClient = new LocationClient(MainActivity.mInstance);
-        mLocClient.setLocOption(option);
-        mLocClient.registerLocationListener(dbListener);
-        mLocClient.start();
+        option.setLocationMode(LocationClientOption.LocationMode.Hight_Accuracy);
+        if (Utils.isNetworkConnected()) {
+            mLocClient = new LocationClient(MainActivity.mInstance);
+            mLocClient.setLocOption(option);
+            mLocClient.registerLocationListener(dbListener);
+            mLocClient.start();
+            progressDialog = ProgressDialog.show(MainActivity.mInstance, "",
+                    "加载中...");
+        } else {//请检测网络连接
+
+        }
     }
 
     /**
@@ -137,7 +158,7 @@ public class MainFragment extends BaseFragment implements IFMainView {
         switch (view.getId()) {
             case R.id.xuanze_zuobiao_rl:
                 isIntent = true;
-                startActivityForResult(new Intent(MainActivity.mInstance, GetLocationActivity.class), 0);
+                startActivityForResult(new Intent(MainActivity.mInstance, GetLocationActivity.class), 1);
                 break;
             case R.id.title_search_ll:
                 Utils.IntentPost(SearchShopActivity.class);//跳转到查询页面
@@ -156,15 +177,20 @@ public class MainFragment extends BaseFragment implements IFMainView {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         isIntent = false;
-        switch (resultCode) {//重新获取坐标，刷新当前页面
-            case 99:
-                String address = data.getStringExtra("selectAddress");
-                String[] vals = address.split(":");
-                dizhi_tv.setText(vals[0].split("\\(")[0]);
-                Utils.WriteString(SaveKey.KEY_LAT_LON, vals[1] + ":" + vals[2] + ":" + vals[3]);
-                page_size = 1;
-                loadShop(vals[1], vals[2]);
-                break;
+        if (requestCode == 0) {
+            mLocClient = new LocationClient(MainActivity.mInstance);
+            mLocClient.setLocOption(option);
+            mLocClient.registerLocationListener(dbListener);
+            mLocClient.start();
+            progressDialog.show();
+        }
+        if (resultCode == 99) {
+            String address = data.getStringExtra("selectAddress");
+            String[] vals = address.split(":");
+            dizhi_tv.setText(vals[0].split("\\(")[0]);
+            Utils.WriteString(SaveKey.KEY_LAT_LON, address);
+            page_size = 1;
+            loadShop(vals[1], vals[2]);
         }
     }
 
@@ -177,52 +203,86 @@ public class MainFragment extends BaseFragment implements IFMainView {
         public void onReceiveLocation(BDLocation location) {//首次定位，加载第一页
             // 创建GeoCoder实例对象
             geoCoder = GeoCoder.newInstance();
-            // 发起反地理编码请求(经纬度->地址信息)
-            ReverseGeoCodeOption reverseGeoCodeOption = new ReverseGeoCodeOption();
-            // 设置反地理编码位置坐标
-            reverseGeoCodeOption.location(new LatLng(location.getLatitude(), location.getLongitude()));
-            geoCoder.reverseGeoCode(reverseGeoCodeOption);
-            if (!isIntent) {
-                // 设置查询结果监听者
-                geoCoder.setOnGetGeoCodeResultListener(new OnGetGeoCoderResultListener() {
-                    @Override
-                    public void onGetGeoCodeResult(GeoCodeResult geoCodeResult) {
+            if (location.getLocType() == 61 || location.getLocType() == 161) {//定位成功
+                // 发起反地理编码请求(经纬度->地址信息)
+                ReverseGeoCodeOption reverseGeoCodeOption = new ReverseGeoCodeOption();
+                // 设置反地理编码位置坐标
+                reverseGeoCodeOption.location(new LatLng(location.getLatitude(), location.getLongitude()));
+                geoCoder.reverseGeoCode(reverseGeoCodeOption);
+                if (!isIntent) {
+                    // 设置查询结果监听者
+                    geoCoder.setOnGetGeoCodeResultListener(new OnGetGeoCoderResultListener() {
+                        @Override
+                        public void onGetGeoCodeResult(GeoCodeResult geoCodeResult) {
 
-                    }
+                        }
 
-                    @Override
-                    public void onGetReverseGeoCodeResult(ReverseGeoCodeResult reverseGeoCodeResult) {
-                        List<PoiInfo> poiInfos = reverseGeoCodeResult.getPoiList();
-                        String name = poiInfos.get(0).name.toString();
-                        LatLng lnn = poiInfos.get(0).location;
-                        String lat = (lnn.latitude + "").substring(0, 9);
-                        String lon = (lnn.longitude + "").substring(0, 10);
-                        page_size = 1;
-                        loadShop(lat, lon);
-                        dizhi_tv.setText(name);
-                        ReverseGeoCodeResult.AddressComponent address = reverseGeoCodeResult.getAddressDetail();
-                        Utils.WriteString(SaveKey.KEY_LAT_LON, name + "(" + poiInfos.get(0).address + "):" + lat + ":" + lon + ":" +
-                                address.province + "," + address.city + "," + address.district + "," +
-                                address.street + "," + address.streetNumber);
-                    }
-                });
+                        @Override
+                        public void onGetReverseGeoCodeResult(ReverseGeoCodeResult reverseGeoCodeResult) {
+                            List<PoiInfo> poiInfos = reverseGeoCodeResult.getPoiList();
+                            if (poiInfos.size() > 0) {
+                                String name = poiInfos.get(0).name.toString();
+                                LatLng lnn = poiInfos.get(0).location;
+                                String lat = (lnn.latitude + "").substring(0, 9);
+                                String lon = (lnn.longitude + "").substring(0, 10);
+                                page_size = 1;
+                                mListener.initGG();//加载广告
+                                mListener.initShopType();
+                                loadShop(lat, lon);
+                                dizhi_tv.setText(name);
+                                ReverseGeoCodeResult.AddressComponent address = reverseGeoCodeResult.getAddressDetail();
+                                Utils.WriteString(SaveKey.KEY_LAT_LON, name + "(" + poiInfos.get(0).address + "):" + lat + ":" + lon + ":" +
+                                        address.province + "," + address.city + "," + address.district + "," +
+                                        address.street + "," + address.streetNumber);
+                            }
+                        }
+                    });
+                }
+            } else {
+                progressDialog.dismiss();
+                dialog.show();
             }
         }
     };
-    private int index = 0;
 
     @Override
+    public void onStop() {
+        super.onStop();
+        mLocClient.stop();
+    }
+
+    private int index = 0;
+
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
+    @Override
     public void initEvents() {
+        //创建，提示开启定位权限的dialog
+        dialog = new AlertDialog.Builder(MainActivity.mInstance)
+                .setTitle("请允许获得位置信息").setMessage("由于大可到家无法获得位置信息的权限，不能正常运行，请开启权限后再使用大可到家。\n\n设置路径：应用详情>权限").
+                        setNegativeButton("确定", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                                intent.setData(Uri.parse("package:cc.listviewdemo"));
+                                startActivityForResult(intent, 0);
+                            }
+                        }).setPositiveButton("取消", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        MainActivity.mInstance.finish();
+                        System.exit(0);
+                    }
+                }).setOnCancelListener(new DialogInterface.OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface dialog) {
+                        MainActivity.mInstance.finish();
+                        System.exit(0);
+                    }
+                }).create();
         imageLoader = ImageLoaderFactory.create(MainActivity.mInstance);
         PtrClassicDefaultHeader defaultHeader = new PtrClassicDefaultHeader(MainActivity.mInstance);//1.默认经典头布局
         ptr.setHeaderView(defaultHeader);//给Ptr添加头布局
         ptr.addPtrUIHandler(defaultHeader);//使头布局的状态和刷新状态同步
-        if (Utils.isNetworkConnected()) {
-            progressDialog = ProgressDialog.show(MainActivity.mInstance, "",
-                    "加载中...");
-            mListener.initGG();//加载广告
-            mListener.initShopType();
-        }
         main.setTitleView(iv, xuanze_zuobiao_ll, title_search_ll);//设置需要显示隐藏的view
         main.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -307,7 +367,6 @@ public class MainFragment extends BaseFragment implements IFMainView {
                         loadShop(loca.split(":")[1], loca.split(":")[2]);
                         mListener.initGG();//加载广告
                         mListener.initShopType();
-                        isBottom = false;
                     } else {
                         iv.setVisibility(View.VISIBLE);
                         ptr.refreshComplete();
@@ -391,6 +450,7 @@ public class MainFragment extends BaseFragment implements IFMainView {
                     });
                 }
             });
+            shoptype_gv.setSelection(0);
         }
     }
 
@@ -406,38 +466,42 @@ public class MainFragment extends BaseFragment implements IFMainView {
      */
     @Override
     public void loadNearSH(int record, final int page, final int total, final List<Shop> list) {
-        if (page == total) {
-            isBottom = true;
-        }
-        if (page_size > 1) {
-            mShopDetailsList.addAll(list);
-        } else {
-            mShopDetailsList = list;
-        }
-
-        mAdapter.refresh(mShopDetailsList);
-        getTotalHeightofListView(mAdapter);
-        if (progressDialog != null) {
-            progressDialog.dismiss();
-        }
-        isLoadMore = false;
-        ptr.refreshComplete();
-        if (page < total) {
-            main_list.addFooterView(load_more_tv);
-        } else {
-            main_list.removeFooterView(load_more_tv);
-        }
-        main_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
-                Utils.IntentPost(SHDetailsActivity.class, new Utils.putListener() {
-                    @Override
-                    public void put(Intent intent) {
-                        intent.putExtra("Shop", mShopDetailsList.get(position));
-                    }
-                });
+        if (list != null) {
+            if (page == total) {
+                isBottom = true;
+            } else {
+                isBottom = false;
             }
-        });
+            if (page_size > 1) {
+                mShopDetailsList.addAll(list);
+            } else {
+                mShopDetailsList = list;
+            }
+            mAdapter.refresh(mShopDetailsList);
+            getTotalHeightofListView(mAdapter);
+            progressDialog.dismiss();
+
+            isLoadMore = false;
+            ptr.refreshComplete();
+//            if (page < total) {
+//                main_list.addFooterView(load_more_tv);
+//            } else {
+//                main_list.removeFooterView(load_more_tv);
+//            }
+            main_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
+                    Utils.IntentPost(SHDetailsActivity.class, new Utils.putListener() {
+                        @Override
+                        public void put(Intent intent) {
+                            intent.putExtra("Shop", mShopDetailsList.get(position));
+                        }
+                    });
+                }
+            });
+        } else {//点击刷新
+
+        }
     }
 
     /**

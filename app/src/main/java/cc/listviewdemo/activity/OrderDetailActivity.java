@@ -36,6 +36,7 @@ import cc.listviewdemo.base.BaseActivity;
 import cc.listviewdemo.config.Config;
 import cc.listviewdemo.config.SaveKey;
 import cc.listviewdemo.model.ActivityModel;
+import cc.listviewdemo.model.FoodDescModel;
 import cc.listviewdemo.model.Goods;
 import cc.listviewdemo.model.OrderDetailModel;
 import cc.listviewdemo.model.OrderGood;
@@ -370,20 +371,20 @@ public class OrderDetailActivity extends BaseActivity {
                     etOrderNum.setText(model.getOrderID());
                     etUserName.setText(model.getUserName());
                     etphone.setText(model.getTel());
-                    etAddress.setText(model.getAddress());
+                    String[] address = model.getAddress().split("|");
+                    if (address.length == 3) {
+                        etAddress.setText(address[1] + address[2]);
+                    } else {
+                        etAddress.setText(model.getAddress().replace("|", ""));
+                    }
                     if (model.getPayMode().equals("1")) {
                         etOrderType.setText("支付宝");
                     } else {
                         etOrderType.setText("微信");
                     }
                     if (model.getFoodlist().size() > 0) {
-                        for (String foods : model.getFoodlist()) {
-                            for (int i = 0; i < foods.split("]").length; i++) {
-                                String name = foods.split("]")[i].split(":")[5].split(",")[0].replace("\"", "");
-                                String num = foods.split("]")[i].split(":")[1].split(",")[0];
-                                String price = foods.split("]")[i].split(":")[3].split(",")[0];
-                                list.add(name + "*" + num + ":" + price);
-                            }
+                        for (FoodDescModel foods : model.getFoodlist()) {
+                            list.add(foods.getFoodname() + "*" + foods.getNum() + ":" + foods.getFoodPrice());
                         }
                     }
                     etRemark.setText(model.getRemark());
@@ -401,7 +402,8 @@ public class OrderDetailActivity extends BaseActivity {
                         mBtnDoorder.setText("去支付");
                     }
                     if (model.getHuoDong().size() > 0) {
-                        mActivityAdapter = new CommonAdapter<ActivityModel>(mInstance, model.getHuoDong(), R.layout.item_activity_tag) {
+                        List<ActivityModel> huodong = (List<ActivityModel>) model.getHuoDong();
+                        mActivityAdapter = new CommonAdapter<ActivityModel>(mInstance, huodong, R.layout.item_activity_tag) {
                             @Override
                             public void convert(CommonViewHolder holder, ActivityModel activityModel, int position) {
                                 holder.setGlideImage(R.id.activity_tag_iv, activityModel.get活动图片());

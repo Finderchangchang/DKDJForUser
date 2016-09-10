@@ -73,7 +73,7 @@ public class OrderDetailModel {
     private String SentTime;
     private String Remark;
     private String isfirst;
-    private List<String> foodlist;
+    private List<FoodDescModel> foodlist;
     private List<?> Promotions;
     private List<ActivityModel> HuoDong;
 
@@ -325,11 +325,11 @@ public class OrderDetailModel {
         this.Remark = Remark;
     }
 
-    public List<String> getFoodlist() {
+    public List<FoodDescModel> getFoodlist() {
         return foodlist;
     }
 
-    public void setFoodlist(List<String> foodlist) {
+    public void setFoodlist(List<FoodDescModel> foodlist) {
         this.foodlist = foodlist;
     }
 

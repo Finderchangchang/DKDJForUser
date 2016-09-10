@@ -104,7 +104,7 @@ public class GoodsDetailsAdapter extends BaseAdapter {
                 holder.mTopTitle.setVisibility(View.GONE);
             }
         }
-        if (FoodDetail.getAttrlist().size() > 0) {
+        if (FoodDetail.getFoodstylelist().size() > 1) {
             holder.choice_guige_btn.setVisibility(View.VISIBLE);
             holder.add_goods_ll.setVisibility(View.GONE);
         } else {
@@ -124,8 +124,12 @@ public class GoodsDetailsAdapter extends BaseAdapter {
             holder.mGoodsReduce.setVisibility(View.VISIBLE);
         }
         holder.mSellNum.setText(FoodDetail.getSale());
-        holder.mGoodsPrice.setText("￥" + FoodDetail.getFoodstylelist().get(0).getPrice());
-        double totalPrice = num * Double.parseDouble(showList.get(position).getFoodstylelist().get(0).getPrice());
+        if (FoodDetail.getFoodstylelist().size() > 1) {//规格数量大于1
+            holder.mGoodsPrice.setVisibility(View.GONE);
+        } else {
+            holder.mGoodsPrice.setText("￥" + FoodDetail.getFoodstylelist().get(0).getPrice());
+        }
+        double totalPrice = num * showList.get(position).getFoodstylelist().get(0).getPrice();
         FoodDetail.setTotalMoney("￥" + totalPrice);
         holder.mGoodsNum.setText(num + "");
         holder.mGoodsReduce.setVisibility(View.GONE);//减显示
@@ -139,7 +143,7 @@ public class GoodsDetailsAdapter extends BaseAdapter {
                 holder.mGoodsNum.setText(goods.getPNum());
             }
         }
-        final double price = Double.parseDouble(FoodDetail.getFoodstylelist().get(0).getPrice());
+        final double price = FoodDetail.getFoodstylelist().get(0).getPrice();
         //设置加减监听事件
         holder.mGoodsReduce.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -147,7 +151,10 @@ public class GoodsDetailsAdapter extends BaseAdapter {
                 count = showList.get(position).getCount();
                 count--;
                 showList.get(position).setCount(count);
-                context.calculateTotalPrice(-1, -price, -Double.parseDouble(FoodDetail.getPackageFree()), new Goods(Uri.encode(FoodDetail.getName()), "0", "0", "0", FoodDetail.getFoodID(), "", "0.00", FoodDetail.getFoodID(), shop_id, FoodDetail.getPackageFree(), price + "", price + "", FoodDetail.getName()));
+                context.calculateTotalPrice(-1, -price, -Double.parseDouble(FoodDetail.getPackageFree()),
+                        new Goods(Uri.encode(FoodDetail.getName()), "0", "0", "0", FoodDetail.getFoodID(),
+                        "", "0.00", FoodDetail.getFoodID(), shop_id, FoodDetail.getPackageFree(), price + "",
+                                price + "", FoodDetail.getName()));
                 GoodsDetailsAdapter.this.notifyDataSetChanged();
 
             }

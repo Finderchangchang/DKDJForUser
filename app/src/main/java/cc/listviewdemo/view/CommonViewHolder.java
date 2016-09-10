@@ -157,6 +157,12 @@ public class CommonViewHolder {
         return this;
     }
 
+    public CommonViewHolder setTextBG(int viewId, int color) {
+        TextView view = getView(viewId);
+        view.setBackgroundColor(mContext.getResources().getColor(color));
+        return this;
+    }
+
     public CommonViewHolder setCubeImage(int viewId, ImageLoader loader, String url) {
         CubeImageView view = getView(viewId);
         view.loadImage(loader, url);
@@ -282,6 +288,7 @@ public class CommonViewHolder {
         }
         return this;
     }
+
     public int getPosition() {
         return mPosition;
     }
