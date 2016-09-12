@@ -10,9 +10,9 @@
         android:id="@+id/top_title_tb"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp"
+        android:layout_marginBottom="15dp"
         android:background="@color/colorPrimaryDark"
-        app:centerText="个人设置" />
+        app:centerText="设置" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -24,42 +24,7 @@
         android:orientation="vertical">
 
         <LinearLayout
-            android:id="@+id/touxaing_ll"
-            android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="15dp"
-                android:layout_weight="1"
-                android:text="头像"
-                android:textSize="16sp" />
-
-            <ImageView
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_marginRight="10dp"
-                android:src="@mipmap/no_img" />
-
-            <ImageView
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_marginRight="15dp"
-                android:src="@mipmap/jt_right" />
-        </LinearLayout>
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="0.5dp"
-            android:layout_marginLeft="15dp"
-            android:layout_marginRight="15dp"
-            android:background="@color/line_bg" />
-
-        <LinearLayout
-            android:id="@+id/user_name_ll"
+            android:id="@+id/user_info_ll"
             android:layout_width="match_parent"
             android:layout_height="45dp"
             android:background="@color/white"
@@ -71,14 +36,102 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="15dp"
                 android:layout_weight="1"
-                android:text="用户名"
+                android:text="个人资料"
+                android:textSize="16sp" />
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginRight="15dp"
+                android:src="@mipmap/jt_right" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="25dp"
+            android:background="@color/total_bg" />
+
+        <LinearLayout
+            android:id="@+id/message_tuisong_ll"
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:background="@color/white"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="15dp"
+                android:layout_weight="1"
+                android:text="消息推送"
+                android:textSize="16sp" />
+
+            <ToggleButton
+                android:id="@+id/tuisong_tb_btn"
+                android:layout_width="20dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.14"
+                android:text="ToggleButton" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:background="@color/line_bg" />
+
+        <LinearLayout
+            android:id="@+id/yijian_ll"
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:background="@color/white"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="15dp"
+                android:layout_weight="1"
+                android:text="意见反馈"
+                android:textSize="16sp" />
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginRight="15dp"
+                android:src="@mipmap/jt_right" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="25dp"
+            android:background="@color/total_bg" />
+
+        <LinearLayout
+            android:id="@+id/check_update_ll"
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:background="@color/white"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="15dp"
+                android:layout_weight="1"
+                android:text="检查更新"
                 android:textSize="16sp" />
 
             <TextView
+                android:id="@+id/app_version_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="10dp"
-                android:text="修改" />
+                android:text="V1.0.1"
+                android:textSize="14sp" />
 
             <ImageView
                 android:layout_width="20dp"
@@ -95,7 +148,7 @@
             android:background="@color/line_bg" />
 
         <LinearLayout
-            android:id="@+id/update_pwd_ll"
+            android:id="@+id/about_us_ll"
             android:layout_width="match_parent"
             android:layout_height="45dp"
             android:background="@color/white"
@@ -107,7 +160,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="15dp"
                 android:layout_weight="1"
-                android:text="修改账户密码"
+                android:text="关于我们"
                 android:textSize="16sp" />
 
             <ImageView
@@ -119,13 +172,11 @@
 
         <TextView
             android:layout_width="match_parent"
-            android:layout_height="0.5dp"
-            android:layout_marginLeft="15dp"
-            android:layout_marginRight="15dp"
-            android:background="@color/line_bg" />
+            android:layout_height="25dp"
+            android:background="@color/total_bg" />
 
         <LinearLayout
-            android:id="@+id/bd_tel_ll"
+            android:id="@+id/clear_huancun_ll"
             android:layout_width="match_parent"
             android:layout_height="45dp"
             android:background="@color/white"
@@ -137,22 +188,17 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="15dp"
                 android:layout_weight="1"
-                android:text="已绑定手机号"
+                android:text="消息推送"
                 android:textSize="16sp" />
 
-            <TextView
-                android:id="@+id/tel_tv"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="10dp"
-                android:text="170****5800" />
-
-            <ImageView
+            <ToggleButton
+                android:id="@+id/clear_huancun_tb_btn"
                 android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_marginRight="15dp"
-                android:src="@mipmap/jt_right" />
+                android:layout_height="wrap_content"
+                android:layout_weight="0.14"
+                android:text="ToggleButton" />
         </LinearLayout>
+
     </LinearLayout>
 
     <Button
@@ -160,8 +206,8 @@
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_alignParentBottom="true"
-        android:background="@color/colorPrimary"
+        android:background="@android:color/holo_red_dark"
         android:text="退出当前账号"
         android:textColor="@color/white"
-        android:textSize="16sp" />
+        android:textSize="18sp" />
 </RelativeLayout>

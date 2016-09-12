@@ -2,10 +2,12 @@ package cc.listviewdemo.view;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.PendingIntent;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
@@ -42,6 +44,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import cc.listviewdemo.R;
+import cc.listviewdemo.activity.MainActivity;
 import cc.listviewdemo.base.BaseApplication;
 import cc.listviewdemo.config.SaveKey;
 
@@ -53,12 +56,41 @@ public class Utils {
         return BaseApplication.getContext().getString(key);
     }
 
+    public static Dialog setDialog(String cont, final setSure sure, final setCancle cancle) {
+        return setDialog("提示", cont, "确定", "取消", sure, cancle);
+    }
+
+    public static Dialog setDialog(String title, String cont, String sure_str, String cancle_str, final setSure sure, final setCancle cancle) {
+        AlertDialog.Builder localBuilder1 = new AlertDialog.Builder(MainActivity.mInstance)
+                .setTitle(title).setMessage(cont);
+        return localBuilder1.setPositiveButton(cancle_str, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                cancle.click();
+            }
+        })
+                .setNegativeButton(sure_str, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface paramDialogInterface,
+                                        int paramInt) {
+                        sure.click();
+                    }
+                }).create();
+    }
+
+    public interface setSure {
+        void click();
+    }
+
+    public interface setCancle {
+        void click();
+    }
+
     public static final boolean isMobileNo(String mobiles) {
         Pattern p = Pattern.compile("13\\d{9}|14[57]\\d{8}|15[012356789]\\d{8}|18[012356789]\\d{8}|17[0678]\\d{8}");
         Matcher m = p.matcher(mobiles);
         return m.matches();
     }
-
 
 
     /*
